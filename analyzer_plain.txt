@@ -1,0 +1,106 @@
+Analyzing licences_application...                               
+
+  error - The name 'FormData' is defined in the libraries 'package:dio/src/form_data.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/multipart/form_data.dart (via package:get/get.dart)' - lib\app\controllers\license_application_controller.dart:272:24 - ambiguous_import
+  error - The name 'MultipartFile' is defined in the libraries 'package:dio/src/multipart_file.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/multipart/multipart_file.dart (via package:get/get.dart)' - lib\app\controllers\license_application_controller.dart:274:28 - ambiguous_import
+  error - The name 'MultipartFile' is defined in the libraries 'package:dio/src/multipart_file.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/multipart/multipart_file.dart (via package:get/get.dart)' - lib\app\controllers\license_application_controller.dart:276:33 - ambiguous_import
+  error - The name 'MultipartFile' is defined in the libraries 'package:dio/src/multipart_file.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/multipart/multipart_file.dart (via package:get/get.dart)' - lib\app\controllers\license_application_controller.dart:278:31 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:46:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:49:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:53:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:56:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:58:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:61:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:64:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:67:10 - ambiguous_import
+  error - The name 'FormData' is defined in the libraries 'package:dio/src/form_data.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/multipart/form_data.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:68:21 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:71:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:75:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:76:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:78:10 - ambiguous_import
+  error - The name 'Response' is defined in the libraries 'package:dio/src/response.dart (via package:dio/dio.dart)' and 'package:get/get_connect/http/src/response/response.dart (via package:get/get.dart)' - lib\app\services\api_service.dart:80:10 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\auth\login_screen.dart:88:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\auth\login_screen.dart:313:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\auth\signup_screen.dart:66:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\dashboard_screen.dart:258:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\home_screen.dart:98:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\home_screen.dart:184:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\home_screen.dart:188:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\home_screen.dart:253:33 - deprecated_member_use
+  error - Target of URI doesn't exist: '../../theme/app_theme.dart' - lib\app\views\screens\license\application_success_screen.dart:4:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../widgets/ministry_logo_widget.dart' - lib\app\views\screens\license\application_success_screen.dart:5:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../controllers/license_application_controller.dart' - lib\app\views\screens\license\application_success_screen.dart:6:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../routes/app_routes.dart' - lib\app\views\screens\license\application_success_screen.dart:7:8 - uri_does_not_exist
+  error - The name 'LicenseApplicationController' isn't a type, so it can't be used as a type argument - lib\app\views\screens\license\application_success_screen.dart:14:27 - non_type_as_type_argument
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:17:24 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:19:26 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:24:46 - undefined_identifier
+  error - Undefined name 'AppRoutes' - lib\app\views\screens\license\application_success_screen.dart:31:44 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:35:40 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:35:40 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:41:30 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:41:30 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:58:34 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:58:34 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:65:34 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:65:34 - undefined_identifier
+  error - The name 'MinistryLogoWidget' isn't a class - lib\app\views\screens\license\application_success_screen.dart:71:23 - creation_with_non_type
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:88:26 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:90:45 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\application_success_screen.dart:93:43 - deprecated_member_use
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:109:36 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:131:34 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:131:34 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:146:34 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:146:34 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:160:55 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:175:42 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:175:42 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:180:42 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:180:42 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:190:42 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:190:42 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:204:46 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:204:46 - undefined_identifier
+  error - Undefined name 'AppRoutes' - lib\app\views\screens\license\application_success_screen.dart:221:49 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:240:50 - undefined_identifier
+  error - Invalid constant value - lib\app\views\screens\license\application_success_screen.dart:269:26 - invalid_constant
+  error - Undefined name 'AppColors' - lib\app\views\screens\license\application_success_screen.dart:269:26 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step1_conditions_screen.dart:183:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step1_conditions_screen.dart:186:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step2_license_info_screen.dart:222:50 - deprecated_member_use
+warning - Unused import: '../../../../models/governorate_model.dart' - lib\app\views\screens\license\steps\step3_location_screen.dart:6:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step3_location_screen.dart:121:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step3_location_screen.dart:124:56 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\app\views\screens\license\steps\step3_location_screen.dart:175:50 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step3_location_screen.dart:405:48 - deprecated_member_use
+warning - Dead code - lib\app\views\screens\license\steps\step3_location_screen.dart:545:33 - dead_code
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step3_location_screen.dart:690:35 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\app\views\screens\license\steps\step3_location_screen.dart:801:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\app\views\screens\license\steps\step3_location_screen.dart:802:15 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step4_attachments_screen.dart:37:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step4_attachments_screen.dart:38:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step4_attachments_screen.dart:42:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\license\steps\step4_attachments_screen.dart:43:49 - deprecated_member_use
+  error - The getter 'platform' isn't defined for the type 'FilePicker' - lib\app\views\screens\license\steps\step4_attachments_screen.dart:231:37 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\my_applications_screen.dart:65:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\screens\splash_screen.dart:86:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:101:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:292:41 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\app\views\widgets\common_widgets.dart:309:23 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\app\views\widgets\common_widgets.dart:310:23 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:337:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:339:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:373:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:375:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:527:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:565:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:605:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\common_widgets.dart:609:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\ministry_logo_widget.dart:30:35 - deprecated_member_use
+  error - Undefined name 'Get' - lib\app\views\widgets\ministry_logo_widget.dart:190:28 - undefined_identifier
+warning - The value of the local variable 'isPending' isn't used - lib\app\views\widgets\step_indicator_widget.dart:75:11 - unused_local_variable
+warning - The value of the local variable 'borderColor' isn't used - lib\app\views\widgets\step_indicator_widget.dart:79:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\views\widgets\step_indicator_widget.dart:103:31 - deprecated_member_use
+  error - The named parameter 'snackbarQueue' isn't defined - lib\main.dart:51:7 - undefined_named_parameter
+
+102 issues found. (ran in 4.9s)

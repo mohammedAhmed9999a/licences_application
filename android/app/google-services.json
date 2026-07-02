@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "307862214822",
+    "project_id": "energy-service-portal-a7636",
+    "storage_bucket": "energy-service-portal-a7636.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307862214822:android:07594df0c64a2bfe5bbc67",
+        "android_client_info": {
+          "package_name": "com.example.licences_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDylExJGmrtLAIuMwUXnJxQzxJ896wJ0i4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
