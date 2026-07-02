@@ -23,8 +23,7 @@ void main() async {
   try {
     await MyServices.printFCM();
   } catch (e) {
-    // ignore: jn,n,سيبىيبسl,nsdf,ds,skdfjldsjldkjfkldjfjglfdjavoid_print
-    // ad
+    //slf
     print('MyServices.printFCM error: $e');
   }
 
