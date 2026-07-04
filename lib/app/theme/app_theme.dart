@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constant/app_colors.dart';
+import 'app_icon_theme.dart';
 
 export '../../core/constant/app_colors.dart';
+export 'app_icon_theme.dart';
 
 class AppTheme {
   AppTheme._();
@@ -42,6 +44,7 @@ class AppTheme {
       ),
       iconTheme: const IconThemeData(color: Colors.white),
     ),
+    iconTheme: AppIconTheme.lightNormalIcons,
     cardTheme: CardThemeData(
       color: AppColors.surfaceVariant,
       elevation: 0,
@@ -211,6 +214,7 @@ class AppTheme {
       ),
       iconTheme: const IconThemeData(color: Colors.white),
     ),
+    iconTheme: AppIconTheme.darkNormalIcons,
     cardTheme: CardThemeData(
       color: AppColors.darkSurfaceVariant,
       elevation: 2,

@@ -444,17 +444,16 @@ class ShimmerPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey.shade800
-        : Colors.grey.shade300;
-    final highlightColor = Theme.of(context).brightness == Brightness.dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark ? Colors.grey.shade800 : const Color(0xffeeebe1);
+    final highlightColor = isDark
         ? Colors.grey.shade700
-        : Colors.grey.shade100;
+        : const Color(0xfff8f4e9);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
       highlightColor: highlightColor,
-      period: const Duration(milliseconds: 1200),
+      period: const Duration(milliseconds: 1900),
       child: Container(
         width: width,
         height: height.h,
@@ -474,17 +473,16 @@ class ShimmerLoadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey.shade800
-        : Colors.grey.shade300;
-    final highlightColor = Theme.of(context).brightness == Brightness.dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark ? Colors.grey.shade800 : const Color(0xffeeebe1);
+    final highlightColor = isDark
         ? Colors.grey.shade700
-        : Colors.grey.shade100;
+        : const Color(0xfff8f4e9);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
       highlightColor: highlightColor,
-      period: const Duration(milliseconds: 1200),
+      period: const Duration(milliseconds: 1900),
       child: Container(
         height: height.h,
         margin: EdgeInsets.only(bottom: 12.h),
@@ -538,6 +536,147 @@ class ShimmerLoadingCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: baseColor,
                 borderRadius: BorderRadius.circular(14.r),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ShimmerNotificationCard extends StatelessWidget {
+  final double height;
+
+  const ShimmerNotificationCard({super.key, this.height = 140});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? Colors.grey.shade800 : const Color(0xfffbf7ef);
+    final baseColor = isDark ? Colors.grey.shade600 : const Color(0xffe7dfd4);
+    final highlightColor = isDark
+        ? Colors.grey.shade500
+        : const Color(0xfff4ebdd);
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      period: const Duration(milliseconds: 1800),
+      child: Container(
+        height: height.h,
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.25),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.15)
+                  : Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 42.w,
+              height: 42.w,
+              decoration: BoxDecoration(
+                color: baseColor,
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 14.h,
+                          decoration: BoxDecoration(
+                            color: baseColor,
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10.w),
+                      Container(
+                        width: 44.w,
+                        height: 12.h,
+                        decoration: BoxDecoration(
+                          color: baseColor,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        width: 64.w,
+                        height: 24.h,
+                        decoration: BoxDecoration(
+                          color: baseColor,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Container(
+                        width: 82.w,
+                        height: 24.h,
+                        decoration: BoxDecoration(
+                          color: baseColor,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10.h),
+                  Container(
+                    width: double.infinity,
+                    height: 10.h,
+                    decoration: BoxDecoration(
+                      color: baseColor,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Container(
+                    width: double.infinity,
+                    height: 10.h,
+                    decoration: BoxDecoration(
+                      color: baseColor,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 80.w,
+                      height: 26.h,
+                      decoration: BoxDecoration(
+                        color: baseColor,
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

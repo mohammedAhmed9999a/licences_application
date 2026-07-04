@@ -33,398 +33,293 @@ class LoginScreen extends StatelessWidget {
         : theme.dividerColor;
     final primaryColor = theme.colorScheme.primary;
 
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/splash_background.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Back button row
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () => Get.back(),
-                        child: Row(
-                          children: [
-                            Text(
-                              'العودة إلى الصفحة الرئيسية',
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                color: primaryColor,
-                                fontFamily: 'Cairo',
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textDirection: TextDirection.rtl,
-                            ),
-                            SizedBox(width: 4.w),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              size: 13.sp,
-                              color: primaryColor,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 10.h),
-
-                // Ministry Logo
-                Shimmer.fromColors(
-                  baseColor: AppColors.gold.withOpacity(0.6),
-                  highlightColor: Colors.white,
-                  period: const Duration(seconds: 2),
-                  child: Container(
-                    width: 250.w,
-                    height: 100.h,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/h-logo.webp'),
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
-                // const MinistryLogoWidget(size: 56),
-                SizedBox(height: 20.h),
-
-                // Title
-                Text(
-                  'تسجيل الدخول',
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 28.sp,
-                    fontWeight: FontWeight.bold,
-                    color: textPrimary,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  'إلى بوابة طلبات ترخيص محطات الوقود',
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 13.sp,
-                    color: textSecondary,
-                  ),
-                ),
-
-                SizedBox(height: 24.h),
-
-                // Form Card
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: borderColor),
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.brightness == Brightness.dark
-                              ? Colors.black.withOpacity(0.25)
-                              : Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => Get.back(),
+                    child: Row(
                       children: [
-                        // Tabs
-                        // _buildTabs(context, ctrl),
-
-                        // Tab content - Login
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'مرحباً بعودتك',
-                                style: TextStyle(
-                                  fontFamily: 'Cairo',
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: textPrimary,
-                                ),
-                                textDirection: TextDirection.rtl,
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                'استخدم بريدك الإلكتروني وكلمة المرور الخاصة بك.',
-                                style: TextStyle(
-                                  fontFamily: 'Cairo',
-                                  fontSize: 12.sp,
-                                  color: textSecondary,
-                                ),
-                                textDirection: TextDirection.rtl,
-                              ),
-                              Divider(height: 24.h),
-
-                              // Email
-                              SizedBox(height: 4.h),
-                              ValueListenableBuilder<TextEditingValue>(
-                                valueListenable: ctrl.emailController,
-                                builder: (context, _, __) {
-                                  return LabeledField(
-                                    label: 'البريد الإلكتروني',
-                                    required: true,
-                                    errorText: ctrl.validateEmailField(
-                                      ctrl.emailController.text,
-                                    ),
-
-                                    successText:
-                                        ctrl.emailController.text.isNotEmpty &&
-                                            ctrl.validateEmailField(
-                                                  ctrl.emailController.text,
-                                                ) ==
-                                                null
-                                        ? 'البريد الإلكتروني صالح'
-                                        : null,
-                                    child: RtlTextField(
-                                      controller: ctrl.emailController,
-                                      focusNode: emailFocusNode,
-                                      hintText: 'name@example.com',
-                                      keyboardType: TextInputType.emailAddress,
-                                      textInputAction: TextInputAction.next,
-                                      onSubmitted: (_) {
-                                        FocusScope.of(
-                                          context,
-                                        ).requestFocus(passwordFocusNode);
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 16.h),
-
-                              // Password
-                              ValueListenableBuilder<TextEditingValue>(
-                                valueListenable: ctrl.passwordController,
-                                builder: (context, _, __) {
-                                  return Obx(
-                                    () => LabeledField(
-                                      label: 'كلمة المرور',
-                                      required: true,
-                                      errorText: ctrl
-                                          .validateLoginPasswordField(
-                                            ctrl.passwordController.text,
-                                          ),
-                                      successText:
-                                          ctrl
-                                                  .passwordController
-                                                  .text
-                                                  .isNotEmpty &&
-                                              ctrl.validateLoginPasswordField(
-                                                    ctrl
-                                                        .passwordController
-                                                        .text,
-                                                  ) ==
-                                                  null
-                                          ? 'كلمة المرور مناسبة'
-                                          : null,
-                                      child: RtlTextField(
-                                        controller: ctrl.passwordController,
-                                        focusNode: passwordFocusNode,
-                                        hintText: '••••••••••',
-                                        obscureText: ctrl.obscurePassword.value,
-                                        textInputAction: TextInputAction.done,
-                                        onSubmitted: (_) {
-                                          ctrl.login();
-                                        },
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            ctrl.obscurePassword.value
-                                                ? Icons.visibility_outlined
-                                                : Icons.visibility_off_outlined,
-                                            color: hintColor,
-                                            size: 20,
-                                          ),
-                                          onPressed: () =>
-                                              ctrl.obscurePassword.toggle(),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 12.h),
-
-                              // Remember me
-                              Obx(
-                                () => Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'تذكرني',
-                                      style: TextStyle(
-                                        fontFamily: 'Cairo',
-                                        fontSize: 13.sp,
-                                        color: textPrimary,
-                                      ),
-                                      textDirection: TextDirection.rtl,
-                                    ),
-                                    Checkbox(
-                                      value: ctrl.rememberMe.value,
-                                      onChanged: (v) =>
-                                          ctrl.rememberMe.value = v ?? false,
-                                      activeColor: primaryColor,
-                                      materialTapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Error
-                              Obx(
-                                () => ErrorBanner(
-                                  message: ctrl.errorMessage.value,
-                                ),
-                              ),
-                              SizedBox(height: 8.h),
-                              Obx(
-                                () => ctrl.showResendVerification.value
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          SizedBox(height: 10.h),
-                                          OutlinedButton(
-                                            style: OutlinedButton.styleFrom(
-                                              side: BorderSide(
-                                                color: primaryColor.withOpacity(
-                                                  0.85,
-                                                ),
-                                              ),
-                                              foregroundColor: primaryColor,
-                                            ),
-                                            onPressed:
-                                                (ctrl
-                                                        .isResendingVerification
-                                                        .value ||
-                                                    ctrl
-                                                            .resendCooldownSeconds
-                                                            .value >
-                                                        0 ||
-                                                    ctrl
-                                                            .resendAttemptsLeft
-                                                            .value <=
-                                                        0)
-                                                ? null
-                                                : ctrl.resendVerificationEmail,
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                vertical: 12.h,
-                                              ),
-                                              child: Text(
-                                                ctrl
-                                                        .isResendingVerification
-                                                        .value
-                                                    ? 'يتم الإرسال...'
-                                                    : ctrl
-                                                              .resendAttemptsLeft
-                                                              .value <=
-                                                          0
-                                                    ? 'تم استنفاد المحاولات'
-                                                    : ctrl
-                                                              .resendCooldownSeconds
-                                                              .value >
-                                                          0
-                                                    ? 'أعد المحاولة بعد ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
-                                                    : 'إعادة إرسال رابط التفعيل',
-                                                style: TextStyle(
-                                                  fontFamily: 'Cairo',
-                                                  fontSize: 14.sp,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Text(
-                                            ctrl.resendAttemptsLeft.value <= 0
-                                                ? 'لم يعد مسموحاً بإعادة الإرسال بعد 3 محاولات.'
-                                                : ctrl
-                                                          .resendCooldownSeconds
-                                                          .value >
-                                                      0
-                                                ? 'الوقت المتبقي لإعادة المحاولة: ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
-                                                : 'إذا كان حسابك غير مفعل، اضغط على زر إعادة الإرسال للتحقق من بريدك.',
-                                            style: TextStyle(
-                                              fontFamily: 'Cairo',
-                                              fontSize: 12.sp,
-                                              color: textSecondary,
-                                            ),
-                                            textDirection: TextDirection.rtl,
-                                          ),
-                                        ],
-                                      )
-                                    : const SizedBox.shrink(),
-                              ),
-                              SizedBox(height: 8.h),
-
-                              // Login Button
-                              Obx(
-                                () => PrimaryButton(
-                                  label: 'تسجيل الدخول',
-                                  isLoading: ctrl.isLoading.value,
-                                  onPressed: ctrl.login,
-                                ),
-                              ),
-                              SizedBox(height: 16.h),
-
-                              // Go to signup
-                              GestureDetector(
-                                onTap: () => Get.offNamed(AppRoutes.signup),
-                                child: Center(
-                                  child: Text.rich(
-                                    TextSpan(
-                                      text: 'لا تملك حساباً؟ ',
-                                      style: TextStyle(
-                                        fontFamily: 'Cairo',
-                                        fontSize: 13.sp,
-                                        color: textSecondary,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: 'إنشاء حساب جديد',
-                                          style: TextStyle(
-                                            color: primaryColor,
-                                            fontWeight: FontWeight.w600,
-                                            decoration:
-                                                TextDecoration.underline,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    textDirection: TextDirection.rtl,
-                                  ),
-                                ),
-                              ),
-                            ],
+                        Icon(Icons.arrow_forward_ios, size: 14.sp, color: primaryColor),
+                        SizedBox(width: 6.w),
+                        Text(
+                          'العودة',
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: primaryColor,
+                            fontFamily: 'Cairo',
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
                   ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(14.r),
+                      border: Border.all(color: borderColor),
+                    ),
+                    child: Text(
+                      'بوابة الخدمات',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 12.sp,
+                        color: textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20.h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(color: borderColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 60.h),
-                // Islamic pattern decoration at bottom - subtle
-                // _buildIslamicPattern(theme.dividerColor),
-              ],
-            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'تسجيل الدخول',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.bold,
+                        color: textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'استخدم بيانات حسابك للوصول إلى طلبات التراخيص الخاصة بك.',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 13.sp,
+                        color: textSecondary,
+                        height: 1.6,
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                    SizedBox(height: 24.h),
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: ctrl.emailController,
+                      builder: (context, _, __) {
+                        return LabeledField(
+                          label: 'البريد الإلكتروني',
+                          required: true,
+                          errorText: ctrl.validateEmailField(
+                            ctrl.emailController.text,
+                          ),
+                          successText:
+                              ctrl.emailController.text.isNotEmpty &&
+                                      ctrl.validateEmailField(
+                                            ctrl.emailController.text,
+                                          ) ==
+                                          null
+                                  ? 'البريد الإلكتروني صالح'
+                                  : null,
+                          child: RtlTextField(
+                            controller: ctrl.emailController,
+                            focusNode: emailFocusNode,
+                            hintText: 'name@example.com',
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(passwordFocusNode);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 18.h),
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: ctrl.passwordController,
+                      builder: (context, _, __) {
+                        return Obx(
+                          () => LabeledField(
+                            label: 'كلمة المرور',
+                            required: true,
+                            errorText: ctrl.validateLoginPasswordField(
+                              ctrl.passwordController.text,
+                            ),
+                            successText:
+                                ctrl.passwordController.text.isNotEmpty &&
+                                        ctrl.validateLoginPasswordField(
+                                              ctrl.passwordController.text,
+                                            ) ==
+                                            null
+                                    ? 'كلمة المرور مناسبة'
+                                    : null,
+                            child: RtlTextField(
+                              controller: ctrl.passwordController,
+                              focusNode: passwordFocusNode,
+                              hintText: '••••••••••',
+                              obscureText: ctrl.obscurePassword.value,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) {
+                                ctrl.login();
+                              },
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  ctrl.obscurePassword.value
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  color: hintColor,
+                                  size: 20,
+                                ),
+                                onPressed: () => ctrl.obscurePassword.toggle(),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: 14.h),
+                    Obx(
+                      () => Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Checkbox(
+                            value: ctrl.rememberMe.value,
+                            onChanged: (v) => ctrl.rememberMe.value = v ?? false,
+                            activeColor: primaryColor,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          Text(
+                            'تذكرني',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 13.sp,
+                              color: textPrimary,
+                            ),
+                            textDirection: TextDirection.rtl,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Obx(
+                      () => ErrorBanner(
+                        message: ctrl.errorMessage.value,
+                      ),
+                    ),
+                    Obx(
+                      () => ctrl.showResendVerification.value
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                SizedBox(height: 10.h),
+                                OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                      color: primaryColor.withOpacity(0.85),
+                                    ),
+                                    foregroundColor: primaryColor,
+                                  ),
+                                  onPressed:
+                                      (ctrl.isResendingVerification.value ||
+                                              ctrl.resendCooldownSeconds.value >
+                                                  0 ||
+                                              ctrl.resendAttemptsLeft.value <= 0)
+                                          ? null
+                                          : ctrl.resendVerificationEmail,
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 12.h,
+                                    ),
+                                    child: Text(
+                                      ctrl.isResendingVerification.value
+                                          ? 'يتم الإرسال...'
+                                          : ctrl.resendAttemptsLeft.value <= 0
+                                              ? 'تم استنفاد المحاولات'
+                                              : ctrl.resendCooldownSeconds.value > 0
+                                                  ? 'أعد المحاولة بعد ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
+                                                  : 'إعادة إرسال رابط التفعيل',
+                                      style: TextStyle(
+                                        fontFamily: 'Cairo',
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                Text(
+                                  ctrl.resendAttemptsLeft.value <= 0
+                                      ? 'لم يعد مسموحاً بإعادة الإرسال بعد 3 محاولات.'
+                                      : ctrl.resendCooldownSeconds.value > 0
+                                          ? 'الوقت المتبقي لإعادة المحاولة: ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
+                                          : 'إذا كان حسابك غير مفعل، اضغط على زر إعادة الإرسال للتحقق من بريدك.',
+                                  style: TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 12.sp,
+                                    color: textSecondary,
+                                  ),
+                                  textDirection: TextDirection.rtl,
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                    SizedBox(height: 12.h),
+                    Obx(
+                      () => PrimaryButton(
+                        label: 'تسجيل الدخول',
+                        isLoading: ctrl.isLoading.value,
+                        onPressed: ctrl.login,
+                      ),
+                    ),
+                    SizedBox(height: 18.h),
+                    GestureDetector(
+                      onTap: () => Get.offNamed(AppRoutes.signup),
+                      child: Center(
+                        child: Text.rich(
+                          TextSpan(
+                            text: 'لا تملك حساباً؟ ',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 13.sp,
+                              color: textSecondary,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'إنشاء حساب جديد',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.h),
+            ],
           ),
         ),
       ),

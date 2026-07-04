@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
 import 'package:licences_application/core/services/core_api_service.dart';
 import '../models/application_model.dart';
@@ -17,7 +18,10 @@ class DashboardController extends GetxController {
   Future<void> loadApplications() async {
     try {
       isLoading.value = true;
-      final response = await CoreApiService.get('/v1/license-applications');
+      final response = await CoreApiService.get(
+        '/v1/license-applications',
+        options: dio.Options(receiveTimeout: const Duration(seconds: 60)),
+      );
       final rawData = response.data;
       final payload = rawData is Map<String, dynamic>
           ? rawData['data'] as List? ?? <dynamic>[]

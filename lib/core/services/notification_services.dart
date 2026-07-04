@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import '../../../app/controllers/auth_controller.dart';
-import 'my_services.dart';
+import 'package:licences_application/app/services/storage_service.dart';
+import 'package:licences_application/core/services/core_api_service.dart';
+import 'package:licences_application/core/services/my_services.dart';
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse details) {
@@ -27,11 +28,7 @@ class NotificationServices {
   static const String _channelName = 'Complaints Notifications';
 
   static Future<void> requestNotificationPermission() async {
-    final settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    await messaging.requestPermission(alert: true, badge: true, sound: true);
 
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosInit = DarwinInitializationSettings();
@@ -53,14 +50,13 @@ class NotificationServices {
     setupInteractWhenAppNotOpen();
 
     await getDeviceToken();
+    await syncFcmTokenWithServer();
 
     await _tokenRefreshSubscription?.cancel();
     _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
         .listen((newToken) async {
           await MyServices.saveFCM(newToken);
-          if (Get.isRegistered<AuthController>()) {
-            // Update auth controller if needed
-          }
+          await syncFcmTokenWithServer();
         });
   }
 
@@ -73,6 +69,42 @@ class NotificationServices {
       await MyServices.saveFCM(token);
     }
     return token;
+  }
+
+  static Future<void> syncFcmTokenWithServer() async {
+    final token = await getDeviceToken();
+    if (token.isEmpty) return;
+
+    final sentToken = await MyServices.getSentFCM();
+    if (sentToken == token) return;
+
+    if (!Get.isRegistered<StorageService>()) {
+      Get.put(StorageService(), permanent: true);
+    }
+
+    if (!StorageService.to.isLoggedIn) return;
+
+    try {
+      debugPrint('Sending FCM token to server: $token');
+      await CoreApiService.post(
+        '/v1/user/fcm-token',
+        data: {'fcm_token': token, 'device': _getDeviceType()},
+      );
+      await MyServices.saveSentFCM(token);
+      debugPrint('FCM token successfully sent and marked as sent');
+    } catch (e) {
+      debugPrint('FCM sync failed: $e');
+      debugPrint(
+        'FCM sync payload: fcm_token=$token device=${_getDeviceType()}',
+      );
+      // ignore failures silently; will retry on next token refresh or login
+    }
+  }
+
+  static String _getDeviceType() {
+    if (Platform.isAndroid) return 'android';
+    if (Platform.isIOS) return 'ios';
+    return 'web';
   }
 
   static Future<void> showNotification(RemoteMessage message) async {

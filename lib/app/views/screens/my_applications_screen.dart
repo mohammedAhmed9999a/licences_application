@@ -66,45 +66,75 @@ class MyApplicationsScreen extends StatelessWidget {
             itemBuilder: (ctx, i) {
               final app = ctrl.applications[i];
               final detail = LicenseDetailModel.fromApplication(app);
+              final theme = Theme.of(ctx);
+              final surface = theme.colorScheme.surface;
+              final borderColor = theme.dividerColor;
+              final textPrimary = theme.colorScheme.onBackground;
+              final textSecondary =
+                  theme.textTheme.bodyMedium?.color ??
+                  theme.colorScheme.onSurface.withOpacity(0.75);
+              final statusBackground = theme.colorScheme.onBackground
+                  .withOpacity(0.06);
 
               return InkWell(
                 onTap: () =>
                     Get.toNamed(AppRoutes.licenseDetails, arguments: detail),
-                borderRadius: BorderRadius.circular(14.r),
+                borderRadius: BorderRadius.circular(16.r),
                 child: Container(
                   margin: EdgeInsets.only(bottom: 12.h),
                   padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkSurface : AppColors.surface,
-                    borderRadius: BorderRadius.circular(14.r),
-                    border: Border.all(
-                      color: isDark
-                          ? AppColors.borderDark
-                          : AppColors.borderLight,
-                    ),
+                    color: surface,
+                    borderRadius: BorderRadius.circular(18.r),
+                    border: Border.all(color: borderColor),
                     boxShadow: [
                       BoxShadow(
-                        color: isDark
-                            ? Colors.black.withOpacity(0.25)
-                            : Colors.black.withOpacity(0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  app.applicationNumber.isNotEmpty
+                                      ? app.applicationNumber
+                                      : 'طلب رقم غير محدد',
+                                  style: TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: textPrimary,
+                                  ),
+                                ),
+                                SizedBox(height: 6.h),
+                                Text(
+                                  app.displayStationName,
+                                  style: TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 12.sp,
+                                    color: textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 4.h,
+                              horizontal: 12.w,
+                              vertical: 6.h,
                             ),
                             decoration: BoxDecoration(
-                              color: _statusColor(app.status).withOpacity(0.16),
+                              color: _statusColor(app.status).withOpacity(0.14),
                               borderRadius: BorderRadius.circular(20.r),
                             ),
                             child: Text(
@@ -117,76 +147,157 @@ class MyApplicationsScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Text(
-                            app.applicationNumber,
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: isDark
-                                  ? AppColors.darkText
-                                  : AppColors.textPrimary,
+                        ],
+                      ),
+                      SizedBox(height: 14.h),
+                      Wrap(
+                        spacing: 8.w,
+                        runSpacing: 8.h,
+                        alignment: WrapAlignment.end,
+                        children: [
+                          _buildInfoChip(
+                            theme,
+                            app.requestTypeLabel,
+                            backgroundColor: statusBackground,
+                            textColor: theme.colorScheme.primary,
+                          ),
+                          _buildInfoChip(
+                            theme,
+                            app.investorTypeLabel,
+                            backgroundColor: statusBackground,
+                            textColor: textSecondary,
+                          ),
+                          if (app.stationCategory?.isNotEmpty == true)
+                            _buildInfoChip(
+                              theme,
+                              'الفئة: ${app.stationCategory}',
+                              backgroundColor: statusBackground,
+                              textColor: textSecondary,
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 14.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person_outline,
+                            size: 14.sp,
+                            color: textSecondary,
+                          ),
+                          SizedBox(width: 6.w),
+                          Expanded(
+                            child: Text(
+                              app.applicantName ?? 'مقدم الطلب غير محدد',
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 12.sp,
+                                color: textSecondary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: 10.h),
-                      Text(
-                        detail.stationName,
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? AppColors.darkText
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text(
-                            app.governorate ?? 'غير محدد',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 12.sp,
-                              color: isDark
-                                  ? AppColors.textSecondaryDark
-                                  : AppColors.textSecondary,
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
                           Icon(
                             Icons.location_on_outlined,
-                            size: 16.sp,
-                            color: AppColors.primary,
+                            size: 14.sp,
+                            color: textSecondary,
+                          ),
+                          SizedBox(width: 6.w),
+                          Expanded(
+                            child: Text(
+                              [
+                                app.governorate,
+                                app.district,
+                                app.planningLocation,
+                              ].where((e) => e?.isNotEmpty == true).join(' - '),
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 12.sp,
+                                color: textSecondary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 6.h),
+                      SizedBox(height: 14.h),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        // textDirection: TextDirection.rtl,
                         children: [
-                          Text(
-                            app.createdAt,
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 14.sp,
+                            color: textSecondary,
+                          ),
+                          SizedBox(width: 6.w),
+                          Expanded(
+                            child: Text(
+                              app.createdAt,
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 11.sp,
+                                color: textSecondary,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusBackground,
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.attach_file_outlined,
+                                  size: 12.sp,
+                                  color: textSecondary,
+                                ),
+                                SizedBox(width: 4.w),
+                                Text(
+                                  '${app.attachments.length} مرفقات',
+                                  style: TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 11.sp,
+                                    color: textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (app.statusNote.isNotEmpty) ...[
+                        SizedBox(height: 14.h),
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 10.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _statusColor(app.status).withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(14.r),
+                          ),
+                          child: Text(
+                            app.statusNote,
                             style: TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 11.sp,
-                              color: isDark
-                                  ? AppColors.textHintDark
-                                  : AppColors.textHint,
+                              color: textSecondary,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(width: 8.w),
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            size: 15.sp,
-                            color: AppColors.textHint,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -206,8 +317,38 @@ class MyApplicationsScreen extends StatelessWidget {
         return AppColors.error;
       case 'pending':
         return AppColors.warning;
+      case 'completed':
+        return AppColors.statusCompleted;
+      case 'draft':
+        return AppColors.info;
+      case 'cancelled':
+        return AppColors.statusCancelled;
       default:
         return AppColors.primary;
     }
+  }
+
+  Widget _buildInfoChip(
+    ThemeData theme,
+    String label, {
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 10.sp,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
+      ),
+    );
   }
 }

@@ -27,6 +27,10 @@ class LicenseApplicationController extends GetxController {
   final currentStep = 0.obs; // 0-based (0=Step1 … 3=Step4)
   final applicationId = ''.obs;
   final isLoading = false.obs;
+  final isGovernoratesLoading = false.obs;
+  final isDistrictsLoading = false.obs;
+  final isSubdistrictsLoading = false.obs;
+  final isTownsLoading = false.obs;
   final errorMessage = ''.obs;
 
   // ─── STEP 1: Conditions & Contact ────────────────────────────────
@@ -82,6 +86,7 @@ class LicenseApplicationController extends GetxController {
   final nicknameFocus = FocusNode();
   final nationalIdFocus = FocusNode();
   final birthPlaceFocus = FocusNode();
+  final birthDateFocus = FocusNode();
   final companyNameFocus = FocusNode();
   final companyLicenseNumberFocus = FocusNode();
 
@@ -707,15 +712,20 @@ class LicenseApplicationController extends GetxController {
     final isSettlement = requestType.value == 'settlement';
     final isCompany = investorType.value == 'company';
 
+    final landTitleTitle =
+        requestType.value == 'new' && investorType.value == 'individual'
+        ? 'بيان قيد فردي (حديث)'
+        : 'بيان قيد عقاري (حديث)';
+
     final attachments = <AttachmentRequirement>[
       const AttachmentRequirement(
         key: 'id_card',
         title: 'صورة عن الهوية (وجه أمامي وخلفي معاً)',
         docType: 'NATIONAL_ID',
       ),
-      const AttachmentRequirement(
+      AttachmentRequirement(
         key: 'land_title',
-        title: 'بيان قيد عقاري (حديث)',
+        title: landTitleTitle,
         docType: 'REGISTRATION_STATEMENT',
       ),
       const AttachmentRequirement(
@@ -862,31 +872,32 @@ class LicenseApplicationController extends GetxController {
   }
 
   Map<String, dynamic> buildUserInfoPayload() {
-    if (investorType.value == 'individual') {
-      return {
-        'user_info': {
-          'first_name': firstNameController.text.trim(),
-          'father_name': fatherNameController.text.trim(),
-          'last_name': nicknameController.text.trim(),
-          'mother_name': motherNameController.text.trim(),
-          'national_id': nationalIdController.text.trim(),
-          'place_of_birth': birthPlaceController.text.trim(),
-          'date_of_birth': birthDate.value != null
-              ? '${birthDate.value!.year.toString().padLeft(4, '0')}-${birthDate.value!.month.toString().padLeft(2, '0')}-${birthDate.value!.day.toString().padLeft(2, '0')}'
-              : '',
-        },
-      };
+    // All applicants must provide personal information
+    final userInfoMap = {
+      'user_info[first_name]': firstNameController.text.trim(),
+      'user_info[father_name]': fatherNameController.text.trim(),
+      'user_info[last_name]': nicknameController.text.trim(),
+      'user_info[mother_name]': motherNameController.text.trim(),
+      'user_info[national_id]': nationalIdController.text.trim(),
+      'user_info[place_of_birth]': birthPlaceController.text.trim(),
+      'user_info[date_of_birth]': birthDate.value != null
+          ? '${birthDate.value!.year.toString().padLeft(4, '0')}-${birthDate.value!.month.toString().padLeft(2, '0')}-${birthDate.value!.day.toString().padLeft(2, '0')}'
+          : '',
+    };
+
+    // For company applicants, add company info to applicant section
+    if (investorType.value == 'company') {
+      userInfoMap['applicant[company_name]'] = companyNameController.text
+          .trim();
+      userInfoMap['applicant[company_license_number]'] =
+          companyLicenseNumberController.text.trim();
+      userInfoMap['applicant[company_license_date]'] =
+          companyLicenseDate.value != null
+          ? '${companyLicenseDate.value!.year.toString().padLeft(4, '0')}-${companyLicenseDate.value!.month.toString().padLeft(2, '0')}-${companyLicenseDate.value!.day.toString().padLeft(2, '0')}'
+          : '';
     }
 
-    return {
-      'user_info': {
-        'company_name': companyNameController.text.trim(),
-        'company_license_number': companyLicenseNumberController.text.trim(),
-        'company_license_date': companyLicenseDate.value != null
-            ? '${companyLicenseDate.value!.year.toString().padLeft(4, '0')}-${companyLicenseDate.value!.month.toString().padLeft(2, '0')}-${companyLicenseDate.value!.day.toString().padLeft(2, '0')}'
-            : '',
-      },
-    };
+    return userInfoMap;
   }
 
   // ─── Submit Step 1 ────────────────────────────────────────────────
@@ -958,14 +969,14 @@ class LicenseApplicationController extends GetxController {
         if (investorType.value == 'individual') ...{
           'applicant[full_name]': applicantFullName,
         } else ...{
-          'applicant[company_name]': applicantFullName,
+          // Company applicant info is now included in buildUserInfoPayload()
           for (var i = 0; i < partners.length; i++)
             if (partners[i].trim().isNotEmpty)
               'applicant[partners][$i]': partners[i].trim(),
         },
         if (requestType.value == 'settlement') ...{
           'settlement[is_relocation]': 0,
-          'settlement[License_number]': previousLicenseNumber.text.trim(),
+          'settlement[license_number]': previousLicenseNumber.text.trim(),
         },
         'location[governorate_id]': selectedGovernorate.value?.id,
         'location[district_id]': selectedDistrict.value?.id,
@@ -1016,6 +1027,7 @@ class LicenseApplicationController extends GetxController {
 
   // ─── Lookups ─────────────────────────────────────────────────────
   Future<void> _loadGovernorates() async {
+    isGovernoratesLoading.value = true;
     try {
       final res = await CoreApiService.get('/v1/governorates');
       final data = res.data is Map ? res.data['data'] : res.data;
@@ -1023,8 +1035,9 @@ class LicenseApplicationController extends GetxController {
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
     } catch (_) {
-      // Use sample data if API fails
-      governorates.value = _sampleGovernorates();
+      governorates.value = [];
+    } finally {
+      isGovernoratesLoading.value = false;
     }
   }
 
@@ -1037,6 +1050,7 @@ class LicenseApplicationController extends GetxController {
     subdistricts.clear();
     towns.clear();
     if (gov == null) return;
+    isDistrictsLoading.value = true;
     try {
       final res = await CoreApiService.get(
         '/v1/governorates/${gov.id}/districts',
@@ -1045,7 +1059,10 @@ class LicenseApplicationController extends GetxController {
       districts.value = (data as List)
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      isDistrictsLoading.value = false;
+    }
   }
 
   Future<void> onDistrictChanged(GovernorateModel? dist) async {
@@ -1055,6 +1072,7 @@ class LicenseApplicationController extends GetxController {
     subdistricts.clear();
     towns.clear();
     if (dist == null) return;
+    isSubdistrictsLoading.value = true;
     try {
       final res = await CoreApiService.get(
         '/v1/districts/${dist.id}/sub-districts',
@@ -1063,7 +1081,10 @@ class LicenseApplicationController extends GetxController {
       subdistricts.value = (data as List)
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      isSubdistrictsLoading.value = false;
+    }
   }
 
   Future<void> onSubdistrictChanged(GovernorateModel? sub) async {
@@ -1071,13 +1092,17 @@ class LicenseApplicationController extends GetxController {
     selectedTown.value = null;
     towns.clear();
     if (sub == null) return;
+    isTownsLoading.value = true;
     try {
       final res = await CoreApiService.get('/v1/sub-districts/${sub.id}/towns');
       final data = res.data is Map ? res.data['data'] : res.data;
       towns.value = (data as List)
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      isTownsLoading.value = false;
+    }
   }
 
   void addPartner() {
@@ -1092,22 +1117,4 @@ class LicenseApplicationController extends GetxController {
   }
 
   void updatePartner(int index, String name) => partners[index] = name;
-
-  // Sample data for offline/demo
-  List<GovernorateModel> _sampleGovernorates() => [
-    GovernorateModel(id: 1, name: 'دمشق'),
-    GovernorateModel(id: 2, name: 'ريف دمشق'),
-    GovernorateModel(id: 3, name: 'حلب'),
-    GovernorateModel(id: 4, name: 'حمص'),
-    GovernorateModel(id: 5, name: 'حماة'),
-    GovernorateModel(id: 6, name: 'اللاذقية'),
-    GovernorateModel(id: 7, name: 'طرطوس'),
-    GovernorateModel(id: 8, name: 'إدلب'),
-    GovernorateModel(id: 9, name: 'الحسكة'),
-    GovernorateModel(id: 10, name: 'دير الزور'),
-    GovernorateModel(id: 11, name: 'الرقة'),
-    GovernorateModel(id: 12, name: 'السويداء'),
-    GovernorateModel(id: 13, name: 'درعا'),
-    GovernorateModel(id: 14, name: 'القنيطرة'),
-  ];
 }

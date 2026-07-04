@@ -11,7 +11,7 @@ class CoreApiService {
   // static const String baseUrl =
   //     'https://api-petro-stations.moenergy.gov.sy/api';
 
-  static const String baseUrl = 'http://192.168.88.186:8000/api';
+  static const String baseUrl = 'http://192.168.109.237:8000/api';
   static const String baseUrlPublicImages =
       "http://192.168.109.237:8000/storage/";
 
@@ -22,11 +22,13 @@ class CoreApiService {
   static Future<dio.Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
+    dio.Options? options,
   }) async {
     await updateAuthHeader();
     final result = await ApiClient.get(
       '$baseUrl$path',
       queryParameters: queryParameters,
+      options: options,
     );
     return _toResponse(result, path);
   }

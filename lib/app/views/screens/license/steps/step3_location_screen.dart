@@ -114,6 +114,8 @@ class Step3LocationScreen extends StatelessWidget {
                         hint: 'اختر المحافظة',
                         value: ctrl.selectedGovernorate.value?.name,
                         items: ctrl.governorates.map((g) => g.name).toList(),
+                        isLoading: ctrl.isGovernoratesLoading.value,
+                        loadingLabel: 'جاري تحميل المحافظات...',
                         onChanged: (val) {
                           final gov = ctrl.governorates.firstWhereOrNull(
                             (g) => g.name == val,
@@ -132,6 +134,8 @@ class Step3LocationScreen extends StatelessWidget {
                         hint: 'اختر المنطقة',
                         value: ctrl.selectedDistrict.value?.name,
                         items: ctrl.districts.map((g) => g.name).toList(),
+                        isLoading: ctrl.isDistrictsLoading.value,
+                        loadingLabel: 'جاري تحميل المناطق...',
                         onChanged: (val) {
                           final d = ctrl.districts.firstWhereOrNull(
                             (g) => g.name == val,
@@ -150,6 +154,8 @@ class Step3LocationScreen extends StatelessWidget {
                         hint: 'اختر الناحية',
                         value: ctrl.selectedSubdistrict.value?.name,
                         items: ctrl.subdistricts.map((g) => g.name).toList(),
+                        isLoading: ctrl.isSubdistrictsLoading.value,
+                        loadingLabel: 'جاري تحميل النواحي...',
                         onChanged: (val) {
                           final s = ctrl.subdistricts.firstWhereOrNull(
                             (g) => g.name == val,
@@ -168,6 +174,8 @@ class Step3LocationScreen extends StatelessWidget {
                         hint: 'اختر البلدة',
                         value: ctrl.selectedTown.value?.name,
                         items: ctrl.towns.map((g) => g.name).toList(),
+                        isLoading: ctrl.isTownsLoading.value,
+                        loadingLabel: 'جاري تحميل البلديات...',
                         onChanged: (val) {
                           final t = ctrl.towns.firstWhereOrNull(
                             (g) => g.name == val,
@@ -981,56 +989,98 @@ class _DropdownField extends StatelessWidget {
   final String? value;
   final List<String> items;
   final ValueChanged<String?> onChanged;
+  final bool isLoading;
+  final String? loadingLabel;
 
   const _DropdownField({
     required this.hint,
     required this.value,
     required this.items,
     required this.onChanged,
+    this.isLoading = false,
+    this.loadingLabel,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48.h,
+      height: 50.h,
       padding: EdgeInsets.symmetric(horizontal: 12.w),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          hint: Text(
-            hint,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 13.sp,
-              color: AppColors.textHint,
-            ),
-          ),
-          isExpanded: true,
-          alignment: AlignmentDirectional.centerStart,
-          icon: const Icon(
-            Icons.keyboard_arrow_down,
-            color: AppColors.textHint,
-          ),
-          items: items
-              .map(
-                (item) => DropdownMenuItem(
-                  value: item,
-                  child: Text(
-                    item,
-                    textDirection: TextDirection.rtl,
-                    style: TextStyle(fontFamily: 'Cairo', fontSize: 13.sp),
+      child: isLoading
+          ? Row(
+              children: [
+                SizedBox(
+                  width: 18.w,
+                  height: 18.w,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
+                    backgroundColor: AppColors.primary.withOpacity(0.12),
                   ),
                 ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Text(
+                    loadingLabel ?? 'جاري التحميل...',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 12.5.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+                Icon(Icons.sync_rounded, size: 18.sp, color: AppColors.primary),
+              ],
+            )
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: value,
+                hint: Text(
+                  hint,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 13.sp,
+                    color: AppColors.textHint,
+                  ),
+                ),
+                isExpanded: true,
+                alignment: AlignmentDirectional.centerStart,
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: AppColors.textHint,
+                ),
+                items: items
+                    .map(
+                      (item) => DropdownMenuItem(
+                        value: item,
+                        child: Text(
+                          item,
+                          textDirection: TextDirection.rtl,
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 13.sp,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: onChanged,
+              ),
+            ),
     );
   }
 }

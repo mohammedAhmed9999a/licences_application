@@ -28,12 +28,18 @@ class AttachmentItem {
     // relative file path (e.g. "license-applications/31/...")
     // Use conventional storage path if the server serves files under /storage
     final baseWithoutSlash = baseUrl.replaceAll(RegExp(r'/+$'), '');
-    final baseEndsWithStorage = baseWithoutSlash.toLowerCase().endsWith('/storage');
+    final baseEndsWithStorage = baseWithoutSlash.toLowerCase().endsWith(
+      '/storage',
+    );
     if (trimmed.startsWith('storage/')) {
       final rel = trimmed.replaceFirst(RegExp(r'^storage/+'), '');
-      return baseEndsWithStorage ? '$baseWithoutSlash/$rel' : '$baseWithoutSlash/$trimmed';
+      return baseEndsWithStorage
+          ? '$baseWithoutSlash/$rel'
+          : '$baseWithoutSlash/$trimmed';
     }
-    return baseEndsWithStorage ? '$baseWithoutSlash/$trimmed' : '$baseWithoutSlash/storage/$trimmed';
+    return baseEndsWithStorage
+        ? '$baseWithoutSlash/$trimmed'
+        : '$baseWithoutSlash/storage/$trimmed';
   }
 
   String get fileName {
@@ -50,7 +56,8 @@ class AttachmentItem {
   }
 
   String get extension {
-    final source = (normalizedFilePath.isNotEmpty ? normalizedFilePath : name).toLowerCase();
+    final source = (normalizedFilePath.isNotEmpty ? normalizedFilePath : name)
+        .toLowerCase();
     final dotIndex = source.lastIndexOf('.');
     if (dotIndex >= 0 && dotIndex < source.length - 1) {
       return source.substring(dotIndex);
@@ -65,7 +72,8 @@ class AttachmentItem {
     if (filePath == null) return '';
     var s = filePath!.trim();
     // Trim surrounding quotes
-    if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+    if ((s.startsWith('"') && s.endsWith('"')) ||
+        (s.startsWith("'") && s.endsWith("'"))) {
       s = s.substring(1, s.length - 1).trim();
     }
     // Remove markdown-like wrapper [url](...) or [text](url)
@@ -75,7 +83,8 @@ class AttachmentItem {
       final insideParens = m.group(2)?.trim();
       final insideBrackets = m.group(1)?.trim();
       if (insideParens != null && insideParens.isNotEmpty) return insideParens;
-      if (insideBrackets != null && insideBrackets.isNotEmpty) return insideBrackets;
+      if (insideBrackets != null && insideBrackets.isNotEmpty)
+        return insideBrackets;
     }
     // Remove angle brackets
     if (s.startsWith('<') && s.endsWith('>')) {
@@ -367,19 +376,38 @@ class ApplicationModel {
       statusNote.isNotEmpty ? statusNote : 'لا توجد ملاحظات إضافية';
 
   static String _statusLabel(String status) {
-    switch (status) {
-      case 'pending':
-        return 'قيد المراجعة';
-      case 'approved':
-        return 'مقبول';
-      case 'rejected':
-        return 'مرفوض';
-      case 'draft':
-        return 'مسودة';
-      case 'under_review':
-        return 'قيد الدراسة';
-      default:
-        return 'غير معروف';
+    final normalized = status.trim().toLowerCase();
+    if (normalized.isEmpty) return 'غير معروف';
+
+    if (normalized.contains('pending') ||
+        normalized.contains('in_review') ||
+        normalized.contains('under_review') ||
+        normalized.contains('review') ||
+        normalized.contains('in progress') ||
+        normalized.contains('processing')) {
+      return 'قيد المراجعة';
     }
+
+    if (normalized.contains('approved') || normalized.contains('accepted')) {
+      return 'مقبول';
+    }
+
+    if (normalized.contains('rejected') || normalized.contains('declined')) {
+      return 'مرفوض';
+    }
+
+    if (normalized.contains('draft')) {
+      return 'مسودة';
+    }
+
+    if (normalized.contains('completed') || normalized.contains('finished')) {
+      return 'مكتمل';
+    }
+
+    if (normalized.contains('canceled') || normalized.contains('cancelled')) {
+      return 'ملغى';
+    }
+
+    return status;
   }
 }

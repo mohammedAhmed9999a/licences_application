@@ -25,7 +25,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 12.h),
           child: Column(
             children: [
               SectionCard(
@@ -231,7 +231,9 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                           onTap: () {
                                             ctrl.settledAgreed.toggle();
                                             if (ctrl.settledAgreed.value) {
-                                              ctrl.settlementAgreementError.value =
+                                              ctrl
+                                                      .settlementAgreementError
+                                                      .value =
                                                   '';
                                             }
                                           },
@@ -258,21 +260,29 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                                 onChanged: (v) {
                                                   ctrl.settledAgreed.value =
                                                       v ?? false;
-                                                  if (ctrl.settledAgreed.value) {
-                                                    ctrl.settlementAgreementError
-                                                        .value = '';
+                                                  if (ctrl
+                                                      .settledAgreed
+                                                      .value) {
+                                                    ctrl
+                                                            .settlementAgreementError
+                                                            .value =
+                                                        '';
                                                   }
                                                 },
                                               ),
                                             ],
                                           ),
                                         ),
-                                        if (ctrl.settlementAgreementError.value
+                                        if (ctrl
+                                            .settlementAgreementError
+                                            .value
                                             .isNotEmpty)
                                           Padding(
                                             padding: EdgeInsets.only(top: 6.h),
                                             child: Text(
-                                              ctrl.settlementAgreementError.value,
+                                              ctrl
+                                                  .settlementAgreementError
+                                                  .value,
                                               style: TextStyle(
                                                 fontFamily: 'Cairo',
                                                 fontSize: 11.sp,
@@ -1157,6 +1167,31 @@ class _CompanyForm extends StatelessWidget {
                   SizedBox(height: 12.h),
                   Obx(
                     () => LabeledField(
+                      key: ctrl.birthPlaceFieldKey,
+                      label: 'مكان الولادة',
+                      required: true,
+                      errorText: ctrl.birthPlaceError.value,
+                      child: RtlTextField(
+                        controller: ctrl.birthPlaceController,
+                        focusNode: ctrl.birthPlaceFocus,
+                        hintText: 'مكان الولادة',
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[\u0600-\u06FF\s]'),
+                          ),
+                        ],
+                        maxLength: 50,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (v) =>
+                            ctrl.validateStep2Field('birthPlace', v),
+                        onSubmitted: (_) =>
+                            ctrl.requestFocus(ctrl.birthDateFocus),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Obx(
+                    () => LabeledField(
                       key: ctrl.birthDateFieldKey,
                       label: 'تاريخ الولادة',
                       required: true,
@@ -1432,6 +1467,29 @@ class _CompanyForm extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 12.h),
+                Obx(
+                  () => LabeledField(
+                    key: ctrl.birthPlaceFieldKey,
+                    label: 'مكان الولادة',
+                    required: true,
+                    errorText: ctrl.birthPlaceError.value,
+                    child: RtlTextField(
+                      controller: ctrl.birthPlaceController,
+                      focusNode: ctrl.birthPlaceFocus,
+                      hintText: 'مكان الولادة',
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[\u0600-\u06FF\s]'),
+                        ),
+                      ],
+                      maxLength: 50,
+                      textInputAction: TextInputAction.next,
+                      onChanged: (v) =>
+                          ctrl.validateStep2Field('birthPlace', v),
+                    ),
+                  ),
                 ),
               ],
             );

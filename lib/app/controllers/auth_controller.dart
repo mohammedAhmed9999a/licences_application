@@ -4,6 +4,7 @@ import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:licences_application/core/services/core_api_service.dart';
+import 'package:licences_application/core/services/notification_services.dart';
 import 'package:licences_application/core/validators/form_validator.dart';
 import '../services/storage_service.dart';
 import '../routes/app_routes.dart';
@@ -157,6 +158,13 @@ class AuthController extends GetxController {
       profileEmail.value = email;
       profileName.value = userName;
 
+      print(
+        'Calling NotificationServices.syncFcmTokenWithServer() after login',
+      );
+      await NotificationServices.syncFcmTokenWithServer();
+      print(
+        'login successful, navigating to dashboard...>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',
+      );
       Get.offAllNamed(AppRoutes.dashboard);
     } catch (e) {
       if (e is dio.DioException) {
@@ -314,7 +322,7 @@ class AuthController extends GetxController {
 
   Future<void> logout() async {
     try {
-      await CoreApiService.post('/auth/logout');
+      await CoreApiService.post('/v1/logout');
     } catch (_) {}
     await StorageService.to.clearAuth();
     Get.offAllNamed(AppRoutes.home);

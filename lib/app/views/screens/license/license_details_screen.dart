@@ -9,6 +9,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../theme/app_theme.dart';
+import '../../../controllers/settings_controller.dart';
 import '../../../models/application_model.dart';
 import '../../../models/license_detail_model.dart';
 import '../../../../core/constant/app_constants.dart';
@@ -51,67 +52,103 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       textDirection: TextDirection.ltr,
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(
-          title: Text(
-            'تفاصيل الطلب',
-            style: TextStyle(color: Colors.black, fontSize: 20.sp),
-          ),
-          centerTitle: true,
-          backgroundColor: surface,
-          elevation: 0,
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _buildStatusOverview(context, detail!, surface, borderColor),
-                SizedBox(height: 16.h),
-                _buildSectionTitle('الملخص العام'),
-                SizedBox(height: 12.h),
-                _buildInfoGrid(context, [
-                  _InfoEntry(
-                    'رقم الطلب',
-                    detail!.application.applicationNumber,
+        appBar: _buildAppBar(context, detail!),
+        body: Stack(
+          children: [
+            // خلفية احترافية
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 120.h,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      primary.withValues(alpha: 0.08),
+                      primary.withValues(alpha: 0.02),
+                    ],
                   ),
-                  _InfoEntry('نوع الطلب', detail!.requestTypeLabel),
-                  _InfoEntry('نوع المستثمر', detail!.investorTypeLabel),
-                  _InfoEntry('تاريخ الإنشاء', detail!.application.createdAt),
-                ]),
-                SizedBox(height: 18.h),
-                _buildSectionTitle('بيانات مقدم الطلب'),
-                SizedBox(height: 12.h),
-                _buildInfoCard(context, [
-                  _InfoEntry('اسم مقدم الطلب', detail!.applicantName),
-                  _InfoEntry('البريد الإلكتروني', detail!.email),
-                  _InfoEntry('الهاتف', detail!.phone),
-                  _InfoEntry('الهوية الوطنية', detail!.nationalId),
-                ]),
-                SizedBox(height: 18.h),
-                _buildSectionTitle('تفاصيل الموقع والمحطة'),
-                SizedBox(height: 12.h),
-                _buildInfoCard(context, [
-                  _InfoEntry('المحافظة', detail!.governorate),
-                  _InfoEntry('المنطقة / الحي', detail!.district),
-                  _InfoEntry('اسم المحطة', detail!.stationName),
-                  _InfoEntry('فئة المحطة', detail!.stationCategory),
-                  //
-                  _InfoEntry('نوع الطريق', detail!.roadType),
-                  _InfoEntry('الموقع التخطيطي', detail!.planningLocation),
-                  _InfoEntry('الإحداثيات', detail!.coordinates),
-                ]),
-                SizedBox(height: 18.h),
-                _buildAttachmentsSection(context, detail!, primary, onSurface),
-
-                SizedBox(height: 18.h),
-                _buildTimelineSection(context, detail!, primary, secondary),
-                SizedBox(height: 24.h),
-                _buildActionButtons(context, primary),
-              ],
+                ),
+              ),
             ),
-          ),
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _buildStatusOverview(
+                      context,
+                      detail!,
+                      surface,
+                      borderColor,
+                    ),
+                    SizedBox(height: 24.h),
+                    _buildSectionCard(
+                      context,
+                      title: 'الملخص العام',
+                      icon: Icons.description_outlined,
+                      child: _buildInfoGrid(context, [
+                        _InfoEntry(
+                          'رقم الطلب',
+                          detail!.application.applicationNumber,
+                        ),
+                        _InfoEntry('نوع الطلب', detail!.requestTypeLabel),
+                        _InfoEntry('نوع المستثمر', detail!.investorTypeLabel),
+                        _InfoEntry(
+                          'تاريخ الإنشاء',
+                          detail!.application.createdAt,
+                        ),
+                      ]),
+                    ),
+                    SizedBox(height: 18.h),
+                    _buildSectionCard(
+                      context,
+                      title: 'بيانات مقدم الطلب',
+                      icon: Icons.person_outline,
+                      child: _buildInfoCard(context, [
+                        _InfoEntry('اسم مقدم الطلب', detail!.applicantName),
+                        _InfoEntry('البريد الإلكتروني', detail!.email),
+                        _InfoEntry('الهاتف', detail!.phone),
+                        _InfoEntry('الهوية الوطنية', detail!.nationalId),
+                      ]),
+                    ),
+                    SizedBox(height: 18.h),
+                    _buildSectionCard(
+                      context,
+                      title: 'تفاصيل الموقع والمحطة',
+                      icon: Icons.location_on_outlined,
+                      child: _buildInfoCard(context, [
+                        _InfoEntry('المحافظة', detail!.governorate),
+                        _InfoEntry('المنطقة / الحي', detail!.district),
+                        _InfoEntry('اسم المحطة', detail!.stationName),
+                        _InfoEntry('فئة المحطة', detail!.stationCategory),
+                        _InfoEntry('نوع الطريق', detail!.roadType),
+                        _InfoEntry('الموقع التخطيطي', detail!.planningLocation),
+                        _InfoEntry('الإحداثيات', detail!.coordinates),
+                      ]),
+                    ),
+                    SizedBox(height: 18.h),
+                    _buildAttachmentsSection(
+                      context,
+                      detail!,
+                      primary,
+                      onSurface,
+                    ),
+                    SizedBox(height: 18.h),
+                    _buildTimelineSection(context, detail!, primary, secondary),
+                    SizedBox(height: 24.h),
+                    _buildActionButtons(context, primary),
+                    SizedBox(height: 16.h),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -126,19 +163,20 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
     final onSurface = theme.colorScheme.onSurface;
+    final statusColor = _getStatusColor(detail.application.status);
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(18.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: surface,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(22.r),
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -157,143 +195,283 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: onSurface,
                       ),
                       textAlign: TextAlign.right,
                     ),
                     SizedBox(height: 8.h),
-                    Text(
-                      detail.application.governorate ?? 'المحافظة غير محددة',
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 13.sp,
-                        color: theme.textTheme.bodyMedium?.color,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          detail.application.governorate ??
+                              'المحافظة غير محددة',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 13.sp,
+                            color: theme.textTheme.bodyMedium?.color,
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 14.sp,
+                          color: primary,
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
                 decoration: BoxDecoration(
-                  color: primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(18.r),
+                  color: statusColor.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(20.r),
                 ),
-                child: Text(
-                  detail.application.statusLabel,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w700,
-                    color: primary,
-                  ),
+                child: Column(
+                  children: [
+                    Icon(
+                      _getStatusIcon(detail.application.status),
+                      color: statusColor,
+                      size: 20.sp,
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      detail.application.statusLabel,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w700,
+                        color: statusColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           SizedBox(height: 16.h),
-          Text(
-            detail.statusNote,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 13.sp,
-              color: theme.textTheme.bodyMedium?.color,
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(12.r),
             ),
-            textAlign: TextAlign.right,
+            child: Text(
+              detail.statusNote,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 12.sp,
+                color: theme.textTheme.bodyMedium?.color,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      textDirection: TextDirection.rtl,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: 15.sp,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        Container(
-          width: 42.w,
-          height: 4.h,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary,
-            borderRadius: BorderRadius.circular(2.r),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoGrid(BuildContext context, List<_InfoEntry> items) {
+  PreferredSize _buildAppBar(BuildContext context, LicenseDetailModel detail) {
     final theme = Theme.of(context);
+    final surface = context.themeSurface;
     final borderColor = context.themeBorder;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: borderColor),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 24.h),
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: items.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.5,
-          crossAxisSpacing: 16.w,
-          mainAxisSpacing: 24.h,
+    return PreferredSize(
+      preferredSize: Size.fromHeight(70.h),
+      child: AppBar(
+        backgroundColor: surface,
+        elevation: 0,
+        leading: Container(
+          margin: EdgeInsets.all(8.w),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: theme.colorScheme.primary,
+              size: 20.sp,
+            ),
+            onPressed: () => Get.back(),
+          ),
         ),
-        itemBuilder: (context, index) {
-          final entry = items[index];
-          return _buildInfoTile(entry.title, entry.value, context);
-        },
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              'تفاصيل الطلب',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 2.h),
+            Text(
+              detail.application.applicationNumber,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 11.sp,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: false,
+        toolbarHeight: 70.h,
+        actions: [
+          Obx(() {
+            final settingsCtrl = Get.find<SettingsController>();
+            final isDark = settingsCtrl.isDark;
+            return IconButton(
+              onPressed: () => settingsCtrl.toggleTheme(),
+              tooltip: isDark ? 'الوضع الفاتح' : 'الوضع الداكن',
+              icon: ThemedIcon(
+                isDark ? Icons.light_mode : Icons.dark_mode,
+                type: IconType.appBar,
+                customSize: 20.sp,
+              ),
+            );
+          }),
+        ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1.h),
+          child: Container(height: 1.h, color: borderColor),
+        ),
       ),
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, List<_InfoEntry> items) {
+  Widget _buildSectionCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
     final borderColor = context.themeBorder;
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: borderColor.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: items
-            .map(
-              (entry) => Padding(
-                padding: EdgeInsets.only(bottom: 12.h),
-                child: _buildInfoRow(entry.title, entry.value, context),
+        children: [
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: borderColor.withValues(alpha: 0.3),
+                  width: 1.2,
+                ),
               ),
-            )
-            .toList(),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    color: primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(icon, color: primary, size: 20.sp),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            child: child,
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildInfoGrid(BuildContext context, List<_InfoEntry> items) {
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: items.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.4,
+        crossAxisSpacing: 14.w,
+        mainAxisSpacing: 14.h,
+      ),
+      itemBuilder: (context, index) {
+        final entry = items[index];
+        return _buildInfoTile(entry.title, entry.value, context);
+      },
+    );
+  }
+
+  Widget _buildInfoCard(BuildContext context, List<_InfoEntry> items) {
+    final borderColor = context.themeBorder;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: List.generate(items.length, (index) {
+        final entry = items[index];
+        final isLast = index == items.length - 1;
+        return Column(
+          children: [
+            _buildInfoRow(entry.title, entry.value, context),
+            if (!isLast)
+              Padding(
+                padding: EdgeInsets.only(top: 14.h, bottom: 14.h),
+                child: Container(
+                  height: 1.h,
+                  color: borderColor.withValues(alpha: 0.2),
+                ),
+              ),
+          ],
+        );
+      }),
     );
   }
 
   Widget _buildInfoTile(String title, String value, BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: context.themeBorder.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -308,11 +486,12 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
               fontFamily: 'Cairo',
               fontSize: 11.sp,
               color: theme.textTheme.bodyMedium?.color,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
           Text(
-            value,
+            value.isEmpty ? 'غير محدد' : value,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             softWrap: true,
@@ -320,7 +499,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               color: theme.colorScheme.onSurface,
             ),
           ),
@@ -331,34 +510,43 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
 
   Widget _buildInfoRow(String title, String value, BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.right,
-          ),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12.h),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: context.themeBorder.withValues(alpha: 0.3)),
         ),
-        SizedBox(width: 10.w),
-        Flexible(
-          child: Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 12.sp,
-              color: theme.textTheme.bodyMedium?.color,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              value.isEmpty ? 'غير محدد' : value,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.right,
             ),
-            textAlign: TextAlign.right,
           ),
-        ),
-      ],
+          SizedBox(width: 10.w),
+          Flexible(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 12.sp,
+                color: theme.textTheme.bodyMedium?.color,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -369,20 +557,28 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     Color onSurface,
   ) {
     final theme = Theme.of(context);
+    final borderColor = context.themeBorder;
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: context.themeBorder),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
                 'المرفقات',
@@ -393,29 +589,54 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   color: onSurface,
                 ),
               ),
-              Text(
-                '${detail.attachments.length} مرفق',
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 12.sp,
-                  color: theme.textTheme.bodyMedium?.color,
+              SizedBox(width: 8.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Text(
+                  '${detail.attachments.length}',
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    color: primary,
+                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 14.h),
           if (detail.attachments.isEmpty)
-            Text(
-              'لا توجد مرفقات للعرض.',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 13.sp,
-                color: theme.textTheme.bodyMedium?.color,
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 24.h),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12.r),
               ),
-              textAlign: TextAlign.right,
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.folder_open_outlined,
+                    size: 40.sp,
+                    color: theme.textTheme.bodyMedium?.color,
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'لا توجد مرفقات',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 13.sp,
+                      color: theme.textTheme.bodyMedium?.color,
+                    ),
+                  ),
+                ],
+              ),
             )
           else
-            // Container(),
             Wrap(
               spacing: 10.w,
               runSpacing: 10.h,
@@ -444,17 +665,17 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       onTap: () => _openAttachment(context, attachment),
       child: Container(
         constraints: BoxConstraints(maxWidth: 390.w),
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: primary.withValues(alpha: 0.08)),
+          color: primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: primary.withValues(alpha: 0.12)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 18.sp, color: primary),
-            SizedBox(width: 8.w),
+            Icon(icon, size: 20.sp, color: primary),
+            SizedBox(width: 10.w),
             Expanded(
               child: Text(
                 attachment.fileName,
@@ -468,6 +689,13 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                 ),
                 textAlign: TextAlign.right,
               ),
+            ),
+            SizedBox(width: 6.w),
+            ThemedIcon(
+              Icons.download_outlined,
+              type: IconType.normal,
+              customSize: 16.sp,
+              customColor: primary,
             ),
           ],
         ),
@@ -651,7 +879,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       ),
                       IconButton(
                         onPressed: () => Get.back(),
-                        icon: const Icon(Icons.close),
+                        icon: const ThemedIcon(
+                          Icons.close,
+                          type: IconType.normal,
+                        ),
                       ),
                     ],
                   ),
@@ -679,62 +910,110 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     Color primary,
     Color secondary,
   ) {
+    final theme = Theme.of(context);
+    final borderColor = context.themeBorder;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: context.themeBorder),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            'خطوات الطلب',
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w700,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'خطوات الطلب',
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Icon(
+                  Icons.checklist_rtl_outlined,
+                  color: primary,
+                  size: 18.sp,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 14.h),
+          SizedBox(height: 16.h),
           ...detail.stepSummary.map((step) {
             final index = detail.stepSummary.indexOf(step) + 1;
+            final isLast = index == detail.stepSummary.length;
             return Padding(
-              padding: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.only(bottom: 16.h),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 32.w,
-                    height: 32.w,
-                    decoration: BoxDecoration(
-                      color: primary.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '$index',
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.bold,
-                        color: primary,
+                  Column(
+                    children: [
+                      Container(
+                        width: 36.w,
+                        height: 36.w,
+                        decoration: BoxDecoration(
+                          color: primary,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$index',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
+                      if (!isLast)
+                        SizedBox(
+                          height: 12.h,
+                          child: Center(
+                            child: Container(
+                              width: 2.w,
+                              height: 12.h,
+                              color: primary.withValues(alpha: 0.4),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
-                    child: Text(
-                      step,
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        fontSize: 13.sp,
-                        color: secondary,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 4.h),
+                      child: Text(
+                        step,
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 13.sp,
+                          color: secondary,
+                          height: 1.6,
+                        ),
+                        textAlign: TextAlign.right,
                       ),
-                      textAlign: TextAlign.right,
                     ),
                   ),
                 ],
@@ -747,35 +1026,89 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, Color primary) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Wrap(
-        spacing: 12.w,
-        runSpacing: 8.h,
-        alignment: WrapAlignment.end,
-        children: [
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.share),
-            label: const Text('مشاركة'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: primary,
-              side: BorderSide(color: primary.withValues(alpha: 0.7)),
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+    return Wrap(
+      spacing: 12.w,
+      runSpacing: 10.h,
+      alignment: WrapAlignment.end,
+      children: [
+        OutlinedButton.icon(
+          onPressed: () {},
+          icon: ThemedIcon(
+            Icons.share_outlined,
+            type: IconType.normal,
+            customSize: 16.sp,
+          ),
+          label: Text('مشاركة', style: TextStyle(fontSize: 12.sp)),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: primary,
+            side: BorderSide(color: primary),
+            padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
           ),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.print),
-            label: const Text('طباعة التقرير'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primary,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {},
+          icon: ThemedIcon(
+            Icons.print_outlined,
+            type: IconType.button,
+            customSize: 16.sp,
+          ),
+          label: Text('طباعة التقرير', style: TextStyle(fontSize: 12.sp)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primary,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return AppColors.success;
+      case 'rejected':
+        return AppColors.error;
+      case 'pending':
+      case 'in_review':
+      case 'under_review':
+        return AppColors.warning;
+      case 'completed':
+        return AppColors.statusCompleted;
+      case 'draft':
+        return AppColors.info;
+      case 'cancelled':
+        return AppColors.statusCancelled;
+      default:
+        return AppColors.primary;
+    }
+  }
+
+  IconData _getStatusIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return Icons.check_circle_outline;
+      case 'rejected':
+        return Icons.cancel_outlined;
+      case 'pending':
+      case 'in_review':
+      case 'under_review':
+        return Icons.schedule_outlined;
+      case 'completed':
+        return Icons.done_all_outlined;
+      case 'draft':
+        return Icons.edit_outlined;
+      case 'cancelled':
+        return Icons.block_outlined;
+      default:
+        return Icons.info_outline;
+    }
   }
 }
 
