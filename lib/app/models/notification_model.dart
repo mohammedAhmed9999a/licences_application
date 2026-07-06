@@ -52,6 +52,11 @@ class NotificationModel {
       return 'مرفوض';
     if (lower.contains('completed') || lower.contains('finished'))
       return 'مكتمل';
+    if (lower.contains('additional') ||
+        lower.contains('additional_info') ||
+        lower.contains('additionalinfo') ||
+        lower.contains('correction'))
+      return 'مطلوب معلومات إضافية';
     if (lower.contains('processing') || lower.contains('in progress'))
       return 'قيد التنفيذ';
     if (lower.contains('new')) return 'جديد';

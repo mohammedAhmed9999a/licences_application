@@ -153,7 +153,7 @@ class MyApplicationsScreen extends StatelessWidget {
                       Wrap(
                         spacing: 8.w,
                         runSpacing: 8.h,
-                        alignment: WrapAlignment.end,
+                        alignment: WrapAlignment.start,
                         children: [
                           _buildInfoChip(
                             theme,

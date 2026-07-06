@@ -25,6 +25,11 @@ class Step1ConditionsScreen extends StatelessWidget {
     final borderColor = context.themeBorder;
     final infoColor = theme.colorScheme.secondary;
     final errorColor = theme.colorScheme.error;
+    final errorContainer = theme.colorScheme.errorContainer;
+    final onErrorContainer = theme.colorScheme.onErrorContainer;
+    final errorTextColor = theme.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
 
     return SingleChildScrollView(
       child: Column(
@@ -289,6 +294,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                                     FilteringTextInputFormatter.digitsOnly,
                                   ],
                                   maxLength: 10,
+                                  enabled: ctrl.isFieldEditable('phone'),
                                 ),
                               );
                             },
@@ -309,6 +315,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                                   controller: ctrl.emailController,
                                   hintText: 'name@example.com',
                                   keyboardType: TextInputType.emailAddress,
+                                  enabled: ctrl.isFieldEditable('email'),
                                 ),
                               );
                             },
@@ -342,6 +349,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                                     FilteringTextInputFormatter.digitsOnly,
                                   ],
                                   maxLength: 10,
+                                  enabled: ctrl.isFieldEditable('phone'),
                                 ),
                               );
                             },
@@ -364,6 +372,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                                   controller: ctrl.emailController,
                                   hintText: 'name@example.com',
                                   keyboardType: TextInputType.emailAddress,
+                                  enabled: ctrl.isFieldEditable('email'),
                                 ),
                               );
                             },
@@ -396,6 +405,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                           FilteringTextInputFormatter.digitsOnly,
                         ],
                         maxLength: 10,
+                        enabled: ctrl.isFieldEditable('phone2'),
                       ),
                     );
                   },
@@ -435,13 +445,41 @@ class Step1ConditionsScreen extends StatelessWidget {
                       if (!ctrl.agreedToTerms.value &&
                           ctrl.errorMessage.value.contains('الشروط'))
                         Padding(
-                          padding: EdgeInsets.only(top: 4.h),
-                          child: Text(
-                            'يجب الموافقة على الشروط والأحكام للمتابعة',
-                            style: TextStyle(
-                              color: errorColor,
-                              fontSize: 11.sp,
-                              fontFamily: 'Cairo',
+                          padding: EdgeInsets.only(top: 6.h),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 8.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: errorContainer.withOpacity(0.22),
+                              borderRadius: BorderRadius.circular(8.r),
+                              border: Border.all(
+                                color: errorColor.withOpacity(0.35),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  color: errorColor,
+                                  size: 16.sp,
+                                ),
+                                SizedBox(width: 6.w),
+                                Expanded(
+                                  child: Text(
+                                    'يجب الموافقة على الشروط والأحكام للمتابعة',
+                                    style: TextStyle(
+                                      color: errorTextColor,
+                                      fontSize: 11.sp,
+                                      fontFamily: 'Cairo',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textDirection: TextDirection.rtl,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

@@ -28,6 +28,8 @@ class SectionCard extends StatelessWidget {
     final surface = theme.cardColor;
     final borderColor = theme.dividerColor;
     final textPrimary = theme.colorScheme.onSurface;
+    final textSecondaryColor =
+        theme.textTheme.bodyMedium?.color ?? theme.colorScheme.onSurface;
     final surfaceAlt = context.themeSurfaceAlt;
     final primaryColor = theme.colorScheme.primary;
 
@@ -100,7 +102,7 @@ class SectionCard extends StatelessWidget {
                           subtitle!,
                           style: TextStyle(
                             fontSize: 12.sp,
-                            color: AppColors.textSecondary,
+                            color: textSecondaryColor,
                             fontFamily: 'Cairo',
                           ),
                           textAlign: TextAlign.start,
@@ -137,7 +139,7 @@ class SectionCard extends StatelessWidget {
                 ),
               ),
             ),
-          Divider(height: 1.h, color: AppColors.borderLight),
+          Divider(height: 1.h, color: theme.dividerColor),
           Padding(padding: EdgeInsets.all(16.w), child: child),
         ],
       ),
@@ -164,7 +166,18 @@ class LabeledField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final errorColor = theme.colorScheme.error;
+    final errorContainer = theme.colorScheme.errorContainer;
+    final onErrorContainer = theme.colorScheme.onErrorContainer;
+    final successColor = theme.colorScheme.primary;
+    final labelColor =
+        theme.textTheme.titleMedium?.color ?? theme.colorScheme.onSurface;
+    final errorTextColor = theme.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Column(
@@ -179,9 +192,7 @@ class LabeledField extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.bold,
-                    color: isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimary,
+                    color: labelColor,
                     fontFamily: 'Cairo',
                   ),
                   textDirection: TextDirection.rtl,
@@ -192,7 +203,7 @@ class LabeledField extends StatelessWidget {
               if (required)
                 Text(
                   ' *',
-                  style: TextStyle(color: AppColors.error, fontSize: 14.sp),
+                  style: TextStyle(color: errorColor, fontSize: 14.sp),
                 ),
             ],
           ),
@@ -200,51 +211,73 @@ class LabeledField extends StatelessWidget {
           child,
           if (errorText != null && errorText!.isNotEmpty) ...[
             SizedBox(height: 6.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Text(
-                    errorText!,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: AppColors.error,
-                      fontFamily: 'Cairo',
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.right,
-                  ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: errorContainer.withOpacity(0.22),
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: errorColor.withOpacity(0.35),
+                  width: 1,
                 ),
-                SizedBox(width: 6.w),
-                Icon(Icons.error_outline, size: 14.sp, color: AppColors.error),
-              ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: Text(
+                      errorText!,
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        color: errorTextColor,
+                        fontFamily: 'Cairo',
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
+                  SizedBox(width: 6.w),
+                  Icon(Icons.error_outline, size: 14.sp, color: errorColor),
+                ],
+              ),
             ),
           ] else if (successText != null && successText!.isNotEmpty) ...[
             SizedBox(height: 6.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Text(
-                    successText!,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.green.shade600,
-                      fontFamily: 'Cairo',
-                      fontWeight: FontWeight.w600,
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: successColor.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: successColor.withOpacity(0.25),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: Text(
+                      successText!,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: successColor,
+                        fontFamily: 'Cairo',
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.right,
                     ),
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.right,
                   ),
-                ),
-                SizedBox(width: 6.w),
-                Icon(
-                  Icons.check_circle_outline,
-                  size: 14.sp,
-                  color: Colors.green.shade600,
-                ),
-              ],
+                  SizedBox(width: 6.w),
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 14.sp,
+                    color: successColor,
+                  ),
+                ],
+              ),
             ),
           ],
         ],
@@ -315,14 +348,20 @@ class RtlTextField extends StatelessWidget {
         ),
         if (helperText != null) ...[
           SizedBox(height: 4.h),
-          Text(
-            helperText!,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: AppColors.textHint,
-              fontFamily: 'Cairo',
-            ),
-            // text direction follows app Directionality
+          Builder(
+            builder: (context) {
+              final theme = Theme.of(context);
+              final helperColor =
+                  theme.textTheme.bodySmall?.color ?? theme.hintColor;
+              return Text(
+                helperText!,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: helperColor,
+                  fontFamily: 'Cairo',
+                ),
+              );
+            },
           ),
         ],
       ],
@@ -336,7 +375,8 @@ class ChoiceCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final bool selected;
-  final VoidCallback onTap;
+  final bool enabled;
+  final VoidCallback? onTap;
 
   const ChoiceCard({
     super.key,
@@ -344,7 +384,8 @@ class ChoiceCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.selected,
-    required this.onTap,
+    this.enabled = true,
+    this.onTap,
   });
 
   @override
@@ -361,15 +402,23 @@ class ChoiceCard extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: GestureDetector(
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: selected ? surfaceAlt : surface,
+            color: selected
+                ? AppColors.selectedCard
+                : enabled
+                ? surface
+                : AppColors.backgroundAlt,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: selected ? primaryColor : borderColor,
+              color: selected
+                  ? primaryColor
+                  : enabled
+                  ? borderColor
+                  : AppColors.borderLight,
               width: selected ? 1.5 : 1,
             ),
           ),
@@ -694,13 +743,22 @@ class ErrorBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (message.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final errorColor = theme.colorScheme.error;
+    final errorContainer = theme.colorScheme.errorContainer;
+    final onErrorContainer = theme.colorScheme.onErrorContainer;
+    final errorTextColor = theme.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: AppColors.error.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: AppColors.error.withOpacity(0.3)),
+        color: errorContainer.withOpacity(0.22),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: errorColor.withOpacity(0.35), width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -710,14 +768,15 @@ class ErrorBanner extends StatelessWidget {
               message,
               style: TextStyle(
                 fontSize: 13.sp,
-                color: AppColors.error,
+                color: errorTextColor,
                 fontFamily: 'Cairo',
+                fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.right,
             ),
           ),
           SizedBox(width: 8.w),
-          const Icon(Icons.error_outline, color: AppColors.error, size: 18),
+          Icon(Icons.error_outline, color: errorColor, size: 18),
         ],
       ),
     );
@@ -867,8 +926,9 @@ class AttachmentCard extends StatelessWidget {
   final String description;
   final bool required;
   final bool uploaded;
+  final bool enabled;
   final String? fileName;
-  final VoidCallback onUpload;
+  final VoidCallback? onUpload;
   final VoidCallback? onView;
   final VoidCallback? onRemove;
 
@@ -878,8 +938,9 @@ class AttachmentCard extends StatelessWidget {
     required this.description,
     this.required = true,
     this.uploaded = false,
+    this.enabled = true,
     this.fileName,
-    required this.onUpload,
+    this.onUpload,
     this.onView,
     this.onRemove,
   });
@@ -980,14 +1041,16 @@ class AttachmentCard extends StatelessWidget {
           Divider(height: 1.h, color: AppColors.borderLight),
           // Upload area
           GestureDetector(
-            onTap: uploaded ? onView ?? onUpload : onUpload,
+            onTap: enabled ? (uploaded ? onView ?? onUpload : onUpload) : null,
             child: Container(
               margin: const EdgeInsets.all(12),
               padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 12.w),
               decoration: BoxDecoration(
-                color: uploaded
-                    ? AppColors.primary.withOpacity(0.05)
-                    : AppColors.backgroundAlt,
+                color: enabled
+                    ? uploaded
+                          ? AppColors.primary.withOpacity(0.05)
+                          : AppColors.backgroundAlt
+                    : AppColors.borderLight.withOpacity(0.16),
                 borderRadius: BorderRadius.circular(8.r),
                 border: Border.all(
                   color: uploaded
@@ -1008,13 +1071,19 @@ class AttachmentCard extends StatelessWidget {
                   ),
                   SizedBox(height: 6.h),
                   Text(
-                    uploaded ? (fileName ?? 'تم رفع الملف') : 'إضافة مرفق',
+                    uploaded
+                        ? (fileName ?? 'تم رفع الملف')
+                        : enabled
+                        ? 'إضافة مرفق'
+                        : 'غير متاح للتعديل',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: uploaded
                           ? AppColors.primary
-                          : AppColors.textSecondary,
+                          : enabled
+                          ? AppColors.textSecondary
+                          : AppColors.textHint,
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.w500,
                     ),

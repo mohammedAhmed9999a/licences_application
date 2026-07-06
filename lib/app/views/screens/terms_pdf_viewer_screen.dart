@@ -85,7 +85,15 @@ class _TermsPdfViewerScreenState extends State<TermsPdfViewerScreen> {
 
       final sourceFile = File(displayPdfPath!);
       final bytes = await sourceFile.readAsBytes();
-      final fileName = displayPdfPath!.split('/').last;
+      final originalName = displayPdfPath!.split('/').last;
+      final extension = originalName.contains('.')
+          ? '.${originalName.split('.').last}'
+          : '';
+      final baseName = originalName.contains('.')
+          ? originalName.substring(0, originalName.lastIndexOf('.'))
+          : originalName;
+      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final fileName = '$baseName-$timestamp$extension';
       final targetDir = Platform.isAndroid
           ? Directory('/storage/emulated/0/Download')
           : await getApplicationDocumentsDirectory();

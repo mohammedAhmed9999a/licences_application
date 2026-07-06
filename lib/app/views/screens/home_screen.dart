@@ -58,9 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? Icons.dark_mode_outlined
                                 : Icons.light_mode_outlined,
                             color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                                Theme.of(context).textTheme.bodyMedium?.color ??
+                                Theme.of(context).colorScheme.onSurface,
                             size: 24.sp,
                           ),
                         ),
@@ -97,9 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 26.sp,
                             fontWeight: FontWeight.bold,
                             color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                                Theme.of(
+                                  context,
+                                ).textTheme.displayMedium?.color ??
+                                Theme.of(context).colorScheme.onSurface,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -110,9 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontFamily: 'Cairo',
                             fontSize: 13.sp,
                             color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                                Theme.of(context).textTheme.bodyMedium?.color ??
+                                Theme.of(context).colorScheme.onSurface,
                             height: 1.6,
                           ),
                           textAlign: TextAlign.center,
@@ -167,10 +166,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             vertical: 4.h,
                           ),
                           decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.primaryLight.withOpacity(0.15)
-                                : AppColors.primary.withOpacity(0.08),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(20.r),
                           ),
                           child: Text(
@@ -178,11 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontFamily: 'Cairo',
                               fontSize: 12.sp,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? AppColors.primaryLight
-                                  : AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -195,9 +189,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 22.sp,
                             fontWeight: FontWeight.bold,
                             color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimary,
+                                Theme.of(
+                                  context,
+                                ).textTheme.displayMedium?.color ??
+                                Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         SizedBox(height: 8.h),
@@ -207,9 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontFamily: 'Cairo',
                             fontSize: 13.sp,
                             color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondary,
+                                Theme.of(context).textTheme.bodyMedium?.color ??
+                                Theme.of(context).colorScheme.onSurface,
                             height: 1.6,
                           ),
                           textAlign: TextAlign.center,
@@ -220,18 +214,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         Container(
                           height: 220.h,
                           decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.darkSurfaceVariant
-                                : const Color(0xFF2C2C2C),
+                            color: Theme.of(context).colorScheme.surfaceVariant,
                             borderRadius: BorderRadius.circular(12.r),
-                            border:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Border.all(
-                                    color: AppColors.borderDark,
-                                    width: 0.5,
-                                  )
-                                : null,
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor,
+                              width: 0.5,
+                            ),
                           ),
                           child: Stack(
                             alignment: Alignment.center,
@@ -240,11 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12.r),
                                 child: Container(
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? AppColors.darkSurface
-                                      : const Color(0xFF1E1E1E),
+                                  color: Theme.of(context).colorScheme.surface,
                                   child: Center(
                                     child: Column(
                                       mainAxisAlignment:
@@ -255,10 +239,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           style: TextStyle(
                                             fontFamily: 'Cairo',
                                             color:
-                                                Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                                ? AppColors.textSecondaryDark
-                                                : Colors.white70,
+                                                Theme.of(
+                                                  context,
+                                                ).textTheme.bodyMedium?.color ??
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                             fontSize: 13.sp,
                                           ),
                                           textAlign: TextAlign.center,
@@ -268,10 +254,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           style: TextStyle(
                                             fontFamily: 'Cairo',
                                             color:
-                                                Theme.of(context).brightness ==
-                                                    Brightness.dark
-                                                ? AppColors.darkTextHint
-                                                : Colors.white38,
+                                                Theme.of(
+                                                  context,
+                                                ).textTheme.bodySmall?.color ??
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                             fontSize: 11.sp,
                                           ),
                                         ),
@@ -329,9 +317,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 12.sp,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.darkTextHint
-                          : AppColors.textHint,
+                      color:
+                          Theme.of(context).textTheme.bodySmall?.color ??
+                          Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   SizedBox(height: 20.h),
@@ -365,15 +353,13 @@ class _AuthCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurfaceVariant : AppColors.surface,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.border,
-          width: 0.5,
-        ),
+        border: Border.all(color: theme.dividerColor, width: 0.5),
         boxShadow: [
           BoxShadow(
             color: isDark
@@ -395,16 +381,14 @@ class _AuthCard extends StatelessWidget {
               width: 44.w,
               height: 44.h,
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.darkSurfaceVariant
-                    : AppColors.backgroundAlt,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: Icon(
                 icon,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color:
+                    theme.textTheme.bodyMedium?.color ??
+                    theme.colorScheme.onSurface,
                 size: 22.sp,
               ),
             ),
@@ -416,7 +400,9 @@ class _AuthCard extends StatelessWidget {
               fontFamily: 'Cairo',
               fontSize: 14.sp,
               fontWeight: FontWeight.bold,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              color:
+                  theme.textTheme.bodyLarge?.color ??
+                  theme.colorScheme.onSurface,
             ),
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
@@ -429,9 +415,9 @@ class _AuthCard extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 11.sp,
-                color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondary,
+                color:
+                    theme.textTheme.bodySmall?.color ??
+                    theme.colorScheme.onSurface,
                 height: 1.5,
               ),
               textDirection: TextDirection.rtl,

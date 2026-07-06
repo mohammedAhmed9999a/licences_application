@@ -1,8 +1,9 @@
 class AttachmentItem {
   final String name;
   final String? filePath;
+  final String? docTypeName;
 
-  AttachmentItem({required this.name, this.filePath});
+  AttachmentItem({required this.name, this.filePath, this.docTypeName});
 
   String? resolveUrl({required String baseUrl}) {
     if (filePath == null || filePath!.trim().isEmpty) return null;
@@ -40,6 +41,15 @@ class AttachmentItem {
     return baseEndsWithStorage
         ? '$baseWithoutSlash/$trimmed'
         : '$baseWithoutSlash/storage/$trimmed';
+  }
+
+  String get displayName {
+    final value = (docTypeName ?? name).toString().trim();
+    return value.isNotEmpty
+        ? value
+        : name.isNotEmpty
+        ? name
+        : 'مرفق';
   }
 
   String get fileName {
@@ -133,6 +143,27 @@ class ApplicationModel {
   final String statusNote;
   final List<AttachmentItem> attachments;
   final List<String> stepSummary;
+  final List<String> correctionTargets;
+  final bool needsCorrection;
+  final String? firstName;
+  final String? fatherName;
+  final String? lastName;
+  final String? motherName;
+  final String? nickname;
+  final String? placeOfBirth;
+  final String? dateOfBirth;
+  final String? companyName;
+  final String? companyLicenseNumber;
+  final String? companyLicenseDate;
+  final String? secondaryPhone;
+  final String? governorateId;
+  final String? districtId;
+  final String? subDistrictId;
+  final String? townId;
+  final String? latitude;
+  final String? longitude;
+  final String? applicantType;
+  final bool termsAccepted;
 
   ApplicationModel({
     required this.id,
@@ -156,45 +187,68 @@ class ApplicationModel {
     this.statusNote = '',
     this.attachments = const [],
     this.stepSummary = const [],
+    this.correctionTargets = const [],
+    this.needsCorrection = false,
+    this.firstName,
+    this.fatherName,
+    this.lastName,
+    this.motherName,
+    this.nickname,
+    this.placeOfBirth,
+    this.dateOfBirth,
+    this.companyName,
+    this.companyLicenseNumber,
+    this.companyLicenseDate,
+    this.secondaryPhone,
+    this.governorateId,
+    this.districtId,
+    this.subDistrictId,
+    this.townId,
+    this.latitude,
+    this.longitude,
+    this.applicantType,
+    this.termsAccepted = false,
   });
 
   factory ApplicationModel.fromJson(Map<String, dynamic> json) {
-    final location = json['location'] as Map<String, dynamic>? ?? {};
-    final governorateMap = location['governorate'] as Map<String, dynamic>?;
-    final districtMap = location['district'] as Map<String, dynamic>?;
-    final townMap = location['town'] as Map<String, dynamic>?;
-    final allowedCategory = json['allowed_category'] as Map<String, dynamic>?;
-    final licenseCategory =
-        allowedCategory?['license_category'] as Map<String, dynamic>?;
-    final roadTypeMap = allowedCategory?['road_type'] as Map<String, dynamic>?;
-    final zoningMap = allowedCategory?['zoning'] as Map<String, dynamic>?;
-    final applicantable = json['applicantable'] as Map<String, dynamic>?;
-    final user = json['user'] as Map<String, dynamic>?;
+    final location = _asStringKeyedMap(json['location']) ?? <String, dynamic>{};
+    final governorateMap = _asStringKeyedMap(location['governorate']);
+    final districtMap = _asStringKeyedMap(location['district']);
+    final townMap = _asStringKeyedMap(location['town']);
+    final allowedCategory = _asStringKeyedMap(json['allowed_category']);
+    final licenseCategory = _asStringKeyedMap(
+      allowedCategory?['license_category'],
+    );
+    final roadTypeMap = _asStringKeyedMap(allowedCategory?['road_type']);
+    final zoningMap = _asStringKeyedMap(allowedCategory?['zoning']);
+    final applicantable =
+        _asStringKeyedMap(json['applicantable']) ?? <String, dynamic>{};
+    final user = _asStringKeyedMap(json['user']) ?? <String, dynamic>{};
 
-    var applicantName = applicantable?['full_name']?.toString() ?? '';
+    var applicantName = applicantable['full_name']?.toString() ?? '';
     if (applicantName.isEmpty) {
-      applicantName = applicantable?['company_name']?.toString() ?? '';
+      applicantName = applicantable['company_name']?.toString() ?? '';
     }
     if (applicantName.isEmpty) {
-      applicantName = user?['name']?.toString() ?? '';
+      applicantName = user['name']?.toString() ?? '';
     }
 
     final attachmentItems =
         (json['attachments'] as List?)
             ?.map((item) {
-              if (item is Map<String, dynamic>) {
+              if (item is Map) {
+                final itemMap = _asStringKeyedMap(item) ?? <String, dynamic>{};
                 final path =
-                    item['file_path']?.toString() ??
-                    item['file']?.toString() ??
-                    item['url']?.toString();
-                String name = item['file_name']?.toString() ?? '';
-                if (name.isEmpty) {
-                  final docType = item['doc_type'];
-                  if (docType is Map<String, dynamic>) {
-                    name = docType['name']?.toString() ?? '';
-                  } else if (docType != null) {
-                    name = docType.toString();
-                  }
+                    itemMap['file_path']?.toString() ??
+                    itemMap['file']?.toString() ??
+                    itemMap['url']?.toString();
+                String name = itemMap['file_name']?.toString() ?? '';
+                final docTypeName = _readAttachmentDocTypeName(itemMap);
+
+                if (docTypeName != null && docTypeName.trim().isNotEmpty) {
+                  name = docTypeName;
+                } else if (name.isEmpty) {
+                  name = docTypeName ?? '';
                 }
                 if (name.isEmpty && path != null) {
                   final uri = Uri.tryParse(path);
@@ -207,6 +261,7 @@ class ApplicationModel {
                 return AttachmentItem(
                   name: name.isNotEmpty ? name : 'مرفق',
                   filePath: path,
+                  docTypeName: docTypeName,
                 );
               }
               final text = item?.toString() ?? '';
@@ -223,6 +278,13 @@ class ApplicationModel {
             .toList() ??
         [];
 
+    final statusValue = json['status']?.toString() ?? 'PENDING';
+    final normalizedStatus = statusValue.toLowerCase();
+    final needsCorrection =
+        normalizedStatus.contains('additionalinforequired') ||
+        normalizedStatus.contains('correction') ||
+        correctionTargets.isNotEmpty;
+
     final latitude = location['latitude']?.toString() ?? '';
     final longitude = location['longitude']?.toString() ?? '';
     final coordinates = [
@@ -230,7 +292,6 @@ class ApplicationModel {
       longitude,
     ].where((part) => part.isNotEmpty).join(', ');
 
-    final status = json['status']?.toString() ?? 'PENDING';
     final adminMessage = json['admin_message']?.toString() ?? '';
     final statusNote = adminMessage.isNotEmpty
         ? adminMessage
@@ -241,10 +302,38 @@ class ApplicationModel {
     return ApplicationModel(
       id: json['id']?.toString() ?? '',
       applicationNumber: json['license_request_number']?.toString() ?? '',
-      status: status,
-      statusLabel: _statusLabel(status),
+      status: statusValue,
+      statusLabel: _statusLabel(statusValue),
       requestType: json['operation_type']?['name']?.toString() ?? '',
       investorType: json['applicantable_type']?.toString() ?? '',
+      correctionTargets: correctionTargets,
+      needsCorrection: needsCorrection,
+      firstName: user['first_name']?.toString(),
+      fatherName: user['father_name']?.toString(),
+      lastName: user['last_name']?.toString(),
+      motherName: user['mother_name']?.toString(),
+      nickname: user['nickname']?.toString(),
+      placeOfBirth: user['place_of_birth']?.toString(),
+      dateOfBirth: user['date_of_birth']?.toString(),
+      companyName: applicantable['company_name']?.toString(),
+      companyLicenseNumber: applicantable['company_license_number']?.toString(),
+      companyLicenseDate: applicantable['company_license_date']?.toString(),
+      secondaryPhone: json['secondary_phone']?.toString(),
+      governorateId:
+          location['governorate_id']?.toString() ??
+          governorateMap?['id']?.toString(),
+      districtId:
+          location['district_id']?.toString() ?? districtMap?['id']?.toString(),
+      subDistrictId:
+          location['sub_district_id']?.toString() ??
+          (location['sub_district'] as Map<String, dynamic>?)?['id']
+              ?.toString(),
+      townId: location['town_id']?.toString() ?? townMap?['id']?.toString(),
+      latitude: latitude,
+      longitude: longitude,
+      applicantType: json['applicantable_type']?.toString(),
+      termsAccepted:
+          json['terms_accepted'] == true || json['terms_accepted'] == 1,
       createdAt: json['created_at']?.toString() ?? '',
       governorate: governorateMap?['name']?.toString(),
       stationCategory:
@@ -254,7 +343,7 @@ class ApplicationModel {
       applicantName: applicantName.isNotEmpty ? applicantName : null,
       email: json['email']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
-      nationalId: user?['national_id']?.toString() ?? '',
+      nationalId: user['national_id']?.toString() ?? '',
       district: districtMap?['name']?.toString() ?? '',
       roadType:
           roadTypeMap?['name']?.toString() ??
@@ -267,6 +356,31 @@ class ApplicationModel {
       stepSummary:
           (json['step_summary'] as List?)?.map((e) => e.toString()).toList() ??
           [],
+    );
+  }
+
+  static Map<String, dynamic>? _asStringKeyedMap(dynamic value) {
+    if (value is Map) {
+      return value.map((key, value) => MapEntry(key.toString(), value));
+    }
+    return null;
+  }
+
+  static String? _readAttachmentDocTypeName(Map<String, dynamic> item) {
+    final docType = item['doc_type'];
+    final docTypeMap = _asStringKeyedMap(docType);
+    final docTypeName = docTypeMap?['name']?.toString();
+
+    final values = [
+      item['doc_name']?.toString(),
+      item['doc_type_name']?.toString(),
+      item['document_type']?.toString(),
+      docTypeName,
+    ];
+
+    return values.firstWhere(
+      (value) => value != null && value.trim().isNotEmpty,
+      orElse: () => null,
     );
   }
 
@@ -398,6 +512,15 @@ class ApplicationModel {
 
     if (normalized.contains('draft')) {
       return 'مسودة';
+    }
+
+    if (normalized.contains('additional') ||
+        normalized.contains('additional_info') ||
+        normalized.contains('additionalinfo') ||
+        normalized.contains('additional_info_required') ||
+        normalized.contains('correction') ||
+        normalized.contains('correction_targets')) {
+      return 'مطلوب معلومات إضافية';
     }
 
     if (normalized.contains('completed') || normalized.contains('finished')) {

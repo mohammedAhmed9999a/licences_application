@@ -30,9 +30,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
       final fontData = await rootBundle.load('assets/fonts/arial.ttf');
       final font = pw.Font.ttf(fontData);
       final document = pw.Document();
-      final applicantName = ctrl.investorType.value == 'individual'
-          ? '${ctrl.firstNameController.text.trim()} ${ctrl.fatherNameController.text.trim()} ${ctrl.lastNameController.text.trim()}'
-          : ctrl.companyNameController.text.trim();
+      final applicantName = ctrl.getApplicantFullName();
       final requestTypeLabel = ctrl.requestType.value == 'settlement'
           ? 'تسوية'
           : 'جديد';
@@ -78,10 +76,20 @@ class ApplicationSuccessScreen extends StatelessWidget {
                 ? ctrl.previousLicenseNumber.text.trim()
                 : 'غير محدد'
           : 'غير مطبق';
+      final bgImageData = await rootBundle.load(
+        'assets/images/splash_background.png',
+      );
+      final svg = await rootBundle.loadString(
+        'assets/images/pattern-light.svg',
+      );
 
+      final bgImage = pw.MemoryImage(bgImageData.buffer.asUint8List());
+      final logoData = await rootBundle.load('assets/images/h-logo.webp');
+
+      final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
       pw.Widget buildLabelValue(String label, String value) {
         return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.end,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
               label,
@@ -128,6 +136,8 @@ class ApplicationSuccessScreen extends StatelessWidget {
           padding: const pw.EdgeInsets.symmetric(vertical: 9, horizontal: 8),
           child: pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
+
+            // textDirection: pw.TextDirection.rtl,
             children: cells,
           ),
         );
@@ -141,7 +151,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
             borderRadius: pw.BorderRadius.circular(8),
           ),
           child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Container(
                 padding: const pw.EdgeInsets.symmetric(
@@ -182,211 +192,227 @@ class ApplicationSuccessScreen extends StatelessWidget {
           ),
           margin: const pw.EdgeInsets.all(24),
           build: (context) => [
-            pw.Directionality(
-              textDirection: pw.TextDirection.rtl,
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-                children: [
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            pw.Stack(
+              children: [
+                pw.Positioned.fill(
+                  child: pw.Opacity(
+                    opacity: 0.019,
+
+                    child: pw.SvgImage(svg: svg, fit: pw.BoxFit.cover),
+                  ),
+                ),
+                // pw.Positioned.fill(
+                //   child: pw.Image(bgImage, fit: pw.BoxFit.cover),
+                // ),
+                pw.Directionality(
+                  textDirection: pw.TextDirection.rtl,
+                  child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: pw.CrossAxisAlignment.center,
                         children: [
-                          pw.Text(
-                            'وزارة الطاقة',
-                            style: pw.TextStyle(
-                              fontSize: 14,
-                              fontWeight: pw.FontWeight.bold,
-                            ),
+                          pw.Image(logoImage, width: 150.w, height: 100.h),
+
+                          pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.center,
+                            children: [
+                              pw.Text(
+                                'إدارة خدمات الطاقة',
+                                style: pw.TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                              ),
+                              pw.SizedBox(height: 4),
+                              pw.Text(
+                                'طلب ترخيص محطة وقود',
+                                style: pw.TextStyle(
+                                  fontSize: 14,
+                                  color: PdfColors.grey700,
+                                ),
+                              ),
+                              // pw.SizedBox(height: 2),
+                              // pw.Text(
+                              //   'طلب ترخيص محطة وقود',
+                              //   style: pw.TextStyle(
+                              //     fontSize: 12,
+                              //     color: PdfColors.grey700,
+                              //   ),
+                              // ),
+                            ],
                           ),
-                          pw.SizedBox(height: 4),
-                          pw.Text(
-                            'إدارة خدمات الطاقة',
-                            style: pw.TextStyle(
-                              fontSize: 10,
-                              color: PdfColors.grey700,
+                          pw.Container(
+                            padding: const pw.EdgeInsets.all(8),
+                            decoration: pw.BoxDecoration(
+                              border: pw.Border.all(color: PdfColors.grey300),
+                              borderRadius: pw.BorderRadius.circular(8),
+                              color: PdfColors.white,
                             ),
-                          ),
-                          pw.SizedBox(height: 2),
-                          pw.Text(
-                            'طلب ترخيص محطة وقود',
-                            style: pw.TextStyle(
-                              fontSize: 12,
-                              color: PdfColors.grey700,
+                            child: pw.BarcodeWidget(
+                              data: applicationNumber,
+                              barcode: pw.Barcode.qrCode(),
+                              width: 80,
+                              height: 80,
                             ),
                           ),
                         ],
                       ),
+                      pw.SizedBox(height: 18),
                       pw.Container(
-                        padding: const pw.EdgeInsets.all(8),
+                        width: double.infinity,
+                        padding: const pw.EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                         decoration: pw.BoxDecoration(
-                          border: pw.Border.all(color: PdfColors.grey300),
+                          color: PdfColors.grey200,
                           borderRadius: pw.BorderRadius.circular(8),
-                          color: PdfColors.white,
                         ),
-                        child: pw.BarcodeWidget(
-                          data: applicationNumber,
-                          barcode: pw.Barcode.qrCode(),
-                          width: 80,
-                          height: 80,
+                        child: pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text(
+                              'رقم الطلب: $applicationNumber',
+                              style: pw.TextStyle(
+                                fontSize: 10,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                            pw.Text(
+                              'تاريخ التقديم: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                              style: pw.TextStyle(fontSize: 10),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                  pw.SizedBox(height: 18),
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: pw.BoxDecoration(
-                      color: PdfColors.grey200,
-                      borderRadius: pw.BorderRadius.circular(8),
-                    ),
-                    child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          'رقم الطلب: $applicationNumber',
-                          style: pw.TextStyle(
-                            fontSize: 10,
-                            fontWeight: pw.FontWeight.bold,
-                          ),
-                        ),
-                        pw.Text(
-                          'تاريخ التقديم: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                          style: pw.TextStyle(fontSize: 10),
-                        ),
-                      ],
-                    ),
-                  ),
-                  pw.SizedBox(height: 20),
+                      pw.SizedBox(height: 20),
 
-                  buildSection('بيانات الطلب', [
-                    buildTripleRow(
-                      'رقم الطلب',
-                      applicationNumber,
-                      label2: 'نوع الطلب',
-                      value2: requestTypeLabel,
-                      label3: 'حالة الطلب',
-                      value3: 'قيد الدراسة',
-                    ),
-                    buildTripleRow(
-                      'تاريخ التقديم',
-                      '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                      label2: 'مدة الدراسة',
-                      value2: '1.0',
-                      label3: 'فئة المحطة',
-                      value3: stationCategoryLabel,
-                      alternate: true,
-                    ),
-                    buildTripleRow(
-                      'رقم الترخيص السابق',
-                      settlementLicenseNumber,
-                      label2: 'اسم مقدم الطلب',
-                      value2: applicantName,
-                      alternate: false,
-                    ),
-                    if (ctrl.investorType.value == 'company')
-                      buildTripleRow(
-                        'اسم الشركة',
-                        ctrl.companyNameController.text.trim(),
-                        label2: 'رقم ترخيص الشركة',
-                        value2: companyLicenseNumber,
-                        label3: 'تاريخ ترخيص الشركة',
-                        value3: companyLicenseDateLabel,
-                        alternate: true,
-                      ),
-                  ]),
-                  buildSection('بيانات مقدم الطلب', [
-                    buildTripleRow(
-                      'الاسم الكامل',
-                      applicantName,
-                      label2: 'الرقم الوطني',
-                      value2: ctrl.nationalIdController.text.trim(),
-                      label3: 'مكان الولادة',
-                      value3: ctrl.birthPlaceController.text.trim(),
-                    ),
-                    buildTripleRow(
-                      'تاريخ الولادة',
-                      birthDate,
-                      label2: 'البريد الإلكتروني',
-                      value2: ctrl.emailController.text.trim(),
-                      label3: 'رقم التواصل',
-                      value3: ctrl.phoneController.text.trim(),
-                      alternate: true,
-                    ),
-                    if (ctrl.phone2Controller.text.trim().isNotEmpty)
-                      buildTripleRow(
-                        'الهاتف الثانوي',
-                        ctrl.phone2Controller.text.trim(),
-                        alternate: false,
-                      ),
-                    if (ctrl.investorType.value == 'company')
-                      buildTripleRow(
-                        'اسم الشركة',
-                        ctrl.companyNameController.text.trim(),
-                        label2: 'الشركاء',
-                        value2: partners.isNotEmpty
-                            ? partners.join('، ')
-                            : 'غير محدد',
-                        alternate: true,
-                      ),
-                  ]),
-                  buildSection('بيانات الموقع والتصنيف', [
-                    buildTripleRow(
-                      'المحافظة',
-                      governorate,
-                      label2: 'المنطقة',
-                      value2: district,
-                      label3: 'القضاء',
-                      value3: subdistrict,
-                    ),
-                    buildTripleRow(
-                      'الناحية',
-                      town,
-                      label2: 'نوع الطريق',
-                      value2: roadTypeLabel,
-                      label3: 'فئة المحطة',
-                      value3: stationCategoryLabel,
-                      alternate: true,
-                    ),
-                    buildTripleRow(
-                      'خط الطول',
-                      longitude,
-                      label2: 'دائرة العرض',
-                      value2: latitude,
-                      label3: 'حالة التنظيم',
-                      value3: planningLocationLabel,
-                    ),
-                  ]),
-                  pw.SizedBox(height: 22),
-                  pw.Divider(color: PdfColors.grey300),
-                  pw.SizedBox(height: 10),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
-                        style: pw.TextStyle(
-                          fontSize: 9,
-                          color: PdfColors.grey600,
+                      buildSection('بيانات الطلب', [
+                        buildTripleRow(
+                          'رقم الطلب',
+                          applicationNumber,
+                          label2: 'نوع الطلب',
+                          value2: requestTypeLabel,
+                          label3: 'حالة الطلب',
+                          value3: 'قيد الدراسة',
                         ),
-                      ),
-                      pw.Text(
-                        'وزارة الطاقة © ${DateTime.now().year}',
-                        style: pw.TextStyle(
-                          fontSize: 9,
-                          color: PdfColors.grey600,
+                        buildTripleRow(
+                          'تاريخ التقديم',
+                          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                          label2: 'مدة الدراسة',
+                          value2: '1.0',
+                          label3: 'فئة المحطة',
+                          value3: stationCategoryLabel,
+                          alternate: true,
                         ),
+                        buildTripleRow(
+                          'رقم الترخيص السابق',
+                          settlementLicenseNumber,
+                          label2: 'اسم مقدم الطلب',
+                          value2: applicantName,
+                          alternate: false,
+                        ),
+                        if (ctrl.investorType.value == 'company')
+                          buildTripleRow(
+                            'اسم الشركة',
+                            ctrl.companyNameController.text.trim(),
+                            label2: 'رقم ترخيص الشركة',
+                            value2: companyLicenseNumber,
+                            label3: 'تاريخ ترخيص الشركة',
+                            value3: companyLicenseDateLabel,
+                            alternate: true,
+                          ),
+                      ]),
+                      buildSection('بيانات مقدم الطلب', [
+                        buildTripleRow(
+                          'الاسم الكامل',
+                          applicantName,
+                          label2: 'الرقم الوطني',
+                          value2: ctrl.nationalIdController.text.trim(),
+                          label3: 'مكان الولادة',
+                          value3: ctrl.birthPlaceController.text.trim(),
+                        ),
+                        buildTripleRow(
+                          'تاريخ الولادة',
+                          birthDate,
+                          label2: 'البريد الإلكتروني',
+                          value2: ctrl.emailController.text.trim(),
+                          label3: 'رقم التواصل',
+                          value3: ctrl.phoneController.text.trim(),
+                          alternate: true,
+                        ),
+                        if (ctrl.phone2Controller.text.trim().isNotEmpty)
+                          buildTripleRow(
+                            'الهاتف الثانوي',
+                            ctrl.phone2Controller.text.trim(),
+                            alternate: false,
+                          ),
+                        if (ctrl.investorType.value == 'company')
+                          buildTripleRow(
+                            'اسم الشركة',
+                            ctrl.companyNameController.text.trim(),
+                            label2: 'الشركاء',
+                            value2: partners.isNotEmpty
+                                ? partners.join('، ')
+                                : 'غير محدد',
+                            alternate: true,
+                          ),
+                      ]),
+                      buildSection('بيانات الموقع والتصنيف', [
+                        buildTripleRow(
+                          'المحافظة',
+                          governorate,
+                          label2: 'المنطقة',
+                          value2: district,
+                          label3: 'القضاء',
+                          value3: subdistrict,
+                        ),
+                        buildTripleRow(
+                          'الناحية',
+                          town,
+                          label2: 'نوع الطريق',
+                          value2: roadTypeLabel,
+                          label3: 'فئة المحطة',
+                          value3: stationCategoryLabel,
+                          alternate: true,
+                        ),
+                        buildTripleRow(
+                          'خط الطول',
+                          longitude,
+                          label2: 'دائرة العرض',
+                          value2: latitude,
+                          label3: 'حالة التنظيم',
+                          value3: planningLocationLabel,
+                        ),
+                      ]),
+                      pw.SizedBox(height: 22),
+                      pw.Divider(color: PdfColors.grey300),
+                      pw.SizedBox(height: 10),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
+                            style: pw.TextStyle(
+                              fontSize: 9,
+                              color: PdfColors.grey600,
+                            ),
+                          ),
+                          pw.Text(
+                            'وزارة الطاقة © ${DateTime.now().year}',
+                            style: pw.TextStyle(
+                              fontSize: 9,
+                              color: PdfColors.grey600,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),

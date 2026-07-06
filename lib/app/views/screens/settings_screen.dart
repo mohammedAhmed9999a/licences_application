@@ -190,7 +190,8 @@ class _LangOption extends StatelessWidget {
             const Spacer(),
             // Text
             Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              textDirection: TextDirection.ltr,
               children: [
                 Text(
                   label,
@@ -200,9 +201,8 @@ class _LangOption extends StatelessWidget {
                     fontWeight: selected ? FontWeight.bold : FontWeight.w500,
                     color: selected
                         ? primaryColor
-                        : (isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight),
+                        : (Theme.of(context).textTheme.bodyLarge?.color ??
+                              Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
                 Text(
@@ -210,9 +210,9 @@ class _LangOption extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 11.sp,
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight,
+                    color:
+                        Theme.of(context).textTheme.bodySmall?.color ??
+                        Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -339,9 +339,8 @@ class _ThemeOption extends StatelessWidget {
                 fontWeight: selected ? FontWeight.bold : FontWeight.w500,
                 color: selected
                     ? primaryColor
-                    : (isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight),
+                    : (Theme.of(context).textTheme.bodyLarge?.color ??
+                          Theme.of(context).colorScheme.onSurface),
               ),
             ),
             SizedBox(width: 12.w),
@@ -361,9 +360,8 @@ class _ThemeOption extends StatelessWidget {
                 icon,
                 color: selected
                     ? primaryColor
-                    : (isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight),
+                    : (Theme.of(context).textTheme.bodySmall?.color ??
+                          Theme.of(context).colorScheme.onSurface),
                 size: 22,
               ),
             ),

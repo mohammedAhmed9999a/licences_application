@@ -70,6 +70,28 @@ class ApiClient {
     }
   }
 
+  static Future<ApiResult> patch(
+    String url, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final dio = await DioFactory.getDio();
+      final res = await dio.patch(
+        url,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      return _handle(res);
+    } on DioException catch (e) {
+      return _fromDioException(e);
+    } catch (e) {
+      return ApiResult.failure('unexpected_error'.tr);
+    }
+  }
+
   static Future<ApiResult> delete(
     String url, {
     dynamic data,

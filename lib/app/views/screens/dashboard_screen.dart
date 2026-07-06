@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../theme/app_theme.dart';
 import '../../controllers/dashboard_controller.dart';
+import '../../controllers/notifications_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../models/application_model.dart';
 import '../../models/license_detail_model.dart';
@@ -99,43 +100,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: EdgeInsets.only(left: 8.w, right: 8.w),
             child: GestureDetector(
               onTap: () => Get.to(() => const NotificationsScreen()),
-              child: Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    // onPressed: () => Get.to(() => const NotificationsScreen()),
-                    // onPressed: () => _showNotificationsSheet(context),
-                    tooltip: 'الإشعارات',
-                    icon: ThemedIcon(
-                      Icons.notifications_none_outlined,
-                      type: IconType.appBar,
-                      customSize: 26.sp,
-                    ),
-                    color: AppColors.warning,
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 8.h, right: 8.w),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 5.w,
-                      vertical: 2.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.warning,
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Text(
-                      '3',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Cairo',
+              child: Obx(() {
+                final notifCtrl = Get.find<NotificationsController>();
+                final unreadCount = notifCtrl.unreadCount.value;
+
+                return Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Get.to(() => const NotificationsScreen());
+                      },
+                      tooltip: 'الإشعارات',
+                      icon: ThemedIcon(
+                        Icons.notifications_none_outlined,
+                        type: IconType.appBar,
+                        customSize: 26.sp,
                       ),
+                      color: AppColors.warning,
                     ),
-                  ),
-                ],
-              ),
+                    if (unreadCount > 0)
+                      Container(
+                        margin: EdgeInsets.only(top: 8.h, right: 8.w),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 5.w,
+                          vertical: 2.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Text(
+                          unreadCount > 99 ? '99+' : '$unreadCount',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Cairo',
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              }),
             ),
           ),
         ],
@@ -689,7 +696,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Wrap(
                     spacing: 8.w,
                     runSpacing: 8.h,
-                    alignment: WrapAlignment.end,
+                    alignment: WrapAlignment.start,
                     children: [
                       _buildInfoChip(
                         context,
@@ -904,6 +911,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return 'draft';
     }
 
+    if (normalized.contains('additional') ||
+        normalized.contains('additional_info') ||
+        normalized.contains('additionalinfo') ||
+        normalized.contains('correction')) {
+      return 'additional_info_required';
+    }
+
     if (normalized.contains('completed') || normalized.contains('finished')) {
       return 'completed';
     }
@@ -922,6 +936,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 'rejected':
         return AppColors.error;
       case 'pending':
+        return AppColors.warning;
+      case 'additional_info_required':
         return AppColors.warning;
       case 'completed':
         return AppColors.statusCompleted;

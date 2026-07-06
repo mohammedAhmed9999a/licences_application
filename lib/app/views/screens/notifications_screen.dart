@@ -27,7 +27,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     _controller.loadNotifications();
   }
 
-  int get unreadCount => _controller.unreadCount;
+  int get unreadCount => _controller.unreadCount.value;
 
   Future<void> _handleNotificationTap(NotificationModel item) async {
     if (!item.isRead) {
@@ -222,7 +222,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         SizedBox(width: 14.w),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'مرحباً بك في صفحة الإشعارات',
@@ -432,51 +432,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                                           ),
                                                         ),
                                                       ),
-                                                    if (item
-                                                        .statusLabelTranslated
-                                                        .isNotEmpty)
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                              right: 8.w,
-                                                            ),
-                                                        child: Container(
-                                                          padding:
-                                                              EdgeInsets.symmetric(
-                                                                horizontal:
-                                                                    10.w,
-                                                                vertical: 6.h,
-                                                              ),
-                                                          decoration: BoxDecoration(
-                                                            color: item.isRead
-                                                                ? surfaceAlt
-                                                                : primaryColor
-                                                                      .withOpacity(
-                                                                        0.12,
-                                                                      ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  14.r,
-                                                                ),
-                                                          ),
-                                                          child: Text(
-                                                            _notificationStatusLabel(
-                                                              item,
-                                                            ),
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  'Cairo',
-                                                              fontSize: 11.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              color: item.isRead
-                                                                  ? textSecondary
-                                                                  : primaryColor,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
                                                   ],
                                                 ),
                                               ),
@@ -498,31 +453,80 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                         SizedBox(height: 12.h),
                                         Align(
                                           alignment: Alignment.centerLeft,
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 12.w,
-                                              vertical: 6.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: item.isRead
-                                                  ? surfaceAlt
-                                                  : primaryColor.withOpacity(
-                                                      0.12,
+                                          child: Row(
+                                            children: [
+                                              if (item
+                                                  .statusLabelTranslated
+                                                  .isNotEmpty)
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    right: 8.w,
+                                                  ),
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          horizontal: 10.w,
+                                                          vertical: 6.h,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: item.isRead
+                                                          ? surfaceAlt
+                                                          : primaryColor
+                                                                .withOpacity(
+                                                                  0.12,
+                                                                ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            10.r,
+                                                          ),
                                                     ),
-                                              borderRadius:
-                                                  BorderRadius.circular(12.r),
-                                            ),
-                                            child: Text(
-                                              item.isRead ? 'مقروءة' : 'جديدة',
-                                              style: TextStyle(
-                                                fontFamily: 'Cairo',
-                                                fontSize: 11.sp,
-                                                color: item.isRead
-                                                    ? textSecondary
-                                                    : primaryColor,
-                                                fontWeight: FontWeight.w600,
+                                                    child: Text(
+                                                      _notificationStatusLabel(
+                                                        item,
+                                                      ),
+                                                      style: TextStyle(
+                                                        fontFamily: 'Cairo',
+                                                        fontSize: 11.sp,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: item.isRead
+                                                            ? textSecondary
+                                                            : primaryColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              SizedBox(width: 8.w),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 12.w,
+                                                  vertical: 6.h,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: item.isRead
+                                                      ? surfaceAlt
+                                                      : primaryColor
+                                                            .withOpacity(0.12),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        10.r,
+                                                      ),
+                                                ),
+                                                child: Text(
+                                                  item.isRead
+                                                      ? 'مقروءة'
+                                                      : 'جديدة',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Cairo',
+                                                    fontSize: 11.sp,
+                                                    color: item.isRead
+                                                        ? textSecondary
+                                                        : primaryColor,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
                                         ),
                                       ],

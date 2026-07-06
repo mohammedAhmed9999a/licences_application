@@ -15,6 +15,14 @@ class Step3LocationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<LicenseApplicationController>();
+    final governorateEditable = ctrl.isFieldEditable('governorate');
+    final locationEditable =
+        governorateEditable ||
+        ctrl.isFieldEditable('latitude') ||
+        ctrl.isFieldEditable('longitude');
+    final planningLocationEditable = ctrl.isFieldEditable('planningLocation');
+    final roadTypeEditable = ctrl.isFieldEditable('roadType');
+    final stationCategoryEditable = ctrl.isFieldEditable('stationCategory');
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -115,8 +123,10 @@ class Step3LocationScreen extends StatelessWidget {
                         value: ctrl.selectedGovernorate.value?.name,
                         items: ctrl.governorates.map((g) => g.name).toList(),
                         isLoading: ctrl.isGovernoratesLoading.value,
+                        enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل المحافظات...',
                         onChanged: (val) {
+                          if (!governorateEditable) return;
                           final gov = ctrl.governorates.firstWhereOrNull(
                             (g) => g.name == val,
                           );
@@ -135,8 +145,10 @@ class Step3LocationScreen extends StatelessWidget {
                         value: ctrl.selectedDistrict.value?.name,
                         items: ctrl.districts.map((g) => g.name).toList(),
                         isLoading: ctrl.isDistrictsLoading.value,
+                        enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل المناطق...',
                         onChanged: (val) {
+                          if (!governorateEditable) return;
                           final d = ctrl.districts.firstWhereOrNull(
                             (g) => g.name == val,
                           );
@@ -155,8 +167,10 @@ class Step3LocationScreen extends StatelessWidget {
                         value: ctrl.selectedSubdistrict.value?.name,
                         items: ctrl.subdistricts.map((g) => g.name).toList(),
                         isLoading: ctrl.isSubdistrictsLoading.value,
+                        enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل النواحي...',
                         onChanged: (val) {
+                          if (!governorateEditable) return;
                           final s = ctrl.subdistricts.firstWhereOrNull(
                             (g) => g.name == val,
                           );
@@ -175,8 +189,10 @@ class Step3LocationScreen extends StatelessWidget {
                         value: ctrl.selectedTown.value?.name,
                         items: ctrl.towns.map((g) => g.name).toList(),
                         isLoading: ctrl.isTownsLoading.value,
+                        enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل البلديات...',
                         onChanged: (val) {
+                          if (!governorateEditable) return;
                           final t = ctrl.towns.firstWhereOrNull(
                             (g) => g.name == val,
                           );
@@ -223,7 +239,9 @@ class Step3LocationScreen extends StatelessWidget {
                         SizedBox(height: 10.h),
                         // Use my location button
                         OutlinedButton.icon(
-                          onPressed: () => _useMyLocation(ctrl, context),
+                          onPressed: locationEditable
+                              ? () => _useMyLocation(ctrl, context)
+                              : null,
                           icon: Icon(Icons.my_location, size: 15.sp),
                           label: Text(
                             'أنا في المحطة الآن استخدم موقعي',
@@ -287,7 +305,9 @@ class Step3LocationScreen extends StatelessWidget {
                       child: _LocationPickerMap(
                         latitudeController: ctrl.latitudeController,
                         longitudeController: ctrl.longitudeController,
+                        enabled: locationEditable,
                         onLocationSelected: (position) {
+                          if (!locationEditable) return;
                           ctrl.setLocation(
                             position.latitude,
                             position.longitude,
@@ -315,6 +335,7 @@ class Step3LocationScreen extends StatelessWidget {
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
+                                enabled: ctrl.isFieldEditable('latitude'),
                               ),
                             ),
                             SizedBox(height: 12.h),
@@ -328,6 +349,7 @@ class Step3LocationScreen extends StatelessWidget {
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
+                                enabled: ctrl.isFieldEditable('longitude'),
                               ),
                             ),
                           ],
@@ -348,6 +370,7 @@ class Step3LocationScreen extends StatelessWidget {
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
+                                enabled: ctrl.isFieldEditable('longitude'),
                               ),
                             ),
                           ),
@@ -363,6 +386,7 @@ class Step3LocationScreen extends StatelessWidget {
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
+                                enabled: ctrl.isFieldEditable('latitude'),
                               ),
                             ),
                           ),
@@ -417,8 +441,10 @@ class Step3LocationScreen extends StatelessWidget {
                             subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
                             icon: Icons.location_city_outlined,
                             selected: ctrl.planningLocation.value == 'outside',
-                            onTap: () =>
-                                ctrl.planningLocation.value = 'outside',
+                            enabled: planningLocationEditable,
+                            onTap: planningLocationEditable
+                                ? () => ctrl.planningLocation.value = 'outside'
+                                : null,
                           ),
                         ),
                         SizedBox(width: 10.w),
@@ -429,7 +455,10 @@ class Step3LocationScreen extends StatelessWidget {
                                 'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
                             icon: Icons.home_outlined,
                             selected: ctrl.planningLocation.value == 'inside',
-                            onTap: () => ctrl.planningLocation.value = 'inside',
+                            enabled: planningLocationEditable,
+                            onTap: planningLocationEditable
+                                ? () => ctrl.planningLocation.value = 'inside'
+                                : null,
                           ),
                         ),
                       ],
@@ -513,8 +542,10 @@ class Step3LocationScreen extends StatelessWidget {
                                     subtitle: 'يسمح باختيار الفئة أ أو ب.',
                                     icon: Icons.swap_horiz,
                                     selected: ctrl.roadType.value == 'central',
-                                    onTap: () =>
-                                        ctrl.roadType.value = 'central',
+                                    enabled: roadTypeEditable,
+                                    onTap: roadTypeEditable
+                                        ? () => ctrl.roadType.value = 'central'
+                                        : null,
                                   ),
                                   SizedBox(height: 10.h),
                                   ChoiceCard(
@@ -523,8 +554,11 @@ class Step3LocationScreen extends StatelessWidget {
                                     icon: Icons.arrow_outward,
                                     selected:
                                         ctrl.roadType.value == 'international',
-                                    onTap: () =>
-                                        ctrl.roadType.value = 'international',
+                                    enabled: roadTypeEditable,
+                                    onTap: roadTypeEditable
+                                        ? () => ctrl.roadType.value =
+                                              'international'
+                                        : null,
                                   ),
                                 ],
                               )
@@ -539,8 +573,11 @@ class Step3LocationScreen extends StatelessWidget {
                                       icon: Icons.swap_horiz,
                                       selected:
                                           ctrl.roadType.value == 'central',
-                                      onTap: () =>
-                                          ctrl.roadType.value = 'central',
+                                      enabled: roadTypeEditable,
+                                      onTap: roadTypeEditable
+                                          ? () =>
+                                                ctrl.roadType.value = 'central'
+                                          : null,
                                     ),
                                   ),
                                   SizedBox(width: 10.w),
@@ -552,8 +589,11 @@ class Step3LocationScreen extends StatelessWidget {
                                       selected:
                                           ctrl.roadType.value ==
                                           'international',
-                                      onTap: () =>
-                                          ctrl.roadType.value = 'international',
+                                      enabled: roadTypeEditable,
+                                      onTap: roadTypeEditable
+                                          ? () => ctrl.roadType.value =
+                                                'international'
+                                          : null,
                                     ),
                                   ),
                                 ],
@@ -681,8 +721,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق المحلية ضمن حدود الوحدات الإدارية.',
                                   selected: ctrl.stationCategory.value == 'C',
-                                  enabled: canC,
-                                  onTap: canC
+                                  enabled: canC && stationCategoryEditable,
+                                  onTap: canC && stationCategoryEditable
                                       ? () => ctrl.stationCategory.value = 'C'
                                       : null,
                                 ),
@@ -695,8 +735,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   arabicLetter: 'ب',
                                   description: 'الطرق المركزية بين المحافظات.',
                                   selected: ctrl.stationCategory.value == 'B',
-                                  enabled: canB,
-                                  onTap: canB
+                                  enabled: canB && stationCategoryEditable,
+                                  onTap: canB && stationCategoryEditable
                                       ? () => ctrl.stationCategory.value = 'B'
                                       : null,
                                 ),
@@ -710,8 +750,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
                                   selected: ctrl.stationCategory.value == 'A',
-                                  enabled: canA,
-                                  onTap: canA
+                                  enabled: canA && stationCategoryEditable,
+                                  onTap: canA && stationCategoryEditable
                                       ? () => ctrl.stationCategory.value = 'A'
                                       : null,
                                 ),
@@ -892,11 +932,13 @@ class Step3LocationScreen extends StatelessWidget {
 class _LocationPickerMap extends StatefulWidget {
   final TextEditingController latitudeController;
   final TextEditingController longitudeController;
+  final bool enabled;
   final ValueChanged<LatLng> onLocationSelected;
 
   const _LocationPickerMap({
     required this.latitudeController,
     required this.longitudeController,
+    this.enabled = true,
     required this.onLocationSelected,
   });
 
@@ -955,13 +997,15 @@ class _LocationPickerMapState extends State<_LocationPickerMap> {
     return GoogleMap(
       initialCameraPosition: CameraPosition(target: initialPosition, zoom: 10),
       onMapCreated: (controller) => _googleMapController = controller,
-      onTap: (position) {
-        widget.onLocationSelected(position);
-        setState(() {
-          _selectedLatLng = position;
-        });
-        _moveCamera(position);
-      },
+      onTap: widget.enabled
+          ? (position) {
+              widget.onLocationSelected(position);
+              setState(() {
+                _selectedLatLng = position;
+              });
+              _moveCamera(position);
+            }
+          : null,
       markers: _selectedLatLng == null
           ? {}
           : {
@@ -971,11 +1015,11 @@ class _LocationPickerMapState extends State<_LocationPickerMap> {
               ),
             },
       myLocationButtonEnabled: false,
-      zoomControlsEnabled: true,
-      zoomGesturesEnabled: true,
-      scrollGesturesEnabled: true,
-      rotateGesturesEnabled: true,
-      tiltGesturesEnabled: true,
+      zoomControlsEnabled: widget.enabled,
+      zoomGesturesEnabled: widget.enabled,
+      scrollGesturesEnabled: widget.enabled,
+      rotateGesturesEnabled: widget.enabled,
+      tiltGesturesEnabled: widget.enabled,
       mapType: MapType.hybrid,
       gestureRecognizers: {
         Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
@@ -990,6 +1034,7 @@ class _DropdownField extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
   final bool isLoading;
+  final bool enabled;
   final String? loadingLabel;
 
   const _DropdownField({
@@ -998,6 +1043,7 @@ class _DropdownField extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.isLoading = false,
+    this.enabled = true,
     this.loadingLabel,
   });
 
@@ -1078,7 +1124,7 @@ class _DropdownField extends StatelessWidget {
                       ),
                     )
                     .toList(),
-                onChanged: onChanged,
+                onChanged: enabled ? onChanged : null,
               ),
             ),
     );

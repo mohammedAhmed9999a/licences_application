@@ -26,32 +26,26 @@ void main() async {
     //slf
     print('MyServices.printFCM error: $e');
   }
-
-  // Initialize Notifications
+  //
   await NotificationServices.requestNotificationPermission();
   await NotificationServices.checkInitialNotification();
 
-  // Get and print FCM token
   final fcmToken = await NotificationServices.getDeviceToken();
-  // ignore: avoid_print
-  print('🔔 FCM Token: $fcmToken');
+  print('FCM Token: $fcmToken');
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Init SettingsController early so theme/lang are applied on first frame
   final settingsCtrl = SettingsController();
   Get.put(settingsCtrl, permanent: true);
 
-  // Set system UI overlay based on theme preference
   _updateSystemUIOverlay(settingsCtrl.themeMode.value);
 
   runApp(const FuelStationApp());
 }
 
-// Helper function to update system UI overlay based on theme
 void _updateSystemUIOverlay(ThemeMode themeMode) {
   final isDark = themeMode == ThemeMode.dark;
   SystemChrome.setSystemUIOverlayStyle(
@@ -81,23 +75,19 @@ class FuelStationApp extends StatelessWidget {
             title: 'app_name'.tr,
             debugShowCheckedModeBanner: false,
 
-            // ── Theme ─────────────────────────────────────────────────
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: settingsCtrl.themeMode.value,
 
-            // ── Locale & Translations ─────────────────────────────────
             translations: AppTranslations(),
             locale: const Locale('ar', 'SY'),
             fallbackLocale: const Locale('ar', 'SY'),
 
-            // Force RTL layout for Arabic UI
             builder: (ctx, appChild) => Directionality(
               textDirection: TextDirection.rtl,
               child: appChild!,
             ),
 
-            // ── Navigation ────────────────────────────────────────────
             initialRoute: AppRoutes.splash,
             getPages: AppRoutes.pages,
             initialBinding: AppBindings(),

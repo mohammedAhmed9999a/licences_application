@@ -6,12 +6,10 @@ class NotificationsController extends GetxController {
   static NotificationsController get to => Get.find();
 
   final notifications = <NotificationModel>[].obs;
+  final unreadCount = 0.obs;
   final isLoading = false.obs;
   final isSaving = false.obs;
   final errorMessage = ''.obs;
-
-  int get unreadCount =>
-      notifications.where((notification) => !notification.isRead).length;
 
   @override
   void onInit() {
@@ -46,7 +44,11 @@ class NotificationsController extends GetxController {
       }
 
       notifications.value = items;
+      unreadCount.value = items
+          .where((notification) => !notification.isRead)
+          .length;
     } catch (e) {
+      unreadCount.value = 0;
       errorMessage.value = 'تعذر تحميل الإشعارات. حاول مرة أخرى.';
     } finally {
       isLoading.value = false;
@@ -62,6 +64,9 @@ class NotificationsController extends GetxController {
       final index = notifications.indexWhere((n) => n.id == notification.id);
       if (index >= 0) {
         notifications[index] = notifications[index].copyWith(isRead: true);
+        unreadCount.value = notifications
+            .where((notification) => !notification.isRead)
+            .length;
       }
     } catch (_) {
       errorMessage.value = 'تعذر تحديث حالة الإشعار. حاول مرة أخرى.';
@@ -88,6 +93,7 @@ class NotificationsController extends GetxController {
       notifications.value = notifications
           .map((notification) => notification.copyWith(isRead: true))
           .toList();
+      unreadCount.value = 0;
     } finally {
       isSaving.value = false;
     }

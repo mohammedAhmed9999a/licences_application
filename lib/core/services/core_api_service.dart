@@ -7,13 +7,14 @@ import '../../app/services/storage_service.dart';
 
 class CoreApiService {
   CoreApiService._();
-
+  //
   // static const String baseUrl =
   //     'https://api-petro-stations.moenergy.gov.sy/api';
 
-  static const String baseUrl = 'http://192.168.109.237:8000/api';
+  static const String baseUrl = 'http://192.168.88.250:8000/api';
+
   static const String baseUrlPublicImages =
-      "http://192.168.109.237:8000/storage/";
+      "http://192.168.88.250:8000/storage/";
 
   static Future<void> updateAuthHeader() async {
     await DioFactory.updateHeaderWithToken(StorageService.to.token);
@@ -59,6 +60,20 @@ class CoreApiService {
   }) async {
     await updateAuthHeader();
     final result = await ApiClient.post(
+      '$baseUrl$path',
+      data: data,
+      options: options,
+    );
+    return _toResponse(result, path);
+  }
+
+  static Future<dio.Response> patch(
+    String path, {
+    dynamic data,
+    dio.Options? options,
+  }) async {
+    await updateAuthHeader();
+    final result = await ApiClient.patch(
       '$baseUrl$path',
       data: data,
       options: options,

@@ -110,19 +110,32 @@ class Step4AttachmentsScreen extends StatelessWidget {
                       title: requiredAttachments[i].title,
                       description: 'PDF أو صورة - حتى 4MB',
                       required: true,
+                      enabled: ctrl.isAttachmentEditable(
+                        requiredAttachments[i].key,
+                      ),
                       uploaded: ctrl.isAttachmentUploaded(
                         requiredAttachments[i].key,
                       ),
                       fileName: ctrl.getAttachmentFileName(
                         requiredAttachments[i].key,
                       ),
-                      onUpload: () =>
-                          _pickFile(ctrl, requiredAttachments[i].key),
-                      onView: () => _openFile(
-                        ctrl.getAttachmentFile(requiredAttachments[i].key),
-                      ),
-                      onRemove: () =>
-                          ctrl.clearAttachment(requiredAttachments[i].key),
+                      onUpload:
+                          ctrl.isAttachmentEditable(requiredAttachments[i].key)
+                          ? () => _pickFile(ctrl, requiredAttachments[i].key)
+                          : null,
+                      onView:
+                          ctrl.isAttachmentUploaded(requiredAttachments[i].key)
+                          ? () => _openFile(
+                              ctrl.getAttachmentFile(
+                                requiredAttachments[i].key,
+                              ),
+                            )
+                          : null,
+                      onRemove:
+                          ctrl.isAttachmentEditable(requiredAttachments[i].key)
+                          ? () =>
+                                ctrl.clearAttachment(requiredAttachments[i].key)
+                          : null,
                     ),
                     if (i < requiredAttachments.length - 1)
                       SizedBox(height: 12.h),
@@ -194,11 +207,7 @@ class Step4AttachmentsScreen extends StatelessWidget {
               : 'شركة',
         ),
         if (ctrl.investorType.value == 'individual') ...[
-          _SummaryRow(
-            label: 'الاسم',
-            value:
-                '${ctrl.firstNameController.text} ${ctrl.fatherNameController.text} ${ctrl.lastNameController.text}',
-          ),
+          _SummaryRow(label: 'الاسم', value: ctrl.getApplicantFullName()),
           _SummaryRow(
             label: 'الرقم الوطني',
             value: ctrl.nationalIdController.text,

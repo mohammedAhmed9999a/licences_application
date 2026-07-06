@@ -232,7 +232,7 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return Directionality(
-          textDirection: TextDirection.rtl,
+          textDirection: TextDirection.ltr,
           child: AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16.r),
@@ -270,11 +270,8 @@ class _InfoCard extends StatelessWidget {
   final String title;
   final String value;
 
-  const _InfoCard({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+  _InfoCard({required this.icon, required this.title, required this.value});
+  final bool isDark = Get.isDarkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +297,9 @@ class _InfoCard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 12.sp,
-                      color: AppColors.textSecondary,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight,
                     ),
                   ),
                   SizedBox(height: 4.h),

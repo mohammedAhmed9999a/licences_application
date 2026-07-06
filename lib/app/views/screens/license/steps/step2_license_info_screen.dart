@@ -616,6 +616,7 @@ class _IndividualForm extends StatelessWidget {
                             ctrl.validateStep2Field('firstName', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.fatherNameFocus),
+                        enabled: ctrl.isFieldEditable('firstName'),
                       ),
                     ),
                   ),
@@ -642,6 +643,7 @@ class _IndividualForm extends StatelessWidget {
                             ctrl.validateStep2Field('fatherName', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.nicknameFocus),
+                        enabled: ctrl.isFieldEditable('fatherName'),
                       ),
                     ),
                   ),
@@ -695,6 +697,7 @@ class _IndividualForm extends StatelessWidget {
                             ctrl.validateStep2Field('firstName', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.fatherNameFocus),
+                        enabled: ctrl.isFieldEditable('firstName'),
                       ),
                     ),
                   ),
@@ -732,6 +735,7 @@ class _IndividualForm extends StatelessWidget {
                       onChanged: (v) => ctrl.validateStep2Field('nickname', v),
                       onSubmitted: (_) =>
                           ctrl.requestFocus(ctrl.motherNameFocus),
+                      enabled: ctrl.isFieldEditable('nickname'),
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -755,6 +759,7 @@ class _IndividualForm extends StatelessWidget {
                           ctrl.validateStep2Field('motherName', v),
                       onSubmitted: (_) =>
                           ctrl.requestFocus(ctrl.nationalIdFocus),
+                      enabled: ctrl.isFieldEditable('motherName'),
                     ),
                   ),
                 ],
@@ -848,6 +853,7 @@ class _IndividualForm extends StatelessWidget {
                           ctrl.validateStep2Field('nationalId', v),
                       onSubmitted: (_) =>
                           ctrl.requestFocus(ctrl.birthPlaceFocus),
+                      enabled: ctrl.isFieldEditable('nationalId'),
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -1087,6 +1093,7 @@ class _CompanyForm extends StatelessWidget {
                             ctrl.validateStep2Field('fatherName', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.nicknameFocus),
+                        enabled: ctrl.isFieldEditable('fatherName'),
                       ),
                     ),
                   ),
@@ -1517,6 +1524,7 @@ class _CompanyForm extends StatelessWidget {
               onChanged: (v) => ctrl.validateStep2Field('companyName', v),
               onSubmitted: (_) =>
                   ctrl.requestFocus(ctrl.companyLicenseNumberFocus),
+              enabled: ctrl.isFieldEditable('companyName'),
             ),
           ),
         ),
@@ -1538,6 +1546,7 @@ class _CompanyForm extends StatelessWidget {
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   onChanged: (v) =>
                       ctrl.validateStep2Field('companyLicenseNumber', v),
+                  enabled: ctrl.isFieldEditable('companyLicenseNumber'),
                 ),
               ),
             ),
@@ -1574,7 +1583,7 @@ class _CompanyForm extends StatelessWidget {
                       border: Border.all(color: borderColor),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Flexible(
                           child: Text(
@@ -1593,7 +1602,8 @@ class _CompanyForm extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(width: 8.w),
+                        SizedBox(width: 170.w),
+                        // Spacer(),
                         Icon(
                           Icons.calendar_today_outlined,
                           size: 18.r,
@@ -1627,7 +1637,7 @@ class _CompanyForm extends StatelessWidget {
               ),
             ),
             Text(
-              'أسماء الشركاء',
+              'أسماء الشركاء (اختياري)',
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 14.sp,
@@ -1638,7 +1648,7 @@ class _CompanyForm extends StatelessWidget {
         ),
         SizedBox(height: 4.h),
         Text(
-          'أدخل أسماء الشركاء المسجلين في الشركة.',
+          'أدخل أسماء الشركاء المسجلين في الشركة إن وجدت، وهي اختيارية.',
           style: TextStyle(
             fontFamily: 'Cairo',
             fontSize: 11.sp,
