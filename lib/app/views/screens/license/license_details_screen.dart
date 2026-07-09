@@ -1074,6 +1074,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
         _showImagePreview(context, attachment, imageUrl);
       }
       return;
+      //
     }
 
     if (attachment.hasFilePath && attachment.isRemoteUrl) {
