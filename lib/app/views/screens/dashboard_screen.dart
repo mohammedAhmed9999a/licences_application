@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../theme/app_theme.dart';
 import '../../controllers/dashboard_controller.dart';
+import '../../controllers/license_application_controller.dart';
 import '../../controllers/notifications_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../models/application_model.dart';
@@ -203,8 +204,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () =>
-                          Get.toNamed(AppRoutes.licenseApplication),
+                      onPressed: () {
+                        final licenseCtrl =
+                            Get.find<LicenseApplicationController>();
+                        licenseCtrl.resetForm();
+                        Get.toNamed(AppRoutes.licenseApplication);
+                      },
                       icon: ThemedIcon(
                         Icons.add,
                         type: IconType.button,
@@ -576,7 +581,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 SizedBox(height: 24.h),
                 ElevatedButton.icon(
-                  onPressed: () => Get.toNamed(AppRoutes.licenseApplication),
+                  onPressed: () {
+                    final licenseCtrl =
+                        Get.find<LicenseApplicationController>();
+                    licenseCtrl.resetForm();
+                    Get.toNamed(AppRoutes.licenseApplication);
+                  },
                   icon: ThemedIcon(
                     Icons.add,
                     type: IconType.button,

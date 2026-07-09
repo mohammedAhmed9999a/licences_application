@@ -24,6 +24,41 @@ class AttachmentRequirement {
 class LicenseApplicationController extends GetxController {
   static LicenseApplicationController get to => Get.find();
 
+  String extractSubmissionErrorMessage(Object error) {
+    if (error is dio.DioException) {
+      final responseData = error.response?.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final message = responseData['message'];
+        if (message is String && message.trim().isNotEmpty) {
+          return message;
+        }
+
+        final errors = responseData['errors'];
+        if (errors is Map) {
+          for (final entry in errors.entries) {
+            final value = entry.value;
+            if (value is List && value.isNotEmpty) {
+              final firstMessage = value.first;
+              if (firstMessage is String && firstMessage.trim().isNotEmpty) {
+                return firstMessage;
+              }
+            }
+          }
+        }
+      }
+
+      if (responseData is Map) {
+        final message = responseData['message'];
+        if (message is String && message.trim().isNotEmpty) {
+          return message;
+        }
+      }
+    }
+
+    return 'حدث خطأ في إرسال الطلب';
+  }
+
   // ─── Step tracking ───────────────────────────────────────────────
   final currentStep = 0.obs; // 0-based (0=Step1 … 3=Step4)
   final applicationId = ''.obs;
@@ -160,6 +195,7 @@ class LicenseApplicationController extends GetxController {
   final isCorrectionMode = false.obs;
   final editApplicationId = ''.obs;
   final correctionTargets = <String>[].obs;
+  ApplicationModel? _originalApplication;
 
   // Map local field keys to server correction target ids.
   // Add more mappings here as new fields are added.
@@ -200,10 +236,57 @@ class LicenseApplicationController extends GetxController {
     'investment_contract': 'investmentContract',
   };
 
+  final Set<String> _step1Fields = {
+    'email',
+    'phone',
+    'phone2',
+    'agreedToTerms',
+  };
+
+  final Set<String> _step2Fields = {
+    'requestType',
+    'previousLicenseNumber',
+    'firstName',
+    'fatherName',
+    'motherName',
+    'nickname',
+    'lastName',
+    'nationalId',
+    'birthPlace',
+    'birthDate',
+    'companyName',
+    'companyLicenseNumber',
+    'companyLicenseDate',
+  };
+
+  final Set<String> _step3LocationFields = {
+    'governorate',
+    'district',
+    'subdistrict',
+    'town',
+    'latitude',
+    'longitude',
+    'planningLocation',
+    'roadType',
+    'stationCategory',
+  };
+
   /// Returns true if the given local field key should be editable.
   /// When not in correction mode all fields are editable.
   bool isFieldEditable(String fieldKey) {
     if (!isCorrectionMode.value) return true;
+    if (correctionTargets.contains('termsContact') &&
+        _step1Fields.contains(fieldKey)) {
+      return true;
+    }
+    if (correctionTargets.contains('licenseDetails') &&
+        _step2Fields.contains(fieldKey)) {
+      return true;
+    }
+    if (correctionTargets.contains('locationClassification') &&
+        _step3LocationFields.contains(fieldKey)) {
+      return true;
+    }
     final target = _fieldToCorrectionTarget[fieldKey];
     if (target == null) return true;
     return correctionTargets.contains(target);
@@ -271,12 +354,47 @@ class LicenseApplicationController extends GetxController {
     return CoreApiService.patch(path, data: data, options: options);
   }
 
+  Future<dio.Response> _patch_att(
+    String path, {
+    dynamic data,
+    dio.Options? options,
+  }) async {
+    return CoreApiService.post(path, data: data, options: options);
+  }
+
+  Future<dio.Response> updateLicenseApplication(
+    String applicationId, {
+    required dynamic data,
+    // dio.Options? options,
+  }) async {
+    // ةخشااثةmohammed ahed
+    return _patch(
+      '/v1/license-applications/$applicationId',
+      data: data,
+      // options: options,
+    );
+  }
+
+  Future<dio.Response> updateLicenseApplication_att(
+    String applicationId, {
+    required dynamic data,
+    // dio.Options? options,
+  }) async {
+    // ةخشااثةmohammed ahed
+    return _patch_att(
+      '/v1/license-applications/$applicationId',
+      data: data,
+      // options: options,
+    );
+  }
+
   void resetForm() {
     currentStep.value = 0;
     applicationId.value = '';
     isCorrectionMode.value = false;
     editApplicationId.value = '';
     correctionTargets.clear();
+    _originalApplication = null;
     emailController.clear();
     phoneController.clear();
     phone2Controller.clear();
@@ -341,7 +459,12 @@ class LicenseApplicationController extends GetxController {
         application.requestType.toLowerCase().contains('settlement')
         ? 'settlement'
         : 'new';
-    previousLicenseNumber.text = '';
+    previousLicenseNumber.text =
+        application.requestType.toLowerCase().contains('settlement')
+        ? (application.applicationNumber.isNotEmpty
+              ? application.applicationNumber
+              : '')
+        : '';
     investorType.value =
         application.applicantType?.toLowerCase().contains('company') == true
         ? 'company'
@@ -350,7 +473,7 @@ class LicenseApplicationController extends GetxController {
     lastNameController.text = application.lastName ?? '';
     fatherNameController.text = application.fatherName ?? '';
     motherNameController.text = application.motherName ?? '';
-    nicknameController.text = application.nickname ?? '';
+    nicknameController.text = application.lastName ?? '';
     nationalIdController.text = application.nationalId;
     birthPlaceController.text = application.placeOfBirth ?? '';
     if (application.dateOfBirth != null &&
@@ -426,12 +549,203 @@ class LicenseApplicationController extends GetxController {
         selectedTown.value = match;
       }
     }
+    _originalApplication = application;
     if (application.needsCorrection) {
       errorMessage.value = 'تم تهيئة الطلب للتعديل وفقًا للملاحظات';
     }
   }
 
-  // ─── Step navigation ─────────────────────────────────────────────
+  bool _hasChangedString(String? originalValue, String currentValue) {
+    return (originalValue ?? '').trim() != currentValue.trim();
+  }
+
+  bool _hasChangedBool(bool? originalValue, bool currentValue) {
+    return (originalValue ?? false) != currentValue;
+  }
+
+  Map<String, dynamic> buildCorrectionPayload() {
+    final payload = <String, dynamic>{};
+
+    if (!isCorrectionMode.value || editApplicationId.value.isEmpty) {
+      return payload;
+    }
+
+    final original = _originalApplication;
+
+    if (correctionTargets.contains('contactInfo') ||
+        correctionTargets.contains('termsContact')) {
+      final email = emailController.text.trim();
+      if (original == null || _hasChangedString(original.email, email)) {
+        payload['email'] = email;
+      }
+
+      final phone = phoneController.text.trim();
+      if (original == null || _hasChangedString(original.phone, phone)) {
+        payload['phone'] = phone;
+      }
+
+      final secondaryPhone = phone2Controller.text.trim();
+      if (original == null ||
+          _hasChangedString(original.secondaryPhone, secondaryPhone)) {
+        payload['secondary_phone'] = secondaryPhone;
+      }
+    }
+
+    if (correctionTargets.contains('termsContact')) {
+      final termsAccepted = agreedToTerms.value ? 1 : 0;
+      if (original == null ||
+          _hasChangedBool(original.termsAccepted, agreedToTerms.value)) {
+        payload['terms_accepted'] = termsAccepted;
+      }
+    }
+
+    final shouldSendUserInfo =
+        correctionTargets.contains('licenseDetails') ||
+        correctionTargets.contains('applicantInfo') ||
+        correctionTargets.contains('identityDocument');
+    final shouldSendCompanyInfo =
+        correctionTargets.contains('licenseDetails') ||
+        correctionTargets.contains('companyInfo');
+
+    if (shouldSendUserInfo || shouldSendCompanyInfo) {
+      final firstName = firstNameController.text.trim();
+      final fatherName = fatherNameController.text.trim();
+      final lastName = lastNameController.text.trim().isNotEmpty
+          ? lastNameController.text.trim()
+          : nicknameController.text.trim();
+      final motherName = motherNameController.text.trim();
+      final nationalId = nationalIdController.text.trim();
+      final placeOfBirth = birthPlaceController.text.trim();
+      final dateOfBirth = birthDate.value != null
+          ? '${birthDate.value!.year.toString().padLeft(4, '0')}-${birthDate.value!.month.toString().padLeft(2, '0')}-${birthDate.value!.day.toString().padLeft(2, '0')}'
+          : '';
+
+      if (shouldSendUserInfo) {
+        final userInfo = <String, dynamic>{
+          'first_name': firstName,
+          'father_name': fatherName,
+          'last_name': lastName,
+          'mother_name': motherName,
+          'national_id': nationalId,
+          'place_of_birth': placeOfBirth,
+          'date_of_birth': dateOfBirth,
+        };
+        payload['user_info'] = userInfo;
+      }
+
+      if (shouldSendCompanyInfo && investorType.value == 'company') {
+        final companyName = companyNameController.text.trim();
+        final companyLicenseNumber = companyLicenseNumberController.text.trim();
+        final companyLicenseDateValue = companyLicenseDate.value != null
+            ? '${companyLicenseDate.value!.year.toString().padLeft(4, '0')}-${companyLicenseDate.value!.month.toString().padLeft(2, '0')}-${companyLicenseDate.value!.day.toString().padLeft(2, '0')}'
+            : '';
+
+        final applicant = <String, dynamic>{
+          'company_name': companyName,
+          'company_license_number': companyLicenseNumber,
+          'company_license_date': companyLicenseDateValue,
+        };
+
+        payload['applicant'] = applicant;
+      }
+
+      if (correctionTargets.contains('licenseDetails')) {
+        payload['applicant_type'] = investorType.value == 'individual'
+            ? 'INDIVIDUAL'
+            : 'COMPANY';
+      }
+    }
+
+    if (correctionTargets.contains('currentLocation')) {
+      final location = <String, dynamic>{};
+      if (selectedGovernorate.value?.id != null &&
+          (original == null ||
+              original.governorateId !=
+                  selectedGovernorate.value?.id.toString())) {
+        location['governorate_id'] = selectedGovernorate.value?.id;
+      }
+      if (selectedDistrict.value?.id != null &&
+          (original == null ||
+              original.districtId != selectedDistrict.value?.id.toString())) {
+        location['district_id'] = selectedDistrict.value?.id;
+      }
+      if (selectedSubdistrict.value?.id != null &&
+          (original == null ||
+              original.subDistrictId !=
+                  selectedSubdistrict.value?.id.toString())) {
+        location['sub_district_id'] = selectedSubdistrict.value?.id;
+      }
+      if (selectedTown.value?.id != null &&
+          (original == null ||
+              original.townId != selectedTown.value?.id.toString())) {
+        location['town_id'] = selectedTown.value?.id;
+      }
+      final latitude = latitudeController.text.trim();
+      if (latitude.isNotEmpty &&
+          (original == null ||
+              _hasChangedString(original.latitude, latitude))) {
+        location['latitude'] = latitude;
+      }
+      final longitude = longitudeController.text.trim();
+      if (longitude.isNotEmpty &&
+          (original == null ||
+              _hasChangedString(original.longitude, longitude))) {
+        location['longitude'] = longitude;
+      }
+      if (location.isNotEmpty) {
+        payload['location'] = location;
+      }
+    }
+
+    if (correctionTargets.contains('locationClassification')) {
+      final category = <String, dynamic>{};
+      final zoning = planningLocation.value == 'inside' ? 'INSIDE' : 'OUTSIDE';
+      if (original == null ||
+          original.planningLocation.toLowerCase() != planningLocation.value) {
+        category['zoning'] = zoning;
+      }
+      if (planningLocation.value != 'inside') {
+        final roadTypeValue = roadType.value.toUpperCase();
+        if (original == null ||
+            original.roadType.toLowerCase() != roadType.value) {
+          category['road_type'] = roadTypeValue;
+        }
+      }
+      if (original == null ||
+          original.stationCategory != stationCategory.value) {
+        category['license_category'] = stationCategory.value;
+      }
+      if (category.isNotEmpty) {
+        payload['category'] = category;
+      }
+    }
+
+    if (correctionTargets.contains('licenseDetails')) {
+      final operationType = requestType.value.toUpperCase();
+      if (original == null ||
+          original.requestType.toUpperCase() != operationType) {
+        payload['operation_type'] = operationType;
+      }
+
+      if (requestType.value == 'settlement') {
+        payload['settlement'] = {
+          'is_relocation': 0,
+          'license_number': previousLicenseNumber.text.trim(),
+        };
+      }
+    }
+
+    if (correctionTargets.contains('settlementDetails')) {
+      payload['settlement'] = {
+        'is_relocation': 0,
+        'license_number': previousLicenseNumber.text.trim(),
+      };
+    }
+
+    return payload;
+  }
+
+  // ─── Submit Step 1 ────────────────────────────────────────────────
   void goToNextStep() {
     if (currentStep.value < 3) {
       currentStep.value++;
@@ -1147,6 +1461,18 @@ class LicenseApplicationController extends GetxController {
     return attachments;
   }
 
+  List<AttachmentRequirement> getAttachmentsForSubmission() {
+    final attachments = getRequiredAttachments();
+    if (!isCorrectionMode.value || editApplicationId.value.isEmpty) {
+      return attachments;
+    }
+
+    return attachments.where((attachment) {
+      final target = _fieldToCorrectionTarget[attachment.key];
+      return target != null && correctionTargets.contains(target);
+    }).toList();
+  }
+
   File? getAttachmentFile(String key) {
     switch (key) {
       case 'id_card':
@@ -1233,7 +1559,11 @@ class LicenseApplicationController extends GetxController {
 
   bool validateStep4() {
     errorMessage.value = '';
-    final requiredAttachments = getRequiredAttachments();
+    final requiredAttachments = getAttachmentsForSubmission();
+    if (requiredAttachments.isEmpty) {
+      return true;
+    }
+
     final hasAllUploads = requiredAttachments.every(
       (attachment) => isAttachmentUploaded(attachment.key),
     );
@@ -1327,7 +1657,7 @@ class LicenseApplicationController extends GetxController {
       return;
     }
 
-    final requiredAttachments = getRequiredAttachments();
+    final requiredAttachments = getAttachmentsForSubmission();
     final missingFiles = requiredAttachments.where(
       (attachment) => getAttachmentFile(attachment.key) == null,
     );
@@ -1339,6 +1669,74 @@ class LicenseApplicationController extends GetxController {
 
     try {
       isLoading.value = true;
+      if (isCorrectionMode.value && editApplicationId.value.isNotEmpty) {
+        final correctionPayload = buildCorrectionPayload();
+        final rawPayload = <String, dynamic>{}..addAll(correctionPayload);
+
+        if (requiredAttachments.isEmpty) {
+          final response = await updateLicenseApplication(
+            editApplicationId.value,
+            data: rawPayload,
+            // options: dio.Options(contentType: 'application/json'),
+          );
+
+          final payload = response.data is Map
+              ? (response.data['data'] ?? response.data)
+              : response.data;
+          final serverNumber = payload is Map
+              ? payload['license_request_number']?.toString()
+              : null;
+
+          submittedApplicationNumber.value = serverNumber?.isNotEmpty == true
+              ? serverNumber!
+              : 'SY-LR-${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}-000';
+          Get.offAllNamed(AppRoutes.applicationSuccess);
+          return;
+        }
+
+        final formData = dio.FormData.fromMap(rawPayload);
+        for (var i = 0; i < requiredAttachments.length; i++) {
+          final attachment = requiredAttachments[i];
+          final file = getAttachmentFile(attachment.key);
+          if (file == null) {
+            errorMessage.value = 'يرجى رفع جميع المرفقات المطلوبة قبل الإرسال';
+            currentStep.value = 3;
+            return;
+          }
+          formData.fields.add(
+            MapEntry('attachments[$i][doc_type]', attachment.docType),
+          );
+          formData.files.add(
+            MapEntry(
+              'attachments[$i][file]',
+              await dio.MultipartFile.fromFile(
+                file.path,
+                filename: file.path.split(Platform.pathSeparator).last,
+              ),
+            ),
+          );
+        }
+        formData.fields.add(const MapEntry('_method', 'PATCH'));
+
+        final response = await updateLicenseApplication_att(
+          editApplicationId.value,
+          data: formData,
+          // options: dio.Options(contentType: 'multipart/form-data'),
+        );
+        final payload = response.data is Map
+            ? (response.data['data'] ?? response.data)
+            : response.data;
+        final serverNumber = payload is Map
+            ? payload['license_request_number']?.toString()
+            : null;
+
+        submittedApplicationNumber.value = serverNumber?.isNotEmpty == true
+            ? serverNumber!
+            : 'SY-LR-${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}-000';
+        Get.offAllNamed(AppRoutes.applicationSuccess);
+        return;
+      }
+
       final applicantFullName = getApplicantFullName();
       final formData = dio.FormData.fromMap({
         'operation_type': requestType.value.toUpperCase(),
@@ -1396,24 +1794,11 @@ class LicenseApplicationController extends GetxController {
         );
       }
 
-      if (isCorrectionMode.value && editApplicationId.value.isNotEmpty) {
-        for (final target in correctionTargets) {
-          formData.fields.add(MapEntry('correction_targets[]', target));
-        }
-      }
-
-      final response =
-          isCorrectionMode.value && editApplicationId.value.isNotEmpty
-          ? await _patch(
-              '/v1/license-applications/${editApplicationId.value}',
-              data: formData,
-              options: dio.Options(contentType: 'multipart/form-data'),
-            )
-          : await _post(
-              '/v1/license-applications',
-              data: formData,
-              options: dio.Options(contentType: 'multipart/form-data'),
-            );
+      final response = await _post(
+        '/v1/license-applications',
+        data: formData,
+        options: dio.Options(contentType: 'multipart/form-data'),
+      );
 
       final payload = response.data is Map
           ? (response.data['data'] ?? response.data)
@@ -1426,8 +1811,8 @@ class LicenseApplicationController extends GetxController {
           ? serverNumber!
           : 'SY-LR-${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}-000';
       Get.offAllNamed(AppRoutes.applicationSuccess);
-    } catch (_) {
-      errorMessage.value = 'حدث خطأ في إرسال الطلب';
+    } catch (error) {
+      errorMessage.value = extractSubmissionErrorMessage(error);
     } finally {
       isLoading.value = false;
     }

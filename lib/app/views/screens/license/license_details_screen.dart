@@ -1059,12 +1059,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       final path = await _prepareLocalFile(attachment);
 
       if (path != null) {
-        print("pathhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh +${path.toString()}");
-        Get.to(
-          () => TermsPdfViewerScreen(
-            pdfPath: CoreApiService.baseUrlPublicImages + path,
-          ),
-        );
+        Get.to(() => TermsPdfViewerScreen(pdfPath: path));
       } else {
         Get.snackbar('تنبيه', 'تعذر تحميل الملف أو الرابط غير متاح حالياً.');
       }
@@ -1110,7 +1105,9 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       }
     }
 
-    final resolvedUrl = attachment.resolveUrl(baseUrl: AppConstants.baseUrl);
+    final resolvedUrl = attachment.resolveUrl(
+      baseUrl: CoreApiService.baseUrlPublicImages,
+    );
     if (resolvedUrl == null || resolvedUrl.isEmpty) return null;
 
     final uri = Uri.tryParse(resolvedUrl);

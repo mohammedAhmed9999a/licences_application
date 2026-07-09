@@ -59,6 +59,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                         selected:
                                             ctrl.requestType.value ==
                                             'settlement',
+                                        enabled: !ctrl.isCorrectionMode.value,
                                         onTap: () => ctrl.requestType.value =
                                             'settlement',
                                       ),
@@ -69,6 +70,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                         icon: Icons.add_circle_outline,
                                         selected:
                                             ctrl.requestType.value == 'new',
+                                        enabled: !ctrl.isCorrectionMode.value,
                                         onTap: () =>
                                             ctrl.requestType.value = 'new',
                                       ),
@@ -86,11 +88,13 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                           selected:
                                               ctrl.requestType.value ==
                                               'settlement',
+                                          enabled: !ctrl.isCorrectionMode.value,
                                           onTap: () => ctrl.requestType.value =
                                               'settlement',
                                         ),
                                       ),
                                       SizedBox(width: 10.w),
+
                                       Expanded(
                                         child: ChoiceCard(
                                           title: 'جديد',
@@ -99,6 +103,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                           icon: Icons.add_circle_outline,
                                           selected:
                                               ctrl.requestType.value == 'new',
+                                          enabled: !ctrl.isCorrectionMode.value,
                                           onTap: () =>
                                               ctrl.requestType.value = 'new',
                                         ),
@@ -328,6 +333,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                         selected:
                                             ctrl.investorType.value ==
                                             'company',
+                                        enabled: !ctrl.isCorrectionMode.value,
                                         onTap: () =>
                                             ctrl.investorType.value = 'company',
                                       ),
@@ -340,6 +346,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                         selected:
                                             ctrl.investorType.value ==
                                             'individual',
+                                        enabled: !ctrl.isCorrectionMode.value,
                                         onTap: () => ctrl.investorType.value =
                                             'individual',
                                       ),
@@ -357,6 +364,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                           selected:
                                               ctrl.investorType.value ==
                                               'company',
+                                          enabled: !ctrl.isCorrectionMode.value,
                                           onTap: () => ctrl.investorType.value =
                                               'company',
                                         ),
@@ -371,6 +379,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                           selected:
                                               ctrl.investorType.value ==
                                               'individual',
+                                          enabled: !ctrl.isCorrectionMode.value,
                                           onTap: () => ctrl.investorType.value =
                                               'individual',
                                         ),

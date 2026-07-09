@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -30,9 +31,27 @@ class _TermsPdfViewerScreenState extends State<TermsPdfViewerScreen> {
 
   Future<void> _preparePdf() async {
     try {
-      if (widget.pdfPath != null && File(widget.pdfPath!).existsSync()) {
-        displayPdfPath = widget.pdfPath;
-      } else {
+      final pdfInput = widget.pdfPath?.trim();
+      if (pdfInput != null && pdfInput.isNotEmpty) {
+        if (pdfInput.startsWith('http://') || pdfInput.startsWith('https://')) {
+          final downloadedPath = await _downloadPdfFromUrl(pdfInput);
+          if (downloadedPath != null) {
+            displayPdfPath = downloadedPath;
+          }
+        } else if (pdfInput.startsWith('file://')) {
+          final fileUri = Uri.tryParse(pdfInput);
+          if (fileUri != null) {
+            final file = File(fileUri.toFilePath());
+            if (await file.exists()) {
+              displayPdfPath = file.path;
+            }
+          }
+        } else if (File(pdfInput).existsSync()) {
+          displayPdfPath = pdfInput;
+        }
+      }
+
+      if (displayPdfPath == null) {
         final byteData = await rootBundle.load(pdfAssetPath!);
         final dir = await getApplicationDocumentsDirectory();
         final file = File('${dir.path}/terms.pdf');
@@ -50,6 +69,31 @@ class _TermsPdfViewerScreenState extends State<TermsPdfViewerScreen> {
         errorMessage = 'تعذر تحميل الملف. يرجى المحاولة مرة أخرى.';
         isLoading = false;
       });
+    }
+  }
+
+  Future<String?> _downloadPdfFromUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null || !(uri.scheme == 'http' || uri.scheme == 'https')) {
+      return null;
+    }
+
+    try {
+      final request = await HttpClient().getUrl(uri);
+      final response = await request.close();
+      if (response.statusCode != 200) return null;
+
+      final bytes = await consolidateHttpClientResponseBytes(response);
+      final dir = await getTemporaryDirectory();
+      final originalName = uri.pathSegments.isNotEmpty
+          ? uri.pathSegments.last
+          : 'document.pdf';
+      final target = File('${dir.path}/$originalName');
+      await target.writeAsBytes(bytes, flush: true);
+      return target.path;
+    } catch (e) {
+      debugPrint('PDF download failed: $e');
+      return null;
     }
   }
 

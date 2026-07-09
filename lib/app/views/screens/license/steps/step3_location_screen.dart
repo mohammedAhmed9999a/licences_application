@@ -81,9 +81,9 @@ class Step3LocationScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 22.h),
 
-                  SizedBox(height: 6.h),
+                  // SizedBox(height: 6.h),
                   // Location status
                   Obx(
                     () => Row(
@@ -135,6 +135,7 @@ class Step3LocationScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   SizedBox(height: 12.h),
                   LabeledField(
                     label: 'المنطقة',
