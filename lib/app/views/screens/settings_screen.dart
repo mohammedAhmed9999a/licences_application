@@ -24,7 +24,7 @@ class SettingsScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
 
-        appBar: const MinistryAppBar(title: null),
+        // appBar: const MinistryAppBar(title: null),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(16.w),
           child: Column(
@@ -78,11 +78,11 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: AlignmentDirectional.centerEnd,
+      alignment: AlignmentDirectional.centerStart,
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium,
-        textDirection: TextDirection.rtl,
+        textDirection: TextDirection.ltr,
       ),
     );
   }
@@ -312,6 +312,7 @@ class _ThemeOption extends StatelessWidget {
           ),
         ),
         child: Row(
+          textDirection: TextDirection.ltr,
           children: [
             // Radio indicator
             AnimatedContainer(

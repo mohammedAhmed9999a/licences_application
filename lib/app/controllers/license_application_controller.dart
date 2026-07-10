@@ -115,6 +115,9 @@ class LicenseApplicationController extends GetxController {
   final companyNameError = ''.obs;
   final companyLicenseNumberError = ''.obs;
   final companyLicenseDateError = ''.obs;
+  final phonenumberRequied = FocusNode();
+  final phonenumberNotRequied = FocusNode();
+  final emailRequied = FocusNode();
 
   final firstNameFocus = FocusNode();
   final fatherNameFocus = FocusNode();
@@ -139,6 +142,9 @@ class LicenseApplicationController extends GetxController {
   final companyNameFieldKey = GlobalKey();
   final companyLicenseNumberFieldKey = GlobalKey();
   final companyLicenseDateFieldKey = GlobalKey();
+
+  // Scroll controller for step 2 form
+  final ScrollController step2ScrollController = ScrollController();
 
   // ─── STEP 3: Location & Classification ───────────────────────────
   final governorates = <GovernorateModel>[].obs;
@@ -335,6 +341,7 @@ class LicenseApplicationController extends GetxController {
     birthPlaceFocus.dispose();
     latitudeController.dispose();
     longitudeController.dispose();
+    step2ScrollController.dispose();
     super.onClose();
   }
 
@@ -805,6 +812,11 @@ class LicenseApplicationController extends GetxController {
 
       if (!hasPreviousLicenseNumber) {
         settlementPreviousLicenseError.value = 'يرجى إدخال رقم الترخيص السابق';
+      } else if (!RegExp(
+        r'^[A-Za-z0-9]+$',
+      ).hasMatch(previousLicenseNumber.text.trim())) {
+        settlementPreviousLicenseError.value =
+            'رقم الترخيص يجب أن يحتوي على حروف إنكليزية وأرقام فقط وبدون مسافات أو رموز';
       } else {
         settlementPreviousLicenseError.value = '';
       }
@@ -1097,9 +1109,9 @@ class LicenseApplicationController extends GetxController {
       if (licenseNum.isEmpty) {
         companyLicenseNumberError.value = 'يرجى إدخال رقم ترخيص الشركة';
         hasCompanyErrors = true;
-      } else if (!RegExp(r'^\d+$').hasMatch(licenseNum)) {
+      } else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(licenseNum)) {
         companyLicenseNumberError.value =
-            'رقم الترخيص يجب أن يحتوي على أرقام فقط';
+            'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
         hasCompanyErrors = true;
       } else {
         companyLicenseNumberError.value = '';
@@ -1141,12 +1153,50 @@ class LicenseApplicationController extends GetxController {
   void scrollToField(GlobalKey key) {
     final ctx = key.currentContext;
     if (ctx == null) return;
-    Scrollable.ensureVisible(
-      ctx,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      alignment: 0.1,
-    );
+
+    // Try the standard ensureVisible first. If it fails or has no effect,
+    // fall back to computing an offset and animating the step2 scroll controller.
+    try {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.15,
+      );
+      return;
+    } catch (_) {}
+
+    // Fallback: compute widget position relative to the viewport and animate.
+    final renderBox = ctx.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+    final widgetOffset = renderBox.localToGlobal(Offset.zero).dy;
+
+    double scrollTop = 0.0;
+    try {
+      final scrollableRenderBox =
+          Scrollable.of(ctx)?.context.findRenderObject() as RenderBox?;
+      if (scrollableRenderBox != null) {
+        scrollTop = scrollableRenderBox.localToGlobal(Offset.zero).dy;
+      }
+    } catch (_) {}
+
+    final targetOffset =
+        step2ScrollController.offset + (widgetOffset - scrollTop) - 24.0;
+    final clamped = targetOffset < 0
+        ? 0.0
+        : (step2ScrollController.hasClients
+              ? targetOffset.clamp(
+                  0.0,
+                  step2ScrollController.position.maxScrollExtent,
+                )
+              : targetOffset);
+    if (step2ScrollController.hasClients) {
+      step2ScrollController.animateTo(
+        clamped as double,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   void scrollToFirstError() {
@@ -1226,7 +1276,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (firstNameError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(firstNameFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1242,7 +1292,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (fatherNameError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(fatherNameFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1258,7 +1308,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (motherNameError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(motherNameFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1274,7 +1324,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (nicknameError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(nicknameFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1290,7 +1340,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (nationalIdError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(nationalIdFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1307,7 +1357,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (birthPlaceError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(birthPlaceFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1328,7 +1378,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (birthDateError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(birthDateFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1345,22 +1395,38 @@ class LicenseApplicationController extends GetxController {
         }
         if (companyNameError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(companyNameFieldKey);
+            scrollToFirstError();
           });
         }
         break;
       case 'companyLicenseNumber':
         if (value.trim().isEmpty) {
           companyLicenseNumberError.value = 'يرجى إدخال رقم ترخيص الشركة';
-        } else if (!RegExp(r'^\d+$').hasMatch(value.trim())) {
+        } else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(value.trim())) {
           companyLicenseNumberError.value =
-              'رقم الترخيص يجب أن يحتوي على أرقام فقط';
+              'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
         } else {
           companyLicenseNumberError.value = '';
         }
         if (companyLicenseNumberError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(companyLicenseNumberFieldKey);
+            scrollToFirstError();
+          });
+        }
+        break;
+      case 'previousLicenseNumber':
+        if (value.trim().isEmpty) {
+          settlementPreviousLicenseError.value =
+              'يرجى إدخال رقم الترخيص السابق';
+        } else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(value.trim())) {
+          settlementPreviousLicenseError.value =
+              'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
+        } else {
+          settlementPreviousLicenseError.value = '';
+        }
+        if (settlementPreviousLicenseError.value.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            scrollToFirstError();
           });
         }
         break;
@@ -1372,7 +1438,7 @@ class LicenseApplicationController extends GetxController {
         }
         if (companyLicenseDateError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToField(companyLicenseDateFieldKey);
+            scrollToFirstError();
           });
         }
         break;
@@ -1628,7 +1694,12 @@ class LicenseApplicationController extends GetxController {
 
   // ─── Submit Step 2 ────────────────────────────────────────────────
   Future<void> submitStep2() async {
-    if (!validateStep2()) return;
+    if (!validateStep2()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToFirstError();
+      });
+      return;
+    }
     goToNextStep();
   }
 

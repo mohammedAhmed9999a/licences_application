@@ -25,6 +25,28 @@ void main() {
     },
   );
 
+  test('validateStep2 marks empty personal fields as required', () {
+    final controller = LicenseApplicationController();
+    controller.requestType.value = 'new';
+    controller.investorType.value = 'individual';
+    controller.firstNameController.text = '';
+    controller.fatherNameController.text = '';
+    controller.nicknameController.text = '';
+    controller.motherNameController.text = '';
+    controller.nationalIdController.text = '';
+    controller.birthPlaceController.text = '';
+    controller.birthDate.value = null;
+
+    expect(controller.validateStep2(), isFalse);
+    expect(controller.firstNameError.value, contains('يرجى إدخال'));
+    expect(controller.fatherNameError.value, contains('يرجى إدخال'));
+    expect(controller.nicknameError.value, contains('يرجى إدخال'));
+    expect(controller.motherNameError.value, contains('يرجى إدخال'));
+    expect(controller.nationalIdError.value, contains('يرجى إدخال'));
+    expect(controller.birthPlaceError.value, contains('يرجى إدخال'));
+    expect(controller.birthDateError.value, contains('يرجى اختيار'));
+  });
+
   test('validateStep2 accepts valid individual data', () {
     final controller = LicenseApplicationController();
     controller.requestType.value = 'new';

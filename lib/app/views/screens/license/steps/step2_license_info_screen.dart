@@ -24,6 +24,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SingleChildScrollView(
+        controller: ctrl.step2ScrollController,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 12.h),
           child: Column(
@@ -133,6 +134,18 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                               child: RtlTextField(
                                 controller: ctrl.previousLicenseNumber,
                                 hintText: 'رقم الترخيص السابق',
+                                // Allow all input so we can validate and show message on submit
+                                onChanged: (v) => ctrl.validateStep2Field(
+                                  'previousLicenseNumber',
+                                  v,
+                                ),
+                                onSubmitted: (_) {
+                                  ctrl.validateStep2Field(
+                                    'previousLicenseNumber',
+                                    ctrl.previousLicenseNumber.text,
+                                  );
+                                  FocusScope.of(context).unfocus();
+                                },
                               ),
                             ),
                           ),
@@ -725,50 +738,55 @@ class _IndividualForm extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  LabeledField(
-                    key: ctrl.nicknameFieldKey,
-                    label: 'الكنية',
-                    required: true,
-                    errorText: ctrl.nicknameError.value,
-                    child: RtlTextField(
-                      controller: ctrl.nicknameController,
-                      focusNode: ctrl.nicknameFocus,
-                      hintText: 'الكنية',
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'[\u0600-\u06FF\s]'),
-                        ),
-                      ],
-                      maxLength: 50,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (v) => ctrl.validateStep2Field('nickname', v),
-                      onSubmitted: (_) =>
-                          ctrl.requestFocus(ctrl.motherNameFocus),
-                      enabled: ctrl.isFieldEditable('nickname'),
+                  Obx(
+                    () => LabeledField(
+                      key: ctrl.nicknameFieldKey,
+                      label: 'الكنية',
+                      required: true,
+                      errorText: ctrl.nicknameError.value,
+                      child: RtlTextField(
+                        controller: ctrl.nicknameController,
+                        focusNode: ctrl.nicknameFocus,
+                        hintText: 'الكنية',
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[\u0600-\u06FF\s]'),
+                          ),
+                        ],
+                        maxLength: 50,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (v) =>
+                            ctrl.validateStep2Field('nickname', v),
+                        onSubmitted: (_) =>
+                            ctrl.requestFocus(ctrl.motherNameFocus),
+                        enabled: ctrl.isFieldEditable('nickname'),
+                      ),
                     ),
                   ),
                   SizedBox(height: 12.h),
-                  LabeledField(
-                    key: ctrl.motherNameFieldKey,
-                    label: 'اسم الأم',
-                    required: true,
-                    errorText: ctrl.motherNameError.value,
-                    child: RtlTextField(
-                      controller: ctrl.motherNameController,
-                      focusNode: ctrl.motherNameFocus,
-                      hintText: 'اسم الأم',
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'[\u0600-\u06FF\s]'),
-                        ),
-                      ],
-                      maxLength: 50,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (v) =>
-                          ctrl.validateStep2Field('motherName', v),
-                      onSubmitted: (_) =>
-                          ctrl.requestFocus(ctrl.nationalIdFocus),
-                      enabled: ctrl.isFieldEditable('motherName'),
+                  Obx(
+                    () => LabeledField(
+                      key: ctrl.motherNameFieldKey,
+                      label: 'اسم الأم',
+                      required: true,
+                      errorText: ctrl.motherNameError.value,
+                      child: RtlTextField(
+                        controller: ctrl.motherNameController,
+                        focusNode: ctrl.motherNameFocus,
+                        hintText: 'اسم الأم',
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[\u0600-\u06FF\s]'),
+                          ),
+                        ],
+                        maxLength: 50,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (v) =>
+                            ctrl.validateStep2Field('motherName', v),
+                        onSubmitted: (_) =>
+                            ctrl.requestFocus(ctrl.nationalIdFocus),
+                        enabled: ctrl.isFieldEditable('motherName'),
+                      ),
                     ),
                   ),
                 ],
@@ -845,24 +863,30 @@ class _IndividualForm extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  LabeledField(
-                    key: ctrl.nationalIdFieldKey,
-                    label: 'الرقم الوطني',
-                    required: true,
-                    errorText: ctrl.nationalIdError.value,
-                    child: RtlTextField(
-                      controller: ctrl.nationalIdController,
-                      focusNode: ctrl.nationalIdFocus,
-                      hintText: 'مثال: 070XXXXX',
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      maxLength: 12,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (v) =>
-                          ctrl.validateStep2Field('nationalId', v),
-                      onSubmitted: (_) =>
-                          ctrl.requestFocus(ctrl.birthPlaceFocus),
-                      enabled: ctrl.isFieldEditable('nationalId'),
+                  Obx(
+                    () => LabeledField(
+                      key: ctrl.nationalIdFieldKey,
+                      label: 'الرقم الوطني',
+                      required: true,
+                      errorText: ctrl.nationalIdError.value,
+
+                      child: RtlTextField(
+                        controller: ctrl.nationalIdController,
+                        focusNode: ctrl.nationalIdFocus,
+                        hintText: 'مثال: 070XXXXX',
+                        keyboardType: TextInputType.number,
+
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        maxLength: 12,
+                        textInputAction: TextInputAction.next,
+                        onChanged: (v) =>
+                            ctrl.validateStep2Field('nationalId', v),
+                        onSubmitted: (_) =>
+                            ctrl.requestFocus(ctrl.birthPlaceFocus),
+                        enabled: ctrl.isFieldEditable('nationalId'),
+                      ),
                     ),
                   ),
                   SizedBox(height: 12.h),
@@ -925,16 +949,23 @@ class _IndividualForm extends StatelessWidget {
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: LabeledField(
-                    key: ctrl.nationalIdFieldKey,
-                    label: 'الرقم الوطني',
-                    required: true,
-                    child: RtlTextField(
-                      controller: ctrl.nationalIdController,
-                      hintText: 'مثال: 070XXXXX',
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      maxLength: 12,
+                  child: Obx(
+                    () => LabeledField(
+                      key: ctrl.nationalIdFieldKey,
+                      label: 'الرقم الوطني',
+                      required: true,
+                      errorText: ctrl.nationalIdError.value,
+                      child: RtlTextField(
+                        controller: ctrl.nationalIdController,
+                        onChanged: (v) =>
+                            ctrl.validateStep2Field('nationalId', v),
+                        hintText: 'مثال: 070XXXXX',
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        maxLength: 12,
+                      ),
                     ),
                   ),
                 ),
@@ -1551,10 +1582,17 @@ class _CompanyForm extends StatelessWidget {
                   controller: ctrl.companyLicenseNumberController,
                   focusNode: ctrl.companyLicenseNumberFocus,
                   hintText: 'رقم ترخيص الشركة',
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.text,
+                  // Allow all input so we can validate and show message on submit
                   onChanged: (v) =>
                       ctrl.validateStep2Field('companyLicenseNumber', v),
+                  onSubmitted: (_) {
+                    ctrl.validateStep2Field(
+                      'companyLicenseNumber',
+                      ctrl.companyLicenseNumberController.text,
+                    );
+                    FocusScope.of(context).unfocus();
+                  },
                   enabled: ctrl.isFieldEditable('companyLicenseNumber'),
                 ),
               ),
@@ -1576,7 +1614,9 @@ class _CompanyForm extends StatelessWidget {
                       initialDate:
                           ctrl.companyLicenseDate.value ?? DateTime.now(),
                       firstDate: DateTime(1950),
-                      lastDate: DateTime.now(),
+                      lastDate: DateTime.now().subtract(
+                        const Duration(days: 1),
+                      ),
                     );
                     if (picked != null) {
                       ctrl.companyLicenseDate.value = picked;

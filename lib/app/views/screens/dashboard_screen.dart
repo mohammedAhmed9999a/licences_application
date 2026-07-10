@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../theme/app_theme.dart';
 import '../../controllers/dashboard_controller.dart';
@@ -11,8 +12,9 @@ import '../../models/application_model.dart';
 import '../../models/license_detail_model.dart';
 import '../../routes/app_routes.dart';
 import '../widgets/common_widgets.dart';
-import 'profile_screen.dart';
 import 'notifications_screen.dart';
+import 'profile_screen.dart';
+import 'settings_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -23,10 +25,10 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   String? selectedStatus;
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final dashCtrl = Get.find<DashboardController>();
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
     final onPrimaryColor = theme.colorScheme.onPrimary;
@@ -87,65 +89,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: isDark ? AppColors.warning : AppColors.warning,
             );
           }),
-          IconButton(
-            onPressed: () => Get.to(() => const ProfileScreen()),
-            tooltip: 'البروفايل',
-            icon: ThemedIcon(
-              Icons.person_outline,
-              type: IconType.appBar,
-              customSize: 26.sp,
-            ),
-            color: AppColors.warning,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 8.w, right: 8.w),
-            child: GestureDetector(
-              onTap: () => Get.to(() => const NotificationsScreen()),
-              child: Obx(() {
-                final notifCtrl = Get.find<NotificationsController>();
-                final unreadCount = notifCtrl.unreadCount.value;
+          // IconButton(
+          //   onPressed: () => Get.to(() => const ProfileScreen()),
+          //   tooltip: 'البروفايل',
+          //   icon: ThemedIcon(
+          //     Icons.person_outline,
+          //     type: IconType.appBar,
+          //     customSize: 26.sp,
+          //   ),
+          //   color: AppColors.warning,
+          // ),
+          // Padding(
+          //   padding: EdgeInsets.only(left: 4.w, right: 4.w),
+          //   child: GestureDetector(
+          //     onTap: () => Get.to(() => const NotificationsScreen()),
+          //     child: Obx(() {
+          //       final notifCtrl = Get.find<NotificationsController>();
+          //       final unreadCount = notifCtrl.unreadCount.value;
 
-                return Stack(
-                  alignment: Alignment.topRight,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Get.to(() => const NotificationsScreen());
-                      },
-                      tooltip: 'الإشعارات',
-                      icon: ThemedIcon(
-                        Icons.notifications_none_outlined,
-                        type: IconType.appBar,
-                        customSize: 26.sp,
-                      ),
-                      color: AppColors.warning,
-                    ),
-                    if (unreadCount > 0)
-                      Container(
-                        margin: EdgeInsets.only(top: 8.h, right: 8.w),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 5.w,
-                          vertical: 2.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.warning,
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Text(
-                          unreadCount > 99 ? '99+' : '$unreadCount',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Cairo',
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              }),
-            ),
-          ),
+          //       return Stack(
+          //         alignment: Alignment.topRight,
+          //         children: [
+          //           IconButton(
+          //             onPressed: () {
+          //               Get.to(() => const NotificationsScreen());
+          //             },
+          //             tooltip: 'الإشعارات',
+          //             icon: ThemedIcon(
+          //               Icons.notifications_none_outlined,
+          //               type: IconType.appBar,
+          //               customSize: 26.sp,
+          //             ),
+          //             color: AppColors.warning,
+          //           ),
+          //           if (unreadCount > 0)
+          //             Container(
+          //               margin: EdgeInsets.only(top: 8.h, right: 8.w),
+          //               padding: EdgeInsets.symmetric(
+          //                 horizontal: 5.w,
+          //                 vertical: 2.h,
+          //               ),
+          //               decoration: BoxDecoration(
+          //                 color: AppColors.warning,
+          //                 borderRadius: BorderRadius.circular(10.r),
+          //               ),
+          //               child: Text(
+          //                 unreadCount > 99 ? '99+' : '$unreadCount',
+          //                 style: TextStyle(
+          //                   color: Colors.white,
+          //                   fontSize: 10.sp,
+          //                   fontWeight: FontWeight.bold,
+          //                   fontFamily: 'Cairo',
+          //                 ),
+          //               ),
+          //             ),
+          //         ],
+          //       );
+          //     }),
+          //   ),
+          // ),
         ],
         title: Container(
           alignment: Alignment.centerRight,
@@ -166,132 +168,193 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ),
-      body: Stack(
+      body: IndexedStack(
+        index: _currentIndex,
         children: [
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/splash_background.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.center,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    surface,
-                    surface.withOpacity(0.58),
-                    surface.withOpacity(0.28),
-                    // Colors.white.withOpacity(0.92),
-                    // Colors.white.withOpacity(0.28),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Column(
-            children: [
-              Container(
-                color: surface,
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        final licenseCtrl =
-                            Get.find<LicenseApplicationController>();
-                        licenseCtrl.resetForm();
-                        Get.toNamed(AppRoutes.licenseApplication);
-                      },
-                      icon: ThemedIcon(
-                        Icons.add,
-                        type: IconType.button,
-                        customSize: 16.sp,
-                      ),
-                      label: Text(
-                        'طلب جديد',
-                        style: TextStyle(fontSize: 13.sp),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: onPrimaryColor,
-                        minimumSize: const Size(120, 38),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 8.h,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    OutlinedButton.icon(
-                      onPressed: () => Get.toNamed(AppRoutes.myApplications),
-                      icon: ThemedIcon(
-                        Icons.list_alt,
-                        type: IconType.normal,
-                        customSize: 16.sp,
-                      ),
-                      label: Text('طلباتي', style: TextStyle(fontSize: 13.sp)),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: primaryColor,
-                        side: BorderSide(color: borderColor),
-                        minimumSize: const Size(100, 38),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 8.h,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: dashCtrl.loadApplications,
-                  color: primaryColor,
-                  child: Obx(() {
-                    if (dashCtrl.isLoading.value) {
-                      return _buildDashboardLoading(context);
-                    }
-
-                    final filteredApplications = _getFilteredApplications(
-                      dashCtrl.applications,
-                    );
-
-                    return ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
-                          child: _buildStatsSection(context, dashCtrl),
-                        ),
-                        if (filteredApplications.isEmpty)
-                          _buildEmptyState(context)
-                        else
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: _buildApplicationList(
-                              context,
-                              dashCtrl,
-                              filteredApplications,
-                            ),
-                          ),
-                      ],
-                    );
-                  }),
-                ),
-              ),
-            ],
-          ),
+          _buildHomeContent(context),
+          const NotificationsScreen(),
+          const ProfileScreen(),
+          const SettingsScreen(),
         ],
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: surface,
+          border: Border(top: BorderSide(color: borderColor, width: 1)),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            child: GNav(
+              gap: 6.w,
+              activeColor: onPrimaryColor,
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+              tabBackgroundColor: primaryColor.withOpacity(0.12),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              duration: const Duration(milliseconds: 250),
+              selectedIndex: _currentIndex,
+              onTabChange: (index) => setState(() => _currentIndex = index),
+              tabs: [
+                GButton(
+                  icon: Icons.home_outlined,
+                  text: 'الرئيسية',
+                  iconActiveColor: primaryColor,
+                  textColor: primaryColor,
+                ),
+                GButton(
+                  icon: Icons.notifications_outlined,
+                  text: 'الإشعارات',
+                  iconActiveColor: primaryColor,
+                  textColor: primaryColor,
+                ),
+                GButton(
+                  icon: Icons.person_outline,
+                  text: 'الملف الشخصي',
+                  iconActiveColor: primaryColor,
+                  textColor: primaryColor,
+                ),
+                GButton(
+                  icon: Icons.more_horiz,
+                  text: 'المزيد',
+                  iconActiveColor: primaryColor,
+                  textColor: primaryColor,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeContent(BuildContext context) {
+    final dashCtrl = Get.find<DashboardController>();
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    final onPrimaryColor = theme.colorScheme.onPrimary;
+    final surface = context.themeSurface;
+    final borderColor = context.themeBorder;
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/splash_background.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.center,
+                end: Alignment.bottomCenter,
+                colors: [
+                  surface,
+                  surface.withOpacity(0.58),
+                  surface.withOpacity(0.28),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Column(
+          children: [
+            Container(
+              color: surface,
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      final licenseCtrl =
+                          Get.find<LicenseApplicationController>();
+                      licenseCtrl.resetForm();
+                      Get.toNamed(AppRoutes.licenseApplication);
+                    },
+                    icon: ThemedIcon(
+                      Icons.add,
+                      type: IconType.button,
+                      customSize: 16.sp,
+                    ),
+                    label: Text('طلب جديد', style: TextStyle(fontSize: 13.sp)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: onPrimaryColor,
+                      minimumSize: const Size(120, 38),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 8.h,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  OutlinedButton.icon(
+                    onPressed: () => Get.toNamed(AppRoutes.myApplications),
+                    icon: ThemedIcon(
+                      Icons.list_alt,
+                      type: IconType.normal,
+                      customSize: 16.sp,
+                    ),
+                    label: Text('طلباتي', style: TextStyle(fontSize: 13.sp)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      side: BorderSide(color: borderColor),
+                      minimumSize: const Size(100, 38),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 8.h,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: dashCtrl.loadApplications,
+                color: primaryColor,
+                child: Obx(() {
+                  if (dashCtrl.isLoading.value) {
+                    return _buildDashboardLoading(context);
+                  }
+
+                  final filteredApplications = _getFilteredApplications(
+                    dashCtrl.applications,
+                  );
+
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 8.h),
+                        child: _buildStatsSection(context, dashCtrl),
+                      ),
+                      if (filteredApplications.isEmpty)
+                        _buildEmptyState(context)
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _buildApplicationList(
+                            context,
+                            dashCtrl,
+                            filteredApplications,
+                          ),
+                        ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -621,7 +684,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final statusBackground = theme.colorScheme.onBackground.withOpacity(0.06);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 18.h),
       child: Column(
         children: List.generate(applications.length, (idx) {
           final app = applications[idx];

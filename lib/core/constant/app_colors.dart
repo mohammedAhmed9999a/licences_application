@@ -61,16 +61,16 @@ class AppColors {
   static const Color selectedCardLight = Color(0xffF5F0E4);
   static const Color selectedCard = selectedCardLight;
 
-  // ── Dark Theme ─────────────────────────────────────────────────────────────
-  static const Color darkBg = Color(0xff0d1f1d);
-  static const Color darkSurface = Color(0xff122420);
-  static const Color darkSurfaceVariant = Color(0xff1a3530);
-  static const Color darkSurfaceAlt = Color(0xff0f2a22);
-  static const Color darkBorder = Color(0xff2a4440);
-  static const Color darkText = Color(0xffF0EDE4);
-  static const Color darkTextSecondary = Color(0xff9AADA9);
-  static const Color darkTextHint = darkTextSecondary;
-  static const Color darkDivider = Color(0xff223530);
+  //  Dark Theme
+  static const Color darkBg = Color(0xFF000000);
+  static const Color darkSurface = Color(0xFF121212);
+  static const Color darkSurfaceVariant = Color(0xFF14251D);
+  static const Color darkSurfaceAlt = Color(0xFF0D1713);
+  static const Color darkBorder = Color(0xFF2A6A4A);
+  static const Color darkText = Color(0xFFF5F5F0);
+  static const Color darkTextSecondary = Color(0xFF9BA89F);
+  static const Color darkTextHint = Color(0xFF6F7A72);
+  static const Color darkDivider = Color(0xFF1E3027);
 
   // compatibility aliases for older code paths
   static const Color backgroundDark = darkBg;

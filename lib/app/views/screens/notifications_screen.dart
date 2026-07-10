@@ -108,23 +108,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: surface,
+        backgroundColor: surface.withOpacity(0.95),
         elevation: 0,
         automaticallyImplyLeading: false,
         titleSpacing: 10.w,
-        leading: IconButton(
-          onPressed: Get.back,
-          icon: Icon(Icons.arrow_back_ios_new, color: primaryColor),
-        ),
-        title: Text(
-          'الإشعارات',
-          style: TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-            color: textPrimary,
-          ),
-        ),
+        // leading: IconButton(
+        //   onPressed: Get.back,
+        //   icon: Icon(Icons.arrow_back_ios_new, color: primaryColor),
+        // ),
+        // title: Text(
+        //   'الإشعارات',
+        //   style: TextStyle(
+        //     fontFamily: 'Cairo',
+        //     fontSize: 18.sp,
+        //     fontWeight: FontWeight.bold,
+        //     color: textPrimary,
+        //   ),
+        // ),
         actions: [
           Obx(
             () => _controller.unreadCount > 0

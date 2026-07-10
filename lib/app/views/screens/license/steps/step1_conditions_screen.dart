@@ -275,6 +275,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                         children: [
                           ValueListenableBuilder<TextEditingValue>(
                             valueListenable: ctrl.phoneController,
+
                             builder: (context, _, __) {
                               return LabeledField(
                                 label: 'رقم التواصل (رقم سوري حصراً)',
@@ -288,11 +289,16 @@ class Step1ConditionsScreen extends StatelessWidget {
                                           : null),
                                 child: RtlTextField(
                                   controller: ctrl.phoneController,
+                                  focusNode: ctrl.phonenumberRequied,
+
                                   hintText: '09xxxxxxxx',
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
                                   ],
+                                  onSubmitted: (value) {
+                                    ctrl.requestFocus(ctrl.emailRequied);
+                                  },
                                   maxLength: 10,
                                   enabled: ctrl.isFieldEditable('phone'),
                                 ),
@@ -313,6 +319,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                                       ),
                                 child: RtlTextField(
                                   controller: ctrl.emailController,
+                                  focusNode: ctrl.emailRequied,
                                   hintText: 'name@example.com',
                                   keyboardType: TextInputType.emailAddress,
                                   enabled: ctrl.isFieldEditable('email'),
