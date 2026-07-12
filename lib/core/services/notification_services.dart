@@ -71,21 +71,36 @@ class NotificationServices {
     return token;
   }
 
-  static Future<void> syncFcmTokenWithServer() async {
+  static Future<void> syncFcmTokenWithServer({bool forceSend = false}) async {
     final token = await getDeviceToken();
-    if (token.isEmpty) return;
+    debugPrint(
+      'syncFcmTokenWithServer called: token=$token forceSend=$forceSend',
+    );
+    if (token.isEmpty) {
+      debugPrint('syncFcmTokenWithServer: token is empty, aborting');
+      return;
+    }
 
     final sentToken = await MyServices.getSentFCM();
-    if (sentToken == token) return;
+    debugPrint('syncFcmTokenWithServer: sentToken=$sentToken');
+    if (sentToken == token && !forceSend) {
+      debugPrint(
+        'syncFcmTokenWithServer: token already sent and forceSend=false, aborting',
+      );
+      return;
+    }
 
     if (!Get.isRegistered<StorageService>()) {
       Get.put(StorageService(), permanent: true);
     }
 
-    if (!StorageService.to.isLoggedIn) return;
+    if (!StorageService.to.isLoggedIn) {
+      debugPrint('syncFcmTokenWithServer: user not logged in, aborting');
+      return;
+    }
 
     try {
-      debugPrint('Sending FCM token to server: $token');
+      debugPrint('Sending FCM token to server: $token (forceSend=$forceSend)');
       await CoreApiService.post(
         '/v1/user/fcm-token',
         data: {'fcm_token': token, 'device': _getDeviceType()},
@@ -97,7 +112,6 @@ class NotificationServices {
       debugPrint(
         'FCM sync payload: fcm_token=$token device=${_getDeviceType()}',
       );
-      // ignore failures silently; will retry on next token refresh or login
     }
   }
 

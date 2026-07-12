@@ -159,9 +159,9 @@ class AuthController extends GetxController {
       profileName.value = userName;
 
       print(
-        'Calling NotificationServices.syncFcmTokenWithServer() after login',
+        'Calling NotificationServices.syncFcmTokenWithServer(forceSend: true) after login',
       );
-      await NotificationServices.syncFcmTokenWithServer();
+      await NotificationServices.syncFcmTokenWithServer(forceSend: true);
       print(
         'login successful, navigating to dashboard...>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',
       );
@@ -313,8 +313,39 @@ class AuthController extends GetxController {
       profileEmail.value = email;
       profileName.value = name;
       Get.offAllNamed(AppRoutes.emailConfirmation, arguments: {'email': email});
-    } catch (_) {
-      errorMessage.value = 'حدث خطأ في إنشاء الحساب، يرجى المحاولة مرة أخرى';
+    } catch (e) {
+      if (e is dio.DioException) {
+        final responseData = e.response?.data;
+        if (responseData is Map) {
+          final errors = responseData['errors'];
+          if (errors is Map && errors.isNotEmpty) {
+            final firstErrorEntry = errors.entries.first;
+            final firstErrorValue = firstErrorEntry.value;
+            if (firstErrorValue is List && firstErrorValue.isNotEmpty) {
+              errorMessage.value = firstErrorValue.first.toString();
+              return;
+            }
+            if (firstErrorValue is String && firstErrorValue.isNotEmpty) {
+              errorMessage.value = firstErrorValue;
+              return;
+            }
+          }
+
+          final message =
+              responseData['message']?.toString().trim() ??
+              responseData['error']?.toString().trim() ??
+              responseData['msg']?.toString().trim() ??
+              '';
+          if (message.isNotEmpty) {
+            errorMessage.value = message;
+            return;
+          }
+        }
+
+        errorMessage.value = 'حدث خطأ في إنشاء الحساب، يرجى المحاولة مرة أخرى';
+      } else {
+        errorMessage.value = 'حدث خطأ في إنشاء الحساب، يرجى المحاولة مرة أخرى';
+      }
     } finally {
       isLoading.value = false;
     }

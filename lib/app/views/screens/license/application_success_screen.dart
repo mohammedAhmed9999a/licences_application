@@ -415,14 +415,23 @@ class ApplicationSuccessScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? AppColors.darkSurface
+          : Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.darkSurfaceVariant
+            : AppColors.surface,
         elevation: 0,
         automaticallyImplyLeading: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1.h, color: AppColors.borderLight),
+          child: Container(
+            height: 1.h,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.darkDivider
+                : AppColors.borderLight,
+          ),
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -509,12 +518,20 @@ class ApplicationSuccessScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(24.w),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.darkSurfaceVariant
+                      : AppColors.surface,
                   borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(color: AppColors.borderLight),
+                  border: Border.all(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.darkBorder
+                        : AppColors.borderLight,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black.withOpacity(0.25)
+                          : Colors.black.withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -552,7 +569,9 @@ class ApplicationSuccessScreen extends StatelessWidget {
                           fontFamily: 'Cairo',
                           fontSize: 22.sp,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.darkText
+                              : AppColors.textPrimary,
                         ),
                         textDirection: ui.TextDirection.rtl,
                       ),
@@ -567,7 +586,9 @@ class ApplicationSuccessScreen extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 12.sp,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
                           height: 1.6,
                         ),
                         textDirection: ui.TextDirection.rtl,
@@ -613,7 +634,11 @@ class ApplicationSuccessScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 11.sp,
-                                color: AppColors.textSecondary,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
                               ),
                             ),
                             SizedBox(height: 4.h),
@@ -626,7 +651,11 @@ class ApplicationSuccessScreen extends StatelessWidget {
                                   fontFamily: 'Cairo',
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? AppColors.darkText
+                                      : AppColors.primary,
                                   letterSpacing: 1,
                                 ),
                               ),

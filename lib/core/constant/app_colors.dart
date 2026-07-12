@@ -71,6 +71,9 @@ class AppColors {
   static const Color darkTextSecondary = Color(0xFF9BA89F);
   static const Color darkTextHint = Color(0xFF6F7A72);
   static const Color darkDivider = Color(0xFF1E3027);
+  static const Color selectedCardDark = Color(0xff1a2e23);
+  static const Color selectedCardDark2 = Color(0xff233c31);
+  static const Color selectedCardDark3 = selectedCardDark2;
 
   // compatibility aliases for older code paths
   static const Color backgroundDark = darkBg;
@@ -80,7 +83,7 @@ class AppColors {
   static const Color textPrimaryDark = darkText;
   static const Color textSecondaryDark = darkTextSecondary;
   static const Color textHintDark = darkTextHint;
-  static const Color selectedCardDark = Color(0xff1a2e23);
+  static const Color selectedCardDark1 = Color(0xff1a2e23);
 
   // ── Gradients ──────────────────────────────────────────────────────────────
   static const LinearGradient headerGradient = LinearGradient(

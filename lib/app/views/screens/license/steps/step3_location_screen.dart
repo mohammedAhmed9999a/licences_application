@@ -125,6 +125,9 @@ class Step3LocationScreen extends StatelessWidget {
                         isLoading: ctrl.isGovernoratesLoading.value,
                         enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل المحافظات...',
+                        onRefresh: governorateEditable
+                            ? () => ctrl.refreshGovernorates()
+                            : null,
                         onChanged: (val) {
                           if (!governorateEditable) return;
                           final gov = ctrl.governorates.firstWhereOrNull(
@@ -148,6 +151,9 @@ class Step3LocationScreen extends StatelessWidget {
                         isLoading: ctrl.isDistrictsLoading.value,
                         enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل المناطق...',
+                        onRefresh: governorateEditable
+                            ? () => ctrl.refreshDistricts()
+                            : null,
                         onChanged: (val) {
                           if (!governorateEditable) return;
                           final d = ctrl.districts.firstWhereOrNull(
@@ -170,6 +176,9 @@ class Step3LocationScreen extends StatelessWidget {
                         isLoading: ctrl.isSubdistrictsLoading.value,
                         enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل النواحي...',
+                        onRefresh: governorateEditable
+                            ? () => ctrl.refreshSubdistricts()
+                            : null,
                         onChanged: (val) {
                           if (!governorateEditable) return;
                           final s = ctrl.subdistricts.firstWhereOrNull(
@@ -192,6 +201,9 @@ class Step3LocationScreen extends StatelessWidget {
                         isLoading: ctrl.isTownsLoading.value,
                         enabled: governorateEditable,
                         loadingLabel: 'جاري تحميل البلديات...',
+                        onRefresh: governorateEditable
+                            ? () => ctrl.refreshTowns()
+                            : null,
                         onChanged: (val) {
                           if (!governorateEditable) return;
                           final t = ctrl.towns.firstWhereOrNull(
@@ -1037,6 +1049,7 @@ class _DropdownField extends StatelessWidget {
   final bool isLoading;
   final bool enabled;
   final String? loadingLabel;
+  final VoidCallback? onRefresh;
 
   const _DropdownField({
     required this.hint,
@@ -1046,20 +1059,32 @@ class _DropdownField extends StatelessWidget {
     this.isLoading = false,
     this.enabled = true,
     this.loadingLabel,
+    this.onRefresh,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fillColor = isDark ? AppColors.darkSurfaceVariant : AppColors.surface;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.border;
+    final hintColor = isDark ? AppColors.darkTextHint : AppColors.textHint;
+    final textColor = isDark ? AppColors.darkText : AppColors.textPrimary;
+    final iconColor = isDark ? AppColors.darkTextSecondary : AppColors.textHint;
+    final shadowColor = isDark
+        ? Colors.black26
+        : Colors.black.withOpacity(0.03);
+
     return Container(
       height: 50.h,
       padding: EdgeInsets.symmetric(horizontal: 12.w),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: fillColor,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: shadowColor,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1074,9 +1099,11 @@ class _DropdownField extends StatelessWidget {
                   child: CircularProgressIndicator(
                     strokeWidth: 2.2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
+                      theme.colorScheme.primary,
                     ),
-                    backgroundColor: AppColors.primary.withOpacity(0.12),
+                    backgroundColor: theme.colorScheme.primary.withOpacity(
+                      0.12,
+                    ),
                   ),
                 ),
                 SizedBox(width: 10.w),
@@ -1086,47 +1113,75 @@ class _DropdownField extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 12.5.sp,
-                      color: AppColors.textSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),
-                Icon(Icons.sync_rounded, size: 18.sp, color: AppColors.primary),
+                Icon(
+                  Icons.sync_rounded,
+                  size: 18.sp,
+                  color: theme.colorScheme.primary,
+                ),
               ],
             )
-          : DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: value,
-                hint: Text(
-                  hint,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 13.sp,
-                    color: AppColors.textHint,
-                  ),
-                ),
-                isExpanded: true,
-                alignment: AlignmentDirectional.centerStart,
-                icon: const Icon(
-                  Icons.keyboard_arrow_down,
-                  color: AppColors.textHint,
-                ),
-                items: items
-                    .map(
-                      (item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(
-                          item,
-                          textDirection: TextDirection.rtl,
-                          style: TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: 13.sp,
-                          ),
+          : Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: value,
+                      hint: Text(
+                        hint,
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 13.sp,
+                          color: hintColor,
                         ),
                       ),
-                    )
-                    .toList(),
-                onChanged: enabled ? onChanged : null,
-              ),
+                      isExpanded: true,
+                      alignment: AlignmentDirectional.centerStart,
+                      icon: Icon(Icons.keyboard_arrow_down, color: iconColor),
+                      items: items
+                          .map(
+                            (item) => DropdownMenuItem(
+                              value: item,
+                              child: Text(
+                                item,
+                                textDirection: TextDirection.rtl,
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13.sp,
+                                  color: textColor,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: enabled ? onChanged : null,
+                    ),
+                  ),
+                ),
+                if (onRefresh != null && enabled)
+                  Padding(
+                    padding: EdgeInsetsDirectional.only(start: 4.w),
+                    child: IconButton(
+                      onPressed: onRefresh,
+                      tooltip: 'تحديث',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 28,
+                        minHeight: 28,
+                      ),
+                      icon: Icon(
+                        Icons.refresh,
+                        size: 18.sp,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+              ],
             ),
     );
   }
@@ -1151,6 +1206,9 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -1158,7 +1216,9 @@ class _CategoryCard extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.selectedCard
+              ? (isDark
+                    ? AppColors.selectedCardDark1
+                    : AppColors.selectedCardLight)
               : enabled
               ? AppColors.surface
               : AppColors.backgroundAlt,

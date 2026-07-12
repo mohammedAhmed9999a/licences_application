@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,12 +24,12 @@ class Step1ConditionsScreen extends StatelessWidget {
     final infoColor = theme.colorScheme.secondary;
     final errorColor = theme.colorScheme.error;
     final errorContainer = theme.colorScheme.errorContainer;
-    final onErrorContainer = theme.colorScheme.onErrorContainer;
     final errorTextColor = theme.brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
 
     return SingleChildScrollView(
+      controller: ctrl.step1ScrollController,
       child: Column(
         children: [
           // ─── Conditions Section ───────────────────────────────────────
@@ -278,6 +276,7 @@ class Step1ConditionsScreen extends StatelessWidget {
 
                             builder: (context, _, __) {
                               return LabeledField(
+                                key: ctrl.phoneFieldKey,
                                 label: 'رقم التواصل (رقم سوري حصراً)',
                                 required: true,
                                 errorText: ctrl.phoneController.text.isEmpty
@@ -310,6 +309,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                             valueListenable: ctrl.emailController,
                             builder: (context, _, __) {
                               return LabeledField(
+                                key: ctrl.emailFieldKey,
                                 label: 'عنوان البريد الإلكتروني',
                                 required: true,
                                 errorText: ctrl.emailController.text.isEmpty
@@ -339,6 +339,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                             valueListenable: ctrl.phoneController,
                             builder: (context, _, __) {
                               return LabeledField(
+                                key: ctrl.phoneFieldKey,
                                 label: 'رقم التواصل (رقم سوري حصراً)',
                                 required: true,
                                 errorText: ctrl.phoneController.text.isEmpty
@@ -368,6 +369,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                             valueListenable: ctrl.emailController,
                             builder: (context, _, __) {
                               return LabeledField(
+                                key: ctrl.emailFieldKey,
                                 label: 'عنوان البريد الإلكتروني',
                                 required: true,
                                 errorText: ctrl.emailController.text.isEmpty
@@ -396,6 +398,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                   valueListenable: ctrl.phone2Controller,
                   builder: (context, _, __) {
                     return LabeledField(
+                      key: ctrl.secondaryPhoneFieldKey,
                       label: 'رقم التواصل الثانوي (اختياري)',
                       errorText: ctrl.phone2Controller.text.isEmpty
                           ? null
@@ -425,6 +428,7 @@ class Step1ConditionsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
+                        key: ctrl.termsFieldKey,
                         onTap: () => ctrl.agreedToTerms.toggle(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -523,21 +527,5 @@ class Step1ConditionsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _openFile(File? file) async {
-    if (file == null) {
-      Get.snackbar('خطأ', 'لا يوجد ملف لعرضه.');
-      return;
-    }
-
-    if (!file.existsSync()) {
-      Get.snackbar('خطأ', 'تعذر العثور على الملف.');
-      return;
-    }
-    Get.toNamed(AppRoutes.termsPdfViewer);
-    // Get.to(
-    //   () => TermsPdfViewerScreen(pdfPath: file.path),
-    // );
   }
 }

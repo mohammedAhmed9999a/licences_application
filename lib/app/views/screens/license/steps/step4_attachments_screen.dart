@@ -267,7 +267,84 @@ class Step4AttachmentsScreen extends StatelessWidget {
       return;
     }
 
-    Get.to(() => TermsPdfViewerScreen(pdfPath: file.path));
+    final extension = file.path.split('.').last.toLowerCase();
+    if (extension == 'pdf') {
+      Get.to(() => TermsPdfViewerScreen(pdfPath: file.path));
+    } else if ([
+      'png',
+      'jpg',
+      'jpeg',
+      'webp',
+      'bmp',
+      'gif',
+    ].contains(extension)) {
+      Get.to(() => _ImagePreviewScreen(filePath: file.path));
+    } else {
+      Get.snackbar('خطأ', 'هذا النوع من الملفات غير مدعوم للعرض داخل التطبيق.');
+    }
+  }
+}
+
+class _ImagePreviewScreen extends StatelessWidget {
+  final String filePath;
+
+  const _ImagePreviewScreen({required this.filePath});
+
+  @override
+  Widget build(BuildContext context) {
+    final file = File(filePath);
+    final fileName = file.uri.pathSegments.isNotEmpty
+        ? file.uri.pathSegments.last
+        : 'image';
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(
+          fileName,
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 14.sp,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: InteractiveViewer(
+            maxScale: 4.0,
+            minScale: 1.0,
+            child: Image.file(
+              file,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.broken_image_outlined,
+                      size: 64.sp,
+                      color: Colors.white70,
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      'تعذر تحميل الصورة',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -284,6 +361,14 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final valueColor = isDark ? AppColors.darkText : AppColors.textPrimary;
+    final labelColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.textSecondary;
+    final dividerColor = isDark ? AppColors.darkDivider : AppColors.borderLight;
+
     return Column(
       children: [
         Padding(
@@ -291,7 +376,6 @@ class _SummaryRow extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             textDirection: TextDirection.ltr,
-
             children: [
               Flexible(
                 child: Text(
@@ -299,7 +383,7 @@ class _SummaryRow extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 13.sp,
-                    color: AppColors.textPrimary,
+                    color: valueColor,
                     fontWeight: FontWeight.w500,
                   ),
                   textDirection: TextDirection.rtl,
@@ -311,13 +395,13 @@ class _SummaryRow extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 12.sp,
-                  color: AppColors.textSecondary,
+                  color: labelColor,
                 ),
               ),
             ],
           ),
         ),
-        if (!isLast) Divider(height: 1.h, color: AppColors.borderLight),
+        if (!isLast) Divider(height: 1.h, color: dividerColor),
       ],
     );
   }

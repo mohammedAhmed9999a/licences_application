@@ -37,6 +37,10 @@ class LicenseDetailModel {
 
   String get requestTypeLabel => application.requestTypeLabel;
   String get investorTypeLabel => application.investorTypeLabel;
+  List<AttachmentItem> get latest_attachments =>
+      application.latest_attachments.isNotEmpty
+      ? application.latest_attachments
+      : attachments;
 
   static List<LicenseDetailModel> mockLicenses() {
     final base = ApplicationModel.mockApplications();
@@ -117,13 +121,10 @@ class LicenseDetailModel {
           ? app.statusNote
           : 'لا توجد ملاحظات إضافية',
       attachments: app.attachments.isNotEmpty
-          ? app.attachments
-              .cast<dynamic>()
-              .map((item) {
-                if (item is AttachmentItem) return item;
-                return AttachmentItem(name: item.toString());
-              })
-              .toList()
+          ? app.attachments.cast<dynamic>().map((item) {
+              if (item is AttachmentItem) return item;
+              return AttachmentItem(name: item.toString());
+            }).toList()
           : [AttachmentItem(name: 'لا توجد مرفقات')],
       stepSummary: app.stepSummary.isNotEmpty
           ? app.stepSummary

@@ -8,6 +8,7 @@ class DashboardController extends GetxController {
 
   final applications = <ApplicationModel>[].obs;
   final isLoading = false.obs;
+  final errorMessage = ''.obs;
 
   @override
   void onInit() {
@@ -18,6 +19,9 @@ class DashboardController extends GetxController {
   Future<void> loadApplications() async {
     try {
       isLoading.value = true;
+      errorMessage.value = '';
+      applications.value = [];
+
       final response = await CoreApiService.get(
         '/v1/license-applications',
         options: dio.Options(receiveTimeout: const Duration(seconds: 60)),
@@ -29,8 +33,10 @@ class DashboardController extends GetxController {
       applications.value = payload
           .map((e) => ApplicationModel.fromJson(e as Map<String, dynamic>))
           .toList();
-    } catch (_) {
-      applications.value = ApplicationModel.mockApplications();
+    } catch (error) {
+      applications.value = [];
+      errorMessage.value =
+          'تعذر تحميل طلبات التراخيص. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
     } finally {
       isLoading.value = false;
     }

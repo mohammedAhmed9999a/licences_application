@@ -8,13 +8,61 @@ import '../../widgets/common_widgets.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../routes/app_routes.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailFocusNode = FocusNode();
+  final passwordFocusNode = FocusNode();
+  final _scrollController = ScrollController();
+  final _emailFieldKey = GlobalKey();
+  final _passwordFieldKey = GlobalKey();
+
+  @override
+  void dispose() {
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _scrollToField(GlobalKey key) async {
+    final targetContext = key.currentContext;
+    if (targetContext == null) return;
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignment: 0.1,
+    );
+  }
+
+  void _scrollToFirstError(AuthController ctrl) {
+    final emailError = ctrl.validateEmailField(ctrl.emailController.text);
+    final passwordError = ctrl.validateLoginPasswordField(
+      ctrl.passwordController.text,
+    );
+
+    if (emailError != null) {
+      _scrollToField(_emailFieldKey);
+    } else if (passwordError != null) {
+      _scrollToField(_passwordFieldKey);
+    }
+  }
+
+  void _handleLogin(AuthController ctrl) {
+    _scrollToFirstError(ctrl);
+    setState(() {});
+    ctrl.login();
+  }
+
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<AuthController>();
-    final emailFocusNode = FocusNode();
-    final passwordFocusNode = FocusNode();
     final theme = Theme.of(context);
     final textPrimary = theme.brightness == Brightness.dark
         ? theme.colorScheme.onSurface
@@ -37,6 +85,7 @@ class LoginScreen extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -48,7 +97,11 @@ class LoginScreen extends StatelessWidget {
                     onTap: () => Get.back(),
                     child: Row(
                       children: [
-                        Icon(Icons.arrow_forward_ios, size: 14.sp, color: primaryColor),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 14.sp,
+                          color: primaryColor,
+                        ),
                         SizedBox(width: 6.w),
                         Text(
                           'العودة',
@@ -63,7 +116,10 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 8.h,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.cardColor,
                       borderRadius: BorderRadius.circular(14.r),
@@ -123,6 +179,7 @@ class LoginScreen extends StatelessWidget {
                       valueListenable: ctrl.emailController,
                       builder: (context, _, __) {
                         return LabeledField(
+                          key: _emailFieldKey,
                           label: 'البريد الإلكتروني',
                           required: true,
                           errorText: ctrl.validateEmailField(
@@ -130,12 +187,12 @@ class LoginScreen extends StatelessWidget {
                           ),
                           successText:
                               ctrl.emailController.text.isNotEmpty &&
-                                      ctrl.validateEmailField(
-                                            ctrl.emailController.text,
-                                          ) ==
-                                          null
-                                  ? 'البريد الإلكتروني صالح'
-                                  : null,
+                                  ctrl.validateEmailField(
+                                        ctrl.emailController.text,
+                                      ) ==
+                                      null
+                              ? 'البريد الإلكتروني صالح'
+                              : null,
                           child: RtlTextField(
                             controller: ctrl.emailController,
                             focusNode: emailFocusNode,
@@ -143,8 +200,9 @@ class LoginScreen extends StatelessWidget {
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
                             onSubmitted: (_) {
-                              FocusScope.of(context)
-                                  .requestFocus(passwordFocusNode);
+                              FocusScope.of(
+                                context,
+                              ).requestFocus(passwordFocusNode);
                             },
                           ),
                         );
@@ -163,20 +221,21 @@ class LoginScreen extends StatelessWidget {
                             ),
                             successText:
                                 ctrl.passwordController.text.isNotEmpty &&
-                                        ctrl.validateLoginPasswordField(
-                                              ctrl.passwordController.text,
-                                            ) ==
-                                            null
-                                    ? 'كلمة المرور مناسبة'
-                                    : null,
+                                    ctrl.validateLoginPasswordField(
+                                          ctrl.passwordController.text,
+                                        ) ==
+                                        null
+                                ? 'كلمة المرور مناسبة'
+                                : null,
                             child: RtlTextField(
+                              key: _passwordFieldKey,
                               controller: ctrl.passwordController,
                               focusNode: passwordFocusNode,
                               hintText: '••••••••••',
                               obscureText: ctrl.obscurePassword.value,
                               textInputAction: TextInputAction.done,
                               onSubmitted: (_) {
-                                ctrl.login();
+                                _handleLogin(ctrl);
                               },
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -200,7 +259,8 @@ class LoginScreen extends StatelessWidget {
                         children: [
                           Checkbox(
                             value: ctrl.rememberMe.value,
-                            onChanged: (v) => ctrl.rememberMe.value = v ?? false,
+                            onChanged: (v) =>
+                                ctrl.rememberMe.value = v ?? false,
                             activeColor: primaryColor,
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
@@ -218,11 +278,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8.h),
-                    Obx(
-                      () => ErrorBanner(
-                        message: ctrl.errorMessage.value,
-                      ),
-                    ),
+                    Obx(() => ErrorBanner(message: ctrl.errorMessage.value)),
                     Obx(
                       () => ctrl.showResendVerification.value
                           ? Column(
@@ -238,11 +294,11 @@ class LoginScreen extends StatelessWidget {
                                   ),
                                   onPressed:
                                       (ctrl.isResendingVerification.value ||
-                                              ctrl.resendCooldownSeconds.value >
-                                                  0 ||
-                                              ctrl.resendAttemptsLeft.value <= 0)
-                                          ? null
-                                          : ctrl.resendVerificationEmail,
+                                          ctrl.resendCooldownSeconds.value >
+                                              0 ||
+                                          ctrl.resendAttemptsLeft.value <= 0)
+                                      ? null
+                                      : ctrl.resendVerificationEmail,
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
                                       vertical: 12.h,
@@ -251,10 +307,10 @@ class LoginScreen extends StatelessWidget {
                                       ctrl.isResendingVerification.value
                                           ? 'يتم الإرسال...'
                                           : ctrl.resendAttemptsLeft.value <= 0
-                                              ? 'تم استنفاد المحاولات'
-                                              : ctrl.resendCooldownSeconds.value > 0
-                                                  ? 'أعد المحاولة بعد ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
-                                                  : 'إعادة إرسال رابط التفعيل',
+                                          ? 'تم استنفاد المحاولات'
+                                          : ctrl.resendCooldownSeconds.value > 0
+                                          ? 'أعد المحاولة بعد ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
+                                          : 'إعادة إرسال رابط التفعيل',
                                       style: TextStyle(
                                         fontFamily: 'Cairo',
                                         fontSize: 14.sp,
@@ -267,8 +323,8 @@ class LoginScreen extends StatelessWidget {
                                   ctrl.resendAttemptsLeft.value <= 0
                                       ? 'لم يعد مسموحاً بإعادة الإرسال بعد 3 محاولات.'
                                       : ctrl.resendCooldownSeconds.value > 0
-                                          ? 'الوقت المتبقي لإعادة المحاولة: ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
-                                          : 'إذا كان حسابك غير مفعل، اضغط على زر إعادة الإرسال للتحقق من بريدك.',
+                                      ? 'الوقت المتبقي لإعادة المحاولة: ${_formatDuration(ctrl.resendCooldownSeconds.value)}'
+                                      : 'إذا كان حسابك غير مفعل، اضغط على زر إعادة الإرسال للتحقق من بريدك.',
                                   style: TextStyle(
                                     fontFamily: 'Cairo',
                                     fontSize: 12.sp,
@@ -285,7 +341,7 @@ class LoginScreen extends StatelessWidget {
                       () => PrimaryButton(
                         label: 'تسجيل الدخول',
                         isLoading: ctrl.isLoading.value,
-                        onPressed: ctrl.login,
+                        onPressed: () => _handleLogin(ctrl),
                       ),
                     ),
                     SizedBox(height: 18.h),

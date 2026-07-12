@@ -10,6 +10,17 @@ void main() {
 
     expect(controller.validateStep1(), isFalse);
     expect(controller.errorMessage.value, contains('بريد إلكتروني'));
+    expect(controller.step1ErrorField.value, 'email');
+  });
+
+  test('validateStep1 marks the phone field when phone is missing', () {
+    final controller = LicenseApplicationController();
+    controller.emailController.text = 'user@example.com';
+    controller.phoneController.text = '';
+    controller.agreedToTerms.value = true;
+
+    expect(controller.validateStep1(), isFalse);
+    expect(controller.step1ErrorField.value, 'phone');
   });
 
   test('validateStep1 accepts valid step1 data', () {

@@ -8,16 +8,76 @@ import '../../widgets/common_widgets.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../routes/app_routes.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
+
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final nameFocusNode = FocusNode();
+  final emailFocusNode = FocusNode();
+  final passwordFocusNode = FocusNode();
+  final confirmPasswordFocusNode = FocusNode();
+  final _scrollController = ScrollController();
+  final _nameFieldKey = GlobalKey();
+  final _emailFieldKey = GlobalKey();
+  final _passwordFieldKey = GlobalKey();
+  final _confirmPasswordFieldKey = GlobalKey();
+
+  @override
+  void dispose() {
+    nameFocusNode.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+    confirmPasswordFocusNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _scrollToField(GlobalKey key) async {
+    final targetContext = key.currentContext;
+    if (targetContext == null) return;
+    await Scrollable.ensureVisible(
+      targetContext,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignment: 0.1,
+    );
+  }
+
+  void _scrollToFirstError(AuthController ctrl) {
+    final nameError = ctrl.validateNameField(ctrl.nameController.text);
+    final emailError = ctrl.validateEmailField(ctrl.signupEmailController.text);
+    final passwordError = ctrl.validateSignupPasswordField(
+      ctrl.signupPasswordController.text,
+    );
+    final confirmError = ctrl.validateConfirmPasswordField(
+      ctrl.signupPasswordController.text,
+      ctrl.confirmPasswordController.text,
+    );
+
+    if (nameError != null) {
+      _scrollToField(_nameFieldKey);
+    } else if (emailError != null) {
+      _scrollToField(_emailFieldKey);
+    } else if (passwordError != null) {
+      _scrollToField(_passwordFieldKey);
+    } else if (confirmError != null) {
+      _scrollToField(_confirmPasswordFieldKey);
+    }
+  }
+
+  void _handleSignup(AuthController ctrl) {
+    _scrollToFirstError(ctrl);
+    setState(() {});
+    ctrl.signup();
+  }
 
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<AuthController>();
-    final nameFocusNode = FocusNode();
-    final emailFocusNode = FocusNode();
-    final passwordFocusNode = FocusNode();
-    final confirmPasswordFocusNode = FocusNode();
     final theme = Theme.of(context);
     final textPrimary = theme.colorScheme.onSurface;
     final textSecondary = theme.brightness == Brightness.dark
@@ -45,6 +105,7 @@ class SignupScreen extends StatelessWidget {
         backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
         body: SafeArea(
           child: SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               children: [
                 SizedBox(height: 16.h),
@@ -148,6 +209,7 @@ class SignupScreen extends StatelessWidget {
                                 valueListenable: ctrl.nameController,
                                 builder: (context, _, __) {
                                   return LabeledField(
+                                    key: _nameFieldKey,
                                     label: 'الاسم الكامل',
                                     required: true,
                                     errorText: ctrl.validateNameField(
@@ -182,6 +244,7 @@ class SignupScreen extends StatelessWidget {
                                 valueListenable: ctrl.signupEmailController,
                                 builder: (context, _, __) {
                                   return LabeledField(
+                                    key: _emailFieldKey,
                                     label: 'البريد الإلكتروني',
                                     required: true,
                                     errorText: ctrl.validateEmailField(
@@ -248,6 +311,7 @@ class SignupScreen extends StatelessWidget {
                                               ? 'كلمة المرور قوية'
                                               : null,
                                           child: RtlTextField(
+                                            key: _passwordFieldKey,
                                             controller:
                                                 ctrl.signupPasswordController,
                                             focusNode: passwordFocusNode,
@@ -317,6 +381,7 @@ class SignupScreen extends StatelessWidget {
                                               ? 'كلمتا المرور متطابقتان'
                                               : null,
                                           child: RtlTextField(
+                                            key: _confirmPasswordFieldKey,
                                             controller:
                                                 ctrl.confirmPasswordController,
                                             focusNode: confirmPasswordFocusNode,
@@ -327,7 +392,7 @@ class SignupScreen extends StatelessWidget {
                                             textInputAction:
                                                 TextInputAction.done,
                                             onSubmitted: (_) {
-                                              ctrl.signup();
+                                              _handleSignup(ctrl);
                                             },
                                             suffixIcon: IconButton(
                                               icon: Icon(
@@ -370,11 +435,11 @@ class SignupScreen extends StatelessWidget {
                               // ),
 
                               // Error
-                              // Obx(
-                              //   () => ErrorBanner(
-                              //     message: ctrl.errorMessage.value,
-                              //   ),
-                              // ),
+                              Obx(
+                                () => ErrorBanner(
+                                  message: ctrl.errorMessage.value,
+                                ),
+                              ),
                               SizedBox(height: 12.h),
 
                               // Signup Button
@@ -382,7 +447,7 @@ class SignupScreen extends StatelessWidget {
                                 () => PrimaryButton(
                                   label: 'إنشاء الحساب',
                                   isLoading: ctrl.isLoading.value,
-                                  onPressed: ctrl.signup,
+                                  onPressed: () => _handleSignup(ctrl),
                                 ),
                               ),
                               SizedBox(height: 14.h),

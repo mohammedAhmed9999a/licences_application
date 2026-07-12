@@ -68,6 +68,7 @@ class LicenseApplicationController extends GetxController {
   final isSubdistrictsLoading = false.obs;
   final isTownsLoading = false.obs;
   final errorMessage = ''.obs;
+  final step1ErrorField = ''.obs;
 
   // ─── STEP 1: Conditions & Contact ────────────────────────────────
   final emailController = TextEditingController();
@@ -130,6 +131,11 @@ class LicenseApplicationController extends GetxController {
   final companyLicenseNumberFocus = FocusNode();
 
   // Keys for scrolling to fields with errors
+  final step1ScrollController = ScrollController();
+  final phoneFieldKey = GlobalKey();
+  final emailFieldKey = GlobalKey();
+  final secondaryPhoneFieldKey = GlobalKey();
+  final termsFieldKey = GlobalKey();
   final firstNameFieldKey = GlobalKey();
   final fatherNameFieldKey = GlobalKey();
   final motherNameFieldKey = GlobalKey();
@@ -341,6 +347,7 @@ class LicenseApplicationController extends GetxController {
     birthPlaceFocus.dispose();
     latitudeController.dispose();
     longitudeController.dispose();
+    step1ScrollController.dispose();
     step2ScrollController.dispose();
     super.onClose();
   }
@@ -766,22 +773,68 @@ class LicenseApplicationController extends GetxController {
   }
 
   // ─── Validation ───────────────────────────────────────────────────
+  void scrollToStep1Field(GlobalKey key) {
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        Scrollable.ensureVisible(
+          ctx,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOut,
+          alignment: 0.16,
+        );
+      } catch (_) {}
+    });
+  }
+
+  void scrollToStep1Error() {
+    switch (step1ErrorField.value) {
+      case 'phone':
+        scrollToStep1Field(phoneFieldKey);
+        break;
+      case 'email':
+        scrollToStep1Field(emailFieldKey);
+        break;
+      case 'phone2':
+        scrollToStep1Field(secondaryPhoneFieldKey);
+        break;
+      case 'terms':
+        scrollToStep1Field(termsFieldKey);
+        break;
+    }
+  }
+
   bool validateStep1() {
     errorMessage.value = '';
+    step1ErrorField.value = '';
 
     final emailError = FormValidator.validateEmailField(emailController.text);
     if (emailError != null) {
       errorMessage.value = emailError;
+      step1ErrorField.value = 'email';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToStep1Error();
+      });
       return false;
     }
 
     final phone = phoneController.text.trim();
     if (phone.isEmpty) {
       errorMessage.value = 'يرجى إدخال رقم التواصل';
+      step1ErrorField.value = 'phone';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToStep1Error();
+      });
       return false;
     }
     if (!RegExp(r'^09\d{8}$').hasMatch(phone)) {
       errorMessage.value = 'رقم التواصل يجب أن يبدأ بـ 09 وأن يكون 10 أرقام';
+      step1ErrorField.value = 'phone';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToStep1Error();
+      });
       return false;
     }
 
@@ -790,11 +843,19 @@ class LicenseApplicationController extends GetxController {
         !RegExp(r'^09\d{8}$').hasMatch(secondaryPhone)) {
       errorMessage.value =
           'رقم التواصل الثانوي يجب أن يبدأ بـ 09 وأن يكون 10 أرقام';
+      step1ErrorField.value = 'phone2';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToStep1Error();
+      });
       return false;
     }
 
     if (!agreedToTerms.value) {
       errorMessage.value = 'يجب الموافقة على الشروط والأحكام للمتابعة';
+      step1ErrorField.value = 'terms';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToStep1Error();
+      });
       return false;
     }
     return true;
@@ -1174,7 +1235,7 @@ class LicenseApplicationController extends GetxController {
     double scrollTop = 0.0;
     try {
       final scrollableRenderBox =
-          Scrollable.of(ctx)?.context.findRenderObject() as RenderBox?;
+          Scrollable.of(ctx).context.findRenderObject() as RenderBox?;
       if (scrollableRenderBox != null) {
         scrollTop = scrollableRenderBox.localToGlobal(Offset.zero).dy;
       }
@@ -1192,7 +1253,7 @@ class LicenseApplicationController extends GetxController {
               : targetOffset);
     if (step2ScrollController.hasClients) {
       step2ScrollController.animateTo(
-        clamped as double,
+        clamped,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -1978,6 +2039,25 @@ class LicenseApplicationController extends GetxController {
     } finally {
       isTownsLoading.value = false;
     }
+  }
+
+  Future<void> refreshGovernorates() async {
+    await _loadGovernorates();
+    if (selectedGovernorate.value != null) {
+      await onGovernorateChanged(selectedGovernorate.value);
+    }
+  }
+
+  Future<void> refreshDistricts() async {
+    await onGovernorateChanged(selectedGovernorate.value);
+  }
+
+  Future<void> refreshSubdistricts() async {
+    await onDistrictChanged(selectedDistrict.value);
+  }
+
+  Future<void> refreshTowns() async {
+    await onSubdistrictChanged(selectedSubdistrict.value);
   }
 
   void addPartner() {

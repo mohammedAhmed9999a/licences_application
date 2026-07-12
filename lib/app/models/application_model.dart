@@ -142,6 +142,7 @@ class ApplicationModel {
   final String coordinates;
   final String statusNote;
   final List<AttachmentItem> attachments;
+  final List<AttachmentItem> latest_attachments;
   final List<String> stepSummary;
   final List<String> correctionTargets;
   final bool needsCorrection;
@@ -186,6 +187,7 @@ class ApplicationModel {
     this.coordinates = '',
     this.statusNote = '',
     this.attachments = const [],
+    this.latest_attachments = const [],
     this.stepSummary = const [],
     this.correctionTargets = const [],
     this.needsCorrection = false,
@@ -292,6 +294,44 @@ class ApplicationModel {
       longitude,
     ].where((part) => part.isNotEmpty).join(', ');
 
+    final latestAttachmentItems =
+        (json['latest_attachments'] as List?)
+            ?.map((item) {
+              if (item is Map) {
+                final itemMap = _asStringKeyedMap(item) ?? <String, dynamic>{};
+                final path =
+                    itemMap['file_path']?.toString() ??
+                    itemMap['file']?.toString() ??
+                    itemMap['url']?.toString();
+                String name = itemMap['file_name']?.toString() ?? '';
+                final docTypeName = _readAttachmentDocTypeName(itemMap);
+
+                if (docTypeName != null && docTypeName.trim().isNotEmpty) {
+                  name = docTypeName;
+                } else if (name.isEmpty) {
+                  name = docTypeName ?? '';
+                }
+                if (name.isEmpty && path != null) {
+                  final uri = Uri.tryParse(path);
+                  if (uri != null && uri.pathSegments.isNotEmpty) {
+                    name = uri.pathSegments.last;
+                  } else {
+                    name = path;
+                  }
+                }
+                return AttachmentItem(
+                  name: name.isNotEmpty ? name : 'مرفق',
+                  filePath: path,
+                  docTypeName: docTypeName,
+                );
+              }
+              final text = item?.toString() ?? '';
+              return AttachmentItem(name: text, filePath: null);
+            })
+            .where((attachment) => attachment.name.trim().isNotEmpty)
+            .toList() ??
+        [];
+
     final adminMessage = json['admin_message']?.toString() ?? '';
     final statusNote = adminMessage.isNotEmpty
         ? adminMessage
@@ -353,6 +393,9 @@ class ApplicationModel {
       coordinates: coordinates,
       statusNote: statusNote,
       attachments: attachmentItems,
+      latest_attachments: latestAttachmentItems.isNotEmpty
+          ? latestAttachmentItems
+          : attachmentItems,
       stepSummary:
           (json['step_summary'] as List?)?.map((e) => e.toString()).toList() ??
           [],

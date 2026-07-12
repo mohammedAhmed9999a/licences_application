@@ -328,6 +328,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     dashCtrl.applications,
                   );
 
+                  if (dashCtrl.errorMessage.isNotEmpty) {
+                    return ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 8.h),
+                          child: _buildStatsSection(context, dashCtrl),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 24.h,
+                          ),
+                          child: _buildErrorState(
+                            context,
+                            dashCtrl.errorMessage.value,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
                   return ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
@@ -581,6 +604,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const ShimmerLoadingCard(height: 140),
         const ShimmerLoadingCard(height: 140),
       ],
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String message) {
+    final theme = Theme.of(context);
+    final textPrimary = theme.colorScheme.onBackground;
+    final textSecondary =
+        theme.textTheme.bodyMedium?.color ??
+        theme.colorScheme.onSurface.withOpacity(0.75);
+    final surfaceAlt = context.themeSurfaceAlt;
+
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: surfaceAlt,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: theme.colorScheme.error.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.wifi_off_outlined,
+            size: 44,
+            color: theme.colorScheme.error,
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            'تعذر تحميل الطلبات',
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 13.sp,
+              color: textSecondary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

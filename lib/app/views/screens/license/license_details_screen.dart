@@ -119,7 +119,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     'summary': false,
     'applicant': false,
     'location': false,
-    'attachments': false,
+    'latest_attachments': false,
     'timeline': false,
   };
 
@@ -249,8 +249,9 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       detail!,
                       primary,
                       onSurface,
-                      isExpanded: _expandedSections['attachments'] ?? true,
-                      onToggle: () => _toggleSection('attachments'),
+                      isExpanded:
+                          _expandedSections['latest_attachments'] ?? true,
+                      onToggle: () => _toggleSection('latest_attachments'),
                     ),
                     SizedBox(height: 18.h),
                     _buildTimelineSection(
@@ -831,7 +832,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Text(
-                      '${detail.attachments.length}',
+                      '${detail.latest_attachments.length}',
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 12.sp,
@@ -847,7 +848,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
           AnimatedCrossFade(
             firstChild: Padding(
               padding: EdgeInsets.only(top: 14.h),
-              child: detail.attachments.isEmpty
+              child: detail.latest_attachments.isEmpty
                   ? Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(
@@ -884,7 +885,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       crossAxisSpacing: 12.w,
                       mainAxisSpacing: 12.h,
                       childAspectRatio: 0.84,
-                      children: detail.attachments.map((attachment) {
+                      children: detail.latest_attachments.map((attachment) {
                         return _buildAttachmentCard(
                           context,
                           attachment,

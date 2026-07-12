@@ -167,10 +167,8 @@ class LabeledField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final errorColor = theme.colorScheme.error;
     final errorContainer = theme.colorScheme.errorContainer;
-    final onErrorContainer = theme.colorScheme.onErrorContainer;
     final successColor = theme.colorScheme.primary;
     final labelColor =
         theme.textTheme.titleMedium?.color ?? theme.colorScheme.onSurface;
@@ -398,6 +396,7 @@ class ChoiceCard extends StatelessWidget {
         theme.textTheme.bodyMedium?.color ?? theme.colorScheme.onSurface;
     final surfaceAlt = context.themeSurfaceAlt;
     final primaryColor = theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -408,7 +407,9 @@ class ChoiceCard extends StatelessWidget {
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color: selected
-                ? AppColors.selectedCard
+                ? (isDark
+                      ? AppColors.selectedCardDark1
+                      : AppColors.selectedCardLight)
                 : enabled
                 ? surface
                 : AppColors.backgroundAlt,
@@ -747,7 +748,6 @@ class ErrorBanner extends StatelessWidget {
     final theme = Theme.of(context);
     final errorColor = theme.colorScheme.error;
     final errorContainer = theme.colorScheme.errorContainer;
-    final onErrorContainer = theme.colorScheme.onErrorContainer;
     final errorTextColor = theme.brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
@@ -947,15 +947,38 @@ class AttachmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final cardColor = isDark ? AppColors.darkSurfaceVariant : AppColors.surface;
+    final borderColor = uploaded
+        ? (isDark ? AppColors.darkBorder : AppColors.primary.withOpacity(0.4))
+        : (isDark ? AppColors.darkBorder.withOpacity(0.45) : AppColors.border);
+    final iconBgColor = isDark
+        ? AppColors.selectedCardDark2
+        : AppColors.backgroundAlt;
+    final titleColor = isDark ? AppColors.darkText : AppColors.textPrimary;
+    final subtitleColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.textSecondary;
+    final hintColor = isDark ? AppColors.darkTextHint : AppColors.textHint;
+    final uploadAreaColor = enabled
+        ? uploaded
+              ? (isDark
+                    ? AppColors.selectedCardDark
+                    : AppColors.primary.withOpacity(0.05))
+              : (isDark ? AppColors.darkSurfaceAlt : AppColors.backgroundAlt)
+        : (isDark
+              ? AppColors.darkSurface.withOpacity(0.6)
+              : AppColors.borderLight.withOpacity(0.16));
+    final uploadBorderColor = uploaded
+        ? (isDark ? AppColors.darkBorder : AppColors.primary.withOpacity(0.3))
+        : (isDark ? AppColors.darkBorder.withOpacity(0.35) : AppColors.border);
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cardColor,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(
-          color: uploaded
-              ? AppColors.primary.withOpacity(0.4)
-              : AppColors.border,
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         // textDirection: TextDirection.ltr,
@@ -972,7 +995,7 @@ class AttachmentCard extends StatelessWidget {
                   width: 36.w,
                   height: 36.h,
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundAlt,
+                    color: iconBgColor,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
@@ -980,8 +1003,8 @@ class AttachmentCard extends StatelessWidget {
                         ? Icons.check_circle
                         : Icons.insert_drive_file_outlined,
                     color: uploaded
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
+                        ? (isDark ? AppColors.darkText : AppColors.primary)
+                        : subtitleColor,
                     size: 20,
                   ),
                 ),
@@ -997,7 +1020,7 @@ class AttachmentCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: titleColor,
                           fontFamily: 'Cairo',
                         ),
                         textDirection: TextDirection.rtl,
@@ -1006,7 +1029,7 @@ class AttachmentCard extends StatelessWidget {
                         description,
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: AppColors.textSecondary,
+                          color: subtitleColor,
                           fontFamily: 'Cairo',
                         ),
                       ),
@@ -1046,16 +1069,10 @@ class AttachmentCard extends StatelessWidget {
               margin: const EdgeInsets.all(12),
               padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 12.w),
               decoration: BoxDecoration(
-                color: enabled
-                    ? uploaded
-                          ? AppColors.primary.withOpacity(0.05)
-                          : AppColors.backgroundAlt
-                    : AppColors.borderLight.withOpacity(0.16),
+                color: uploadAreaColor,
                 borderRadius: BorderRadius.circular(8.r),
                 border: Border.all(
-                  color: uploaded
-                      ? AppColors.primary.withOpacity(0.3)
-                      : AppColors.border,
+                  color: uploadBorderColor,
                   style: BorderStyle.solid,
                 ),
               ),
@@ -1080,10 +1097,10 @@ class AttachmentCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: uploaded
-                          ? AppColors.primary
+                          ? (isDark ? AppColors.darkText : AppColors.primary)
                           : enabled
-                          ? AppColors.textSecondary
-                          : AppColors.textHint,
+                          ? subtitleColor
+                          : hintColor,
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.w500,
                     ),
@@ -1096,7 +1113,7 @@ class AttachmentCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 10.sp,
-                      color: AppColors.textHint,
+                      color: hintColor,
                       fontFamily: 'Cairo',
                     ),
                   ),
