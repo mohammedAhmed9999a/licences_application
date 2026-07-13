@@ -22,6 +22,24 @@ void main() {
           'land_title',
           'property_map',
         ]);
+        expect(
+          attachments.where((item) => item.key == 'id_card').first.isRequired,
+          isTrue,
+        );
+        expect(
+          attachments
+              .where((item) => item.key == 'land_title')
+              .first
+              .isRequired,
+          isTrue,
+        );
+        expect(
+          attachments
+              .where((item) => item.key == 'property_map')
+              .first
+              .isRequired,
+          isTrue,
+        );
       },
     );
 
@@ -39,6 +57,13 @@ void main() {
           'property_map',
           'commercial_register',
         ]);
+        expect(
+          attachments
+              .where((item) => item.key == 'commercial_register')
+              .first
+              .isRequired,
+          isFalse,
+        );
       },
     );
 
@@ -58,6 +83,20 @@ void main() {
           'lease_contract',
           'commercial_register',
         ]);
+        expect(
+          attachments
+              .where((item) => item.key == 'lease_contract')
+              .first
+              .isRequired,
+          isFalse,
+        );
+        expect(
+          attachments
+              .where((item) => item.key == 'commercial_register')
+              .first
+              .isRequired,
+          isFalse,
+        );
       },
     );
 
@@ -77,6 +116,20 @@ void main() {
           'lease_contract',
           'investment_contract',
         ]);
+        expect(
+          attachments
+              .where((item) => item.key == 'lease_contract')
+              .first
+              .isRequired,
+          isFalse,
+        );
+        expect(
+          attachments
+              .where((item) => item.key == 'investment_contract')
+              .first
+              .isRequired,
+          isTrue,
+        );
       },
     );
   });

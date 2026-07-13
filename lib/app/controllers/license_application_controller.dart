@@ -13,11 +13,13 @@ class AttachmentRequirement {
   final String key;
   final String title;
   final String docType;
+  final bool isRequired;
 
   const AttachmentRequirement({
     required this.key,
     required this.title,
     required this.docType,
+    this.isRequired = true,
   });
 }
 
@@ -460,7 +462,72 @@ class LicenseApplicationController extends GetxController {
     submittedApplicationNumber.value = '';
   }
 
-  void prepareForCorrection(ApplicationModel application) {
+  Future<void> applyLocationSelectionFromIds({
+    String? governorateId,
+    String? districtId,
+    String? subDistrictId,
+    String? townId,
+  }) async {
+    selectedGovernorate.value = null;
+    selectedDistrict.value = null;
+    selectedSubdistrict.value = null;
+    selectedTown.value = null;
+
+    if (governorates.isEmpty) {
+      await _loadGovernorates();
+    }
+
+    if (governorateId?.isNotEmpty == true) {
+      final match = governorates.firstWhere(
+        (item) => item.id.toString() == governorateId,
+        orElse: () => GovernorateModel(id: 0, name: ''),
+      );
+      if (match.id != 0) {
+        selectedGovernorate.value = match;
+        await onGovernorateChanged(match);
+      }
+    }
+
+    if (districtId?.isNotEmpty == true) {
+      final match = districts.firstWhere(
+        (item) => item.id.toString() == districtId,
+        orElse: () => GovernorateModel(id: 0, name: ''),
+      );
+      if (match.id != 0) {
+        selectedDistrict.value = match;
+        await onDistrictChanged(match);
+      }
+    }
+
+    if (subDistrictId?.isNotEmpty == true) {
+      final match = subdistricts.firstWhere(
+        (item) => item.id.toString() == subDistrictId,
+        orElse: () => GovernorateModel(id: 0, name: ''),
+      );
+      if (match.id != 0) {
+        selectedSubdistrict.value = match;
+        await onSubdistrictChanged(match);
+      }
+    }
+
+    if (townId?.isNotEmpty == true) {
+      final match = towns.firstWhere(
+        (item) => item.id.toString() == townId,
+        orElse: () => GovernorateModel(id: 0, name: ''),
+      );
+      if (match.id != 0) {
+        selectedTown.value = match;
+        if (latitudeController.text.isEmpty &&
+            longitudeController.text.isEmpty &&
+            match.latitude != null &&
+            match.longitude != null) {
+          setLocation(match.latitude!, match.longitude!);
+        }
+      }
+    }
+  }
+
+  Future<void> prepareForCorrection(ApplicationModel application) async {
     resetForm();
     isCorrectionMode.value = true;
     editApplicationId.value = application.id;
@@ -531,38 +598,14 @@ class LicenseApplicationController extends GetxController {
         locationStatus.value = 'set';
       }
     }
-    if (application.governorateId?.isNotEmpty == true) {
-      final match = governorates
-          .where((item) => item.id.toString() == application.governorateId)
-          .firstOrNull;
-      if (match != null) {
-        selectedGovernorate.value = match;
-      }
-    }
-    if (application.districtId?.isNotEmpty == true) {
-      final match = districts
-          .where((item) => item.id.toString() == application.districtId)
-          .firstOrNull;
-      if (match != null) {
-        selectedDistrict.value = match;
-      }
-    }
-    if (application.subDistrictId?.isNotEmpty == true) {
-      final match = subdistricts
-          .where((item) => item.id.toString() == application.subDistrictId)
-          .firstOrNull;
-      if (match != null) {
-        selectedSubdistrict.value = match;
-      }
-    }
-    if (application.townId?.isNotEmpty == true) {
-      final match = towns
-          .where((item) => item.id.toString() == application.townId)
-          .firstOrNull;
-      if (match != null) {
-        selectedTown.value = match;
-      }
-    }
+
+    await applyLocationSelectionFromIds(
+      governorateId: application.governorateId,
+      districtId: application.districtId,
+      subDistrictId: application.subDistrictId,
+      townId: application.townId,
+    );
+
     _originalApplication = application;
     if (application.needsCorrection) {
       errorMessage.value = 'تم تهيئة الطلب للتعديل وفقًا للملاحظات';
@@ -1516,6 +1559,18 @@ class LicenseApplicationController extends GetxController {
       errorMessage.value = 'يرجى اختيار المحافظة';
       return false;
     }
+    if (selectedDistrict.value == null) {
+      errorMessage.value = 'يرجى اختيار المنطقة';
+      return false;
+    }
+    if (selectedSubdistrict.value == null) {
+      errorMessage.value = 'يرجى اختيار الناحية';
+      return false;
+    }
+    if (selectedTown.value == null) {
+      errorMessage.value = 'يرجى اختيار البلدة';
+      return false;
+    }
     if (latitudeController.text.isEmpty || longitudeController.text.isEmpty) {
       errorMessage.value = 'يرجى تحديد موقع المحطة على الخريطة';
       return false;
@@ -1563,6 +1618,7 @@ class LicenseApplicationController extends GetxController {
           key: 'lease_contract',
           title: 'عقد إيجار لا يقل عن 15 عاماً',
           docType: 'LEASE_CONTRACT',
+          isRequired: false,
         ),
       );
     }
@@ -1573,6 +1629,7 @@ class LicenseApplicationController extends GetxController {
           key: 'commercial_register',
           title: 'السجل التجاري',
           docType: 'COMMERCIAL_REGISTER',
+          isRequired: false,
         ),
       );
     } else if (isSettlement) {
@@ -1581,6 +1638,7 @@ class LicenseApplicationController extends GetxController {
           key: 'investment_contract',
           title: 'عقد استثمار',
           docType: 'INVESTMENT_CONTRACT',
+          isRequired: true,
         ),
       );
     }
@@ -1684,9 +1742,26 @@ class LicenseApplicationController extends GetxController {
     return file?.path.split(Platform.pathSeparator).last;
   }
 
+  int? getAttachmentFileSize(String key) {
+    final file = getAttachmentFile(key);
+    if (file != null && file.existsSync()) {
+      return file.lengthSync();
+    }
+    return null;
+  }
+
   bool validateStep4() {
     errorMessage.value = '';
-    final requiredAttachments = getAttachmentsForSubmission();
+    final allAttachments = getAttachmentsForSubmission();
+    if (allAttachments.isEmpty) {
+      return true;
+    }
+
+    // Filter only required attachments
+    final requiredAttachments = allAttachments
+        .where((attachment) => attachment.isRequired)
+        .toList();
+
     if (requiredAttachments.isEmpty) {
       return true;
     }
@@ -1790,7 +1865,10 @@ class LicenseApplicationController extends GetxController {
     }
 
     final requiredAttachments = getAttachmentsForSubmission();
-    final missingFiles = requiredAttachments.where(
+    final onlyRequiredAttachments = requiredAttachments
+        .where((attachment) => attachment.isRequired)
+        .toList();
+    final missingFiles = onlyRequiredAttachments.where(
       (attachment) => getAttachmentFile(attachment.key) == null,
     );
     if (missingFiles.isNotEmpty) {
@@ -1827,13 +1905,14 @@ class LicenseApplicationController extends GetxController {
         }
 
         final formData = dio.FormData.fromMap(rawPayload);
-        for (var i = 0; i < requiredAttachments.length; i++) {
-          final attachment = requiredAttachments[i];
+        final uploadAttachments = requiredAttachments
+            .where((attachment) => getAttachmentFile(attachment.key) != null)
+            .toList();
+        for (var i = 0; i < uploadAttachments.length; i++) {
+          final attachment = uploadAttachments[i];
           final file = getAttachmentFile(attachment.key);
           if (file == null) {
-            errorMessage.value = 'يرجى رفع جميع المرفقات المطلوبة قبل الإرسال';
-            currentStep.value = 3;
-            return;
+            continue;
           }
           formData.fields.add(
             MapEntry('attachments[$i][doc_type]', attachment.docType),
@@ -1904,13 +1983,14 @@ class LicenseApplicationController extends GetxController {
         'location[longitude]': longitudeController.text.trim(),
         ...buildUserInfoPayload(),
       });
-      for (var i = 0; i < requiredAttachments.length; i++) {
-        final attachment = requiredAttachments[i];
+      final uploadAttachments = requiredAttachments
+          .where((attachment) => getAttachmentFile(attachment.key) != null)
+          .toList();
+      for (var i = 0; i < uploadAttachments.length; i++) {
+        final attachment = uploadAttachments[i];
         final file = getAttachmentFile(attachment.key);
         if (file == null) {
-          errorMessage.value = 'يرجى رفع جميع المرفقات المطلوبة قبل الإرسال';
-          currentStep.value = 3;
-          return;
+          continue;
         }
         formData.fields.add(
           MapEntry('attachments[$i][doc_type]', attachment.docType),

@@ -29,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
 
-        // appBar: MinistryAppBar(title: 'الملف الشخصي', showBackButton: true),
+        // appBar: AppBar(title: Text("الملف الشخصي ",)),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(16.w),
           child: Directionality(

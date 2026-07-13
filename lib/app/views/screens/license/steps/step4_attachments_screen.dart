@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../../controllers/license_application_controller.dart';
@@ -29,7 +31,10 @@ class Step4AttachmentsScreen extends StatelessWidget {
               children: [
                 // Remaining count badge
                 Obx(() {
-                  final requiredAttachments = ctrl.getRequiredAttachments();
+                  final requiredAttachments = ctrl
+                      .getRequiredAttachments()
+                      .where((attachment) => attachment.isRequired)
+                      .toList();
                   final remaining = requiredAttachments
                       .where(
                         (attachment) =>
@@ -108,8 +113,13 @@ class Step4AttachmentsScreen extends StatelessWidget {
                   for (var i = 0; i < requiredAttachments.length; i++) ...[
                     AttachmentCard(
                       title: requiredAttachments[i].title,
-                      description: 'PDF أو صورة - حتى 4MB',
-                      required: true,
+                      description: _buildAttachmentDescription(
+                        requiredAttachments[i].key,
+                      ),
+                      required: requiredAttachments[i].isRequired,
+                      statusText: _buildAttachmentStatusText(
+                        requiredAttachments[i].key,
+                      ),
                       enabled: ctrl.isAttachmentEditable(
                         requiredAttachments[i].key,
                       ),
@@ -117,6 +127,9 @@ class Step4AttachmentsScreen extends StatelessWidget {
                         requiredAttachments[i].key,
                       ),
                       fileName: ctrl.getAttachmentFileName(
+                        requiredAttachments[i].key,
+                      ),
+                      fileSize: ctrl.getAttachmentFileSize(
                         requiredAttachments[i].key,
                       ),
                       onUpload:
@@ -192,6 +205,90 @@ class Step4AttachmentsScreen extends StatelessWidget {
     );
   }
 
+  String _buildAttachmentDescription(String attachmentKey) {
+    return 'PDF أو صورة - حتى 4MB';
+  }
+
+  // ─── Utility Methods ──────────────────────────────────────────────
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(2)} KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+    }
+  }
+
+  Future<File?> _compressImage(File imageFile) async {
+    try {
+      final fileName = imageFile.path.split('/').last;
+      final extension = fileName.split('.').last.toLowerCase();
+
+      if (!['jpg', 'jpeg', 'png'].contains(extension)) {
+        return imageFile; // Return original if not a compressible format
+      }
+
+      final tempDir = await getTemporaryDirectory();
+      final targetPath =
+          '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.$extension';
+
+      XFile? result;
+
+      if (extension == 'png') {
+        result = await FlutterImageCompress.compressAndGetFile(
+          imageFile.path,
+          targetPath,
+          quality: 80,
+          format: CompressFormat.png,
+        );
+      } else {
+        result = await FlutterImageCompress.compressAndGetFile(
+          imageFile.path,
+          targetPath,
+          quality: 80,
+          format: CompressFormat.jpeg,
+        );
+      }
+
+      if (result != null) {
+        return File(result.path);
+      }
+      return imageFile;
+    } catch (e) {
+      Get.snackbar(
+        'خطأ',
+        'حدث خطأ أثناء ضغط الصورة: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.error.withOpacity(0.8),
+      );
+      return imageFile;
+    }
+  }
+
+  void _showFileSizeWarning(String fileName, int fileSize) {
+    final fileSizeString = _formatFileSize(fileSize);
+    Get.snackbar(
+      'تحذير: حجم الملف كبير',
+      'حجم الملف ($fileSizeString) أكبر من 4 MB - جاري ضغط الصورة تلقائياً',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.warning.withOpacity(0.8),
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  String? _buildAttachmentStatusText(String attachmentKey) {
+    switch (attachmentKey) {
+      case 'lease_contract':
+        return 'مطلوب عند الاستئجار';
+      case 'commercial_register':
+      case 'investment_contract':
+        return 'اختياري';
+      default:
+        return null;
+    }
+  }
+
   Widget _buildSummary(LicenseApplicationController ctrl) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -251,7 +348,116 @@ class Step4AttachmentsScreen extends StatelessWidget {
       allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
     );
     if (result != null && result.files.single.path != null) {
-      final file = File(result.files.single.path!);
+      var file = File(result.files.single.path!);
+      final fileSize = file.lengthSync();
+      final fileName = result.files.single.name;
+      final fileSizeString = _formatFileSize(fileSize);
+      final fileSizeInMB = fileSize / (1024 * 1024);
+
+      // Show file size info
+      Get.snackbar(
+        'معلومات الملف',
+        'اسم الملف: $fileName\nالحجم: $fileSizeString',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 3),
+      );
+
+      // Check if file is larger than 4 MB
+      if (fileSizeInMB > 4) {
+        _showFileSizeWarning(fileName, fileSize);
+
+        // Compress image if it's an image file
+        final extension = fileName.split('.').last.toLowerCase();
+        if (['jpg', 'jpeg', 'png'].contains(extension)) {
+          bool dialogOpen = false;
+          try {
+            // Show loading dialog
+            Get.dialog(
+              AlertDialog(
+                title: Text(
+                  'جاري ضغط الصورة...',
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'يرجى الانتظار',
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(fontFamily: 'Cairo', fontSize: 14.sp),
+                    ),
+                  ],
+                ),
+              ),
+              barrierDismissible: false,
+            );
+            dialogOpen = true;
+
+            // Compress the image
+            final compressedFile = await _compressImage(file);
+
+            // Close loading dialog
+            if (dialogOpen) {
+              Navigator.of(Get.context!).pop();
+              dialogOpen = false;
+            }
+
+            if (compressedFile != null) {
+              file = compressedFile;
+              final compressedSize = file.lengthSync();
+              final compressedSizeString = _formatFileSize(compressedSize);
+              final compressionRatio = ((1 - (compressedSize / fileSize)) * 100)
+                  .toStringAsFixed(1);
+
+              // Show compression result
+              Get.snackbar(
+                'تم ضغط الصورة بنجاح',
+                'الحجم الأصلي: $fileSizeString\nالحجم بعد الضغط: $compressedSizeString\nمعدل الضغط: $compressionRatio%',
+                snackPosition: SnackPosition.BOTTOM,
+                duration: const Duration(seconds: 4),
+              );
+            } else {
+              Get.snackbar(
+                'خطأ',
+                'فشل ضغط الصورة',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: AppColors.error.withOpacity(0.8),
+              );
+              return;
+            }
+          } catch (e) {
+            // Close loading dialog if still open
+            if (dialogOpen) {
+              try {
+                Navigator.of(Get.context!).pop();
+              } catch (_) {}
+            }
+            Get.snackbar(
+              'خطأ',
+              'حدث خطأ أثناء ضغط الصورة',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: AppColors.error.withOpacity(0.8),
+            );
+            return;
+          }
+        } else {
+          // PDF files cannot be compressed, show message
+          Get.snackbar(
+            'تنبيه',
+            'لا يمكن ضغط ملفات PDF. يرجى اختيار ملف أصغر حجماً.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: AppColors.warning.withOpacity(0.8),
+            duration: const Duration(seconds: 3),
+          );
+          return;
+        }
+      }
+
       ctrl.setAttachmentFile(type, file);
     }
   }
@@ -334,7 +540,7 @@ class _ImagePreviewScreen extends StatelessWidget {
                       'تعذر تحميل الصورة',
                       style: TextStyle(
                         fontFamily: 'Cairo',
-                        color: Colors.white70,
+                        color: const Color.fromARGB(179, 213, 207, 207),
                       ),
                     ),
                   ],

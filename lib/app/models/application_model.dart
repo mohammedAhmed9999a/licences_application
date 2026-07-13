@@ -130,6 +130,21 @@ class ApplicationModel {
   final String investorType;
   final String createdAt;
   final String? governorate;
+
+  static String _normalizeRequestType(String value) {
+    final lowerValue = value.trim().toLowerCase();
+    if (lowerValue.contains('settlement') || lowerValue.contains('تسوية')) {
+      return 'settlement';
+    }
+    if (lowerValue.contains('new') || lowerValue.contains('جديد')) {
+      return 'new';
+    }
+    if (lowerValue.contains('renewal') || lowerValue.contains('تجديد')) {
+      return 'renewal';
+    }
+    return value.trim();
+  }
+
   final String? stationCategory;
   final String? stationName;
   final String? applicantName;
@@ -339,12 +354,14 @@ class ApplicationModel {
         ? 'مطلوب معلومات إضافية'
         : 'لا توجد ملاحظات إضافية';
 
+    final rawRequestType = json['operation_type']?['name']?.toString() ?? '';
+
     return ApplicationModel(
       id: json['id']?.toString() ?? '',
       applicationNumber: json['license_request_number']?.toString() ?? '',
       status: statusValue,
       statusLabel: _statusLabel(statusValue),
-      requestType: json['operation_type']?['name']?.toString() ?? '',
+      requestType: _normalizeRequestType(rawRequestType),
       investorType: json['applicantable_type']?.toString() ?? '',
       correctionTargets: correctionTargets,
       needsCorrection: needsCorrection,

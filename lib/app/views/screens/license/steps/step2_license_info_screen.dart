@@ -983,13 +983,19 @@ class _IndividualForm extends StatelessWidget {
             errorText: ctrl.birthDateError.value,
             child: GestureDetector(
               onTap: () async {
+                final lastDate = DateTime.now().subtract(
+                  const Duration(days: 365 * 18),
+                );
+                final initialDate = ctrl.birthDate.value != null
+                    ? (ctrl.birthDate.value!.isBefore(lastDate)
+                          ? ctrl.birthDate.value!
+                          : lastDate)
+                    : DateTime(1990);
                 final picked = await showDatePicker(
                   context: context,
-                  initialDate: ctrl.birthDate.value ?? DateTime(1990),
+                  initialDate: initialDate,
                   firstDate: DateTime(1920),
-                  lastDate: DateTime.now().subtract(
-                    const Duration(days: 365 * 18),
-                  ),
+                  lastDate: lastDate,
                   builder: (ctx, child) => Directionality(
                     textDirection: TextDirection.rtl,
                     child: child!,
@@ -1245,13 +1251,19 @@ class _CompanyForm extends StatelessWidget {
                       errorText: ctrl.birthDateError.value,
                       child: GestureDetector(
                         onTap: () async {
+                          final lastDate = DateTime.now().subtract(
+                            const Duration(days: 365 * 18),
+                          );
+                          final initialDate = ctrl.birthDate.value != null
+                              ? (ctrl.birthDate.value!.isBefore(lastDate)
+                                    ? ctrl.birthDate.value!
+                                    : lastDate)
+                              : DateTime(1990);
                           final picked = await showDatePicker(
                             context: context,
-                            initialDate: ctrl.birthDate.value ?? DateTime(1990),
+                            initialDate: initialDate,
                             firstDate: DateTime(1920),
-                            lastDate: DateTime.now().subtract(
-                              const Duration(days: 365 * 18),
-                            ),
+                            lastDate: lastDate,
                             builder: (ctx, child) => Directionality(
                               textDirection: TextDirection.rtl,
                               child: child!,
@@ -1434,14 +1446,19 @@ class _CompanyForm extends StatelessWidget {
                           errorText: ctrl.birthDateError.value,
                           child: GestureDetector(
                             onTap: () async {
+                              final lastDate = DateTime.now().subtract(
+                                const Duration(days: 365 * 18),
+                              );
+                              final initialDate = ctrl.birthDate.value != null
+                                  ? (ctrl.birthDate.value!.isBefore(lastDate)
+                                        ? ctrl.birthDate.value!
+                                        : lastDate)
+                                  : DateTime(1990);
                               final picked = await showDatePicker(
                                 context: context,
-                                initialDate:
-                                    ctrl.birthDate.value ?? DateTime(1990),
+                                initialDate: initialDate,
                                 firstDate: DateTime(1920),
-                                lastDate: DateTime.now().subtract(
-                                  const Duration(days: 365 * 18),
-                                ),
+                                lastDate: lastDate,
                                 builder: (ctx, child) => Directionality(
                                   textDirection: TextDirection.rtl,
                                   child: child!,
@@ -1614,9 +1631,7 @@ class _CompanyForm extends StatelessWidget {
                       initialDate:
                           ctrl.companyLicenseDate.value ?? DateTime.now(),
                       firstDate: DateTime(1950),
-                      lastDate: DateTime.now().subtract(
-                        const Duration(days: 1),
-                      ),
+                      lastDate: DateTime.now(),
                     );
                     if (picked != null) {
                       ctrl.companyLicenseDate.value = picked;

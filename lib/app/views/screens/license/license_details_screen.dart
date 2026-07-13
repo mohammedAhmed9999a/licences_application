@@ -11,7 +11,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../theme/app_theme.dart';
 import '../../../models/application_model.dart';
 import '../../../models/license_detail_model.dart';
-import '../../../../core/constant/app_constants.dart';
 import '../../../controllers/license_application_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -1342,8 +1341,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       children: [
         if (detail!.application.needsCorrection)
           ElevatedButton.icon(
-            onPressed: () {
-              ctrl.prepareForCorrection(detail!.application);
+            onPressed: () async {
+              await ctrl.prepareForCorrection(detail!.application);
               Get.toNamed(AppRoutes.licenseApplication);
             },
             icon: ThemedIcon(

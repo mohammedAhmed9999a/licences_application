@@ -925,9 +925,11 @@ class AttachmentCard extends StatelessWidget {
   final String title;
   final String description;
   final bool required;
+  final String? statusText;
   final bool uploaded;
   final bool enabled;
   final String? fileName;
+  final int? fileSize;
   final VoidCallback? onUpload;
   final VoidCallback? onView;
   final VoidCallback? onRemove;
@@ -937,13 +939,26 @@ class AttachmentCard extends StatelessWidget {
     required this.title,
     required this.description,
     this.required = true,
+    this.statusText,
     this.uploaded = false,
     this.enabled = true,
     this.fileName,
+    this.fileSize,
     this.onUpload,
     this.onView,
     this.onRemove,
   });
+
+  String _formatFileSize(int? bytes) {
+    if (bytes == null) return '';
+    if (bytes < 1024) {
+      return '$bytes B';
+    } else if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(2)} KB';
+    } else {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1033,7 +1048,7 @@ class AttachmentCard extends StatelessWidget {
                           fontFamily: 'Cairo',
                         ),
                       ),
-                      if (required)
+                      if (required || statusText != null)
                         Container(
                           margin: const EdgeInsets.only(top: 4),
                           padding: EdgeInsets.symmetric(
@@ -1041,14 +1056,18 @@ class AttachmentCard extends StatelessWidget {
                             vertical: 2.h,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.error.withOpacity(0.1),
+                            color: required
+                                ? AppColors.error.withOpacity(0.1)
+                                : AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10.r),
                           ),
                           child: Text(
-                            'مطلوب',
+                            required ? 'مطلوب' : (statusText ?? 'اختياري'),
                             style: TextStyle(
                               fontSize: 10.sp,
-                              color: AppColors.error,
+                              color: required
+                                  ? AppColors.error
+                                  : AppColors.primary,
                               fontFamily: 'Cairo',
                             ),
                           ),
@@ -1105,6 +1124,19 @@ class AttachmentCard extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
+                  if (uploaded && fileSize != null)
+                    Padding(
+                      padding: EdgeInsets.only(top: 4.h),
+                      child: Text(
+                        'الحجم: ${_formatFileSize(fileSize)}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: hintColor,
+                          fontFamily: 'Cairo',
+                        ),
+                      ),
+                    ),
                   SizedBox(height: 4.h),
                   Text(
                     uploaded

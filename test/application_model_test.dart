@@ -23,6 +23,41 @@ void main() {
     },
   );
 
+  test(
+    'normalizes Arabic operation_type name to internal requestType values',
+    () {
+      final settlementApp = ApplicationModel.fromJson({
+        'id': 6,
+        'license_request_number': 'LR-1006',
+        'status': 'Pending',
+        'created_at': '2026-01-01T00:00:00Z',
+        'location': {},
+        'allowed_category': {},
+        'applicantable': {},
+        'user': {},
+        'operation_type': {'id': 2, 'name': 'تسوية'},
+      });
+
+      expect(settlementApp.requestType, 'settlement');
+      expect(settlementApp.requestTypeLabel, 'تسوية');
+
+      final newApp = ApplicationModel.fromJson({
+        'id': 7,
+        'license_request_number': 'LR-1007',
+        'status': 'Pending',
+        'created_at': '2026-01-01T00:00:00Z',
+        'location': {},
+        'allowed_category': {},
+        'applicantable': {},
+        'user': {},
+        'operation_type': {'id': 1, 'name': 'جديد'},
+      });
+
+      expect(newApp.requestType, 'new');
+      expect(newApp.requestTypeLabel, 'طلب جديد');
+    },
+  );
+
   test('stores attachment document type labels from API payload', () {
     final app = ApplicationModel.fromJson({
       'id': 2,
