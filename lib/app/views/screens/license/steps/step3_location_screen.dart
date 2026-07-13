@@ -20,9 +20,6 @@ class Step3LocationScreen extends StatelessWidget {
         governorateEditable ||
         ctrl.isFieldEditable('latitude') ||
         ctrl.isFieldEditable('longitude');
-    final planningLocationEditable = ctrl.isFieldEditable('planningLocation');
-    final roadTypeEditable = ctrl.isFieldEditable('roadType');
-    final stationCategoryEditable = ctrl.isFieldEditable('stationCategory');
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -430,8 +427,10 @@ class Step3LocationScreen extends StatelessWidget {
                             subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
                             icon: Icons.location_city_outlined,
                             selected: ctrl.planningLocation.value == 'outside',
-                            onTap: () =>
-                                ctrl.planningLocation.value = 'outside',
+                            enabled: !ctrl.isCorrectionMode.value,
+                            onTap: !ctrl.isCorrectionMode.value
+                                ? () => ctrl.planningLocation.value = 'outside'
+                                : null,
                           ),
                           SizedBox(height: 10.h),
                           ChoiceCard(
@@ -440,7 +439,10 @@ class Step3LocationScreen extends StatelessWidget {
                                 'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
                             icon: Icons.home_outlined,
                             selected: ctrl.planningLocation.value == 'inside',
-                            onTap: () => ctrl.planningLocation.value = 'inside',
+                            enabled: !ctrl.isCorrectionMode.value,
+                            onTap: !ctrl.isCorrectionMode.value
+                                ? () => ctrl.planningLocation.value = 'inside'
+                                : null,
                           ),
                         ],
                       );
@@ -455,8 +457,8 @@ class Step3LocationScreen extends StatelessWidget {
                             subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
                             icon: Icons.location_city_outlined,
                             selected: ctrl.planningLocation.value == 'outside',
-                            enabled: planningLocationEditable,
-                            onTap: planningLocationEditable
+                            enabled: !ctrl.isCorrectionMode.value,
+                            onTap: !ctrl.isCorrectionMode.value
                                 ? () => ctrl.planningLocation.value = 'outside'
                                 : null,
                           ),
@@ -469,8 +471,8 @@ class Step3LocationScreen extends StatelessWidget {
                                 'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
                             icon: Icons.home_outlined,
                             selected: ctrl.planningLocation.value == 'inside',
-                            enabled: planningLocationEditable,
-                            onTap: planningLocationEditable
+                            enabled: !ctrl.isCorrectionMode.value,
+                            onTap: !ctrl.isCorrectionMode.value
                                 ? () => ctrl.planningLocation.value = 'inside'
                                 : null,
                           ),
@@ -556,8 +558,8 @@ class Step3LocationScreen extends StatelessWidget {
                                     subtitle: 'يسمح باختيار الفئة أ أو ب.',
                                     icon: Icons.swap_horiz,
                                     selected: ctrl.roadType.value == 'central',
-                                    enabled: roadTypeEditable,
-                                    onTap: roadTypeEditable
+                                    enabled: !ctrl.isCorrectionMode.value,
+                                    onTap: !ctrl.isCorrectionMode.value
                                         ? () => ctrl.roadType.value = 'central'
                                         : null,
                                   ),
@@ -568,8 +570,8 @@ class Step3LocationScreen extends StatelessWidget {
                                     icon: Icons.arrow_outward,
                                     selected:
                                         ctrl.roadType.value == 'international',
-                                    enabled: roadTypeEditable,
-                                    onTap: roadTypeEditable
+                                    enabled: !ctrl.isCorrectionMode.value,
+                                    onTap: !ctrl.isCorrectionMode.value
                                         ? () => ctrl.roadType.value =
                                               'international'
                                         : null,
@@ -587,8 +589,8 @@ class Step3LocationScreen extends StatelessWidget {
                                       icon: Icons.swap_horiz,
                                       selected:
                                           ctrl.roadType.value == 'central',
-                                      enabled: roadTypeEditable,
-                                      onTap: roadTypeEditable
+                                      enabled: !ctrl.isCorrectionMode.value,
+                                      onTap: !ctrl.isCorrectionMode.value
                                           ? () =>
                                                 ctrl.roadType.value = 'central'
                                           : null,
@@ -603,8 +605,8 @@ class Step3LocationScreen extends StatelessWidget {
                                       selected:
                                           ctrl.roadType.value ==
                                           'international',
-                                      enabled: roadTypeEditable,
-                                      onTap: roadTypeEditable
+                                      enabled: !ctrl.isCorrectionMode.value,
+                                      onTap: !ctrl.isCorrectionMode.value
                                           ? () => ctrl.roadType.value =
                                                 'international'
                                           : null,
@@ -690,8 +692,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق المحلية ضمن حدود الوحدات الإدارية.',
                                   selected: ctrl.stationCategory.value == 'C',
-                                  enabled: canC,
-                                  onTap: canC
+                                  enabled: !ctrl.isCorrectionMode.value && canC,
+                                  onTap: !ctrl.isCorrectionMode.value && canC
                                       ? () => ctrl.stationCategory.value = 'C'
                                       : null,
                                 ),
@@ -702,8 +704,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   arabicLetter: 'ب',
                                   description: 'الطرق المركزية بين المحافظات.',
                                   selected: ctrl.stationCategory.value == 'B',
-                                  enabled: canB,
-                                  onTap: canB
+                                  enabled: !ctrl.isCorrectionMode.value && canB,
+                                  onTap: !ctrl.isCorrectionMode.value && canB
                                       ? () => ctrl.stationCategory.value = 'B'
                                       : null,
                                 ),
@@ -715,8 +717,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
                                   selected: ctrl.stationCategory.value == 'A',
-                                  enabled: canA,
-                                  onTap: canA
+                                  enabled: !ctrl.isCorrectionMode.value && canA,
+                                  onTap: !ctrl.isCorrectionMode.value && canA
                                       ? () => ctrl.stationCategory.value = 'A'
                                       : null,
                                 ),
@@ -735,8 +737,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق المحلية ضمن حدود الوحدات الإدارية.',
                                   selected: ctrl.stationCategory.value == 'C',
-                                  enabled: canC && stationCategoryEditable,
-                                  onTap: canC && stationCategoryEditable
+                                  enabled: !ctrl.isCorrectionMode.value && canC,
+                                  onTap: !ctrl.isCorrectionMode.value && canC
                                       ? () => ctrl.stationCategory.value = 'C'
                                       : null,
                                 ),
@@ -749,8 +751,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   arabicLetter: 'ب',
                                   description: 'الطرق المركزية بين المحافظات.',
                                   selected: ctrl.stationCategory.value == 'B',
-                                  enabled: canB && stationCategoryEditable,
-                                  onTap: canB && stationCategoryEditable
+                                  enabled: !ctrl.isCorrectionMode.value && canB,
+                                  onTap: !ctrl.isCorrectionMode.value && canB
                                       ? () => ctrl.stationCategory.value = 'B'
                                       : null,
                                 ),
@@ -764,8 +766,8 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
                                   selected: ctrl.stationCategory.value == 'A',
-                                  enabled: canA && stationCategoryEditable,
-                                  onTap: canA && stationCategoryEditable
+                                  enabled: !ctrl.isCorrectionMode.value && canA,
+                                  onTap: !ctrl.isCorrectionMode.value && canA
                                       ? () => ctrl.stationCategory.value = 'A'
                                       : null,
                                 ),
@@ -1210,87 +1212,90 @@ class _CategoryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: selected
-              ? (isDark
-                    ? AppColors.selectedCardDark1
-                    : AppColors.selectedCardLight)
-              : enabled
-              ? AppColors.surface
-              : AppColors.backgroundAlt,
-          borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(
+    return IgnorePointer(
+      ignoring: !enabled,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
             color: selected
-                ? AppColors.primary
+                ? (isDark
+                      ? AppColors.selectedCardDark1
+                      : AppColors.selectedCardLight)
                 : enabled
-                ? AppColors.border
-                : AppColors.borderLight,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Radio<bool>(
-              value: true,
-              groupValue: selected,
-              onChanged: enabled ? (_) => onTap?.call() : null,
-              activeColor: AppColors.primary,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ? AppColors.surface
+                : AppColors.backgroundAlt,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: selected
+                  ? AppColors.primary
+                  : enabled
+                  ? AppColors.border
+                  : AppColors.borderLight,
+              width: selected ? 1.5 : 1,
             ),
-            Container(
-              width: 32.w,
-              height: 32.h,
-              decoration: BoxDecoration(
-                color: selected
-                    ? AppColors.primary
-                    : enabled
-                    ? AppColors.backgroundAlt
-                    : AppColors.borderLight,
-                shape: BoxShape.circle,
+          ),
+          child: Column(
+            children: [
+              Radio<bool>(
+                value: true,
+                groupValue: selected,
+                onChanged: enabled ? (_) => onTap?.call() : null,
+                activeColor: AppColors.primary,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Center(
-                child: Text(
-                  arabicLetter,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: selected ? Colors.white : AppColors.textHint,
+              Container(
+                width: 32.w,
+                height: 32.h,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.primary
+                      : enabled
+                      ? AppColors.backgroundAlt
+                      : AppColors.borderLight,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    arabicLetter,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: selected ? Colors.white : AppColors.textHint,
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 12.sp,
-                fontWeight: FontWeight.bold,
-                color: selected
-                    ? AppColors.primary
-                    : enabled
-                    ? AppColors.textPrimary
-                    : AppColors.textHint,
+              SizedBox(height: 6.h),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  color: selected
+                      ? AppColors.primary
+                      : enabled
+                      ? AppColors.textPrimary
+                      : AppColors.textHint,
+                ),
               ),
-            ),
-            Text(
-              description,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 9.sp,
-                color: AppColors.textSecondary,
+              Text(
+                description,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 9.sp,
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

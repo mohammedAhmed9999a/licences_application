@@ -400,79 +400,84 @@ class ChoiceCard extends StatelessWidget {
 
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: GestureDetector(
-        onTap: enabled ? onTap : null,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: EdgeInsets.all(14.w),
-          decoration: BoxDecoration(
-            color: selected
-                ? (isDark
-                      ? AppColors.selectedCardDark1
-                      : AppColors.selectedCardLight)
-                : enabled
-                ? surface
-                : AppColors.backgroundAlt,
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(
+      child: IgnorePointer(
+        ignoring: !enabled,
+        child: GestureDetector(
+          onTap: enabled ? onTap : null,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
               color: selected
-                  ? primaryColor
+                  ? (isDark
+                        ? AppColors.selectedCardDark1
+                        : AppColors.selectedCardLight)
                   : enabled
-                  ? borderColor
-                  : AppColors.borderLight,
-              width: selected ? 1.5 : 1,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: selected ? primaryColor : textPrimary,
-                        fontFamily: 'Cairo',
-                      ),
-                      textDirection: TextDirection.rtl,
-                      softWrap: true,
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: textSecondary,
-                        fontFamily: 'Cairo',
-                      ),
-                      textDirection: TextDirection.rtl,
-                      softWrap: true,
-                    ),
-                  ],
-                ),
+                  ? surface
+                  : AppColors.backgroundAlt,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(
+                color: selected
+                    ? primaryColor
+                    : enabled
+                    ? borderColor
+                    : AppColors.borderLight,
+                width: selected ? 1.5 : 1,
               ),
-              SizedBox(width: 10.w),
-              Container(
-                width: 36.w,
-                height: 36.h,
-                decoration: BoxDecoration(
-                  color: selected ? primaryColor.withOpacity(0.15) : surfaceAlt,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Center(
-                  child: Icon(
-                    icon,
-                    color: selected ? primaryColor : textSecondary,
-                    size: 20.sp,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: selected ? primaryColor : textPrimary,
+                          fontFamily: 'Cairo',
+                        ),
+                        textDirection: TextDirection.rtl,
+                        softWrap: true,
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: textSecondary,
+                          fontFamily: 'Cairo',
+                        ),
+                        textDirection: TextDirection.rtl,
+                        softWrap: true,
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                SizedBox(width: 10.w),
+                Container(
+                  width: 36.w,
+                  height: 36.h,
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? primaryColor.withOpacity(0.15)
+                        : surfaceAlt,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      icon,
+                      color: selected ? primaryColor : textSecondary,
+                      size: 20.sp,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
