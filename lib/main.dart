@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:licences_application/core/services/my_services.dart';
@@ -20,6 +21,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await GetStorage.init();
+  await initializeDateFormatting('ar', null);
   try {
     await MyServices.printFCM();
   } catch (e) {

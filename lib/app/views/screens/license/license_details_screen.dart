@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'dart:ui' as ui;
+
+import 'package:intl/intl.dart';
 import 'package:licences_application/app/views/screens/terms_pdf_viewer_screen.dart';
 import 'package:licences_application/core/services/core_api_service.dart';
 import 'package:open_filex/open_filex.dart';
@@ -128,6 +132,20 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     detail = Get.arguments as LicenseDetailModel?;
   }
 
+  String _formatDisplayDate(String? rawValue) {
+    if (rawValue == null || rawValue.trim().isEmpty) {
+      return 'غير محدد';
+    }
+
+    final value = rawValue.trim();
+    final parsed = DateTime.tryParse(value);
+    if (parsed != null) {
+      return DateFormat('yyyy/MM/dd - hh:mm', 'ar').format(parsed);
+    }
+
+    return value;
+  }
+
   void _toggleSection(String key) {
     setState(() {
       _expandedSections[key] = !(_expandedSections[key] ?? true);
@@ -153,7 +171,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     }
 
     return Directionality(
-      textDirection: TextDirection.ltr,
+      textDirection: ui.TextDirection.ltr,
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: _buildAppBar(context, detail!),
@@ -207,7 +225,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                         _InfoEntry('نوع المستثمر', detail!.investorTypeLabel),
                         _InfoEntry(
                           'تاريخ الإنشاء',
-                          detail!.application.createdAt,
+                          _formatDisplayDate(detail!.application.createdAt),
                         ),
                       ]),
                     ),
@@ -304,7 +322,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Row(
-            textDirection: TextDirection.rtl,
+            textDirection: ui.TextDirection.rtl,
             children: [
               Expanded(
                 child: Column(
@@ -464,7 +482,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
         // alignLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          textDirection: TextDirection.rtl,
+          textDirection: ui.TextDirection.rtl,
           children: [
             Text(
               'تفاصيل الطلب',
@@ -629,8 +647,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       shrinkWrap: true,
       itemCount: items.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 1.4,
+        crossAxisCount: 1,
+        childAspectRatio: 2.9,
         crossAxisSpacing: 14.w,
         mainAxisSpacing: 14.h,
       ),

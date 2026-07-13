@@ -185,43 +185,109 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-            child: GNav(
-              gap: 6.w,
-              activeColor: onPrimaryColor,
-              color: theme.colorScheme.onSurface.withOpacity(0.7),
-              tabBackgroundColor: primaryColor.withOpacity(0.12),
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-              duration: const Duration(milliseconds: 250),
-              selectedIndex: _currentIndex,
-              onTabChange: (index) => setState(() => _currentIndex = index),
-              tabs: [
-                GButton(
-                  icon: Icons.home_outlined,
-                  text: 'الرئيسية',
-                  iconActiveColor: primaryColor,
-                  textColor: primaryColor,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildBottomNavItem(
+                    context: context,
+                    index: 0,
+                    icon: Icons.home_outlined,
+                    label: 'الرئيسية',
+                  ),
                 ),
-                GButton(
-                  icon: Icons.notifications_outlined,
-                  text: 'الإشعارات',
-                  iconActiveColor: primaryColor,
-                  textColor: primaryColor,
+                Expanded(
+                  child: _buildBottomNavItem(
+                    context: context,
+                    index: 1,
+                    icon: Icons.notifications_outlined,
+                    label: 'الإشعارات',
+                  ),
                 ),
-                GButton(
-                  icon: Icons.person_outline,
-                  text: 'الملف الشخصي',
-                  iconActiveColor: primaryColor,
-                  textColor: primaryColor,
+                Expanded(
+                  child: _buildBottomNavItem(
+                    context: context,
+                    index: 2,
+                    icon: Icons.person_outline,
+                    label: 'الملف الشخصي',
+                  ),
                 ),
-                GButton(
-                  icon: Icons.more_horiz,
-                  text: 'المزيد',
-                  iconActiveColor: primaryColor,
-                  textColor: primaryColor,
+                Expanded(
+                  child: _buildBottomNavItem(
+                    context: context,
+                    index: 3,
+                    icon: Icons.more_horiz,
+                    label: 'المزيد',
+                  ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavItem({
+    required BuildContext context,
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    final isActive = _currentIndex == index;
+    final iconColor = isActive
+        ? primaryColor
+        : theme.colorScheme.onSurface.withOpacity(0.7);
+
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 2.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  icon,
+                  color: iconColor,
+                  size: 24.sp,
+                ),
+                if (index == 1)
+                  Obx(() {
+                    final notifCtrl = Get.find<NotificationsController>();
+                    if (notifCtrl.unreadCount.value <= 0) {
+                      return const SizedBox.shrink();
+                    }
+                    return Positioned(
+                      right: -2.w,
+                      top: -2.h,
+                      child: Container(
+                        width: 10.w,
+                        height: 10.w,
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1),
+                        ),
+                      ),
+                    );
+                  }),
+              ],
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              label,
+              style: TextStyle(
+                color: iconColor,
+                fontSize: 11.sp,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                fontFamily: 'Cairo',
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -948,7 +1014,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              '${app.attachments.length} مرفقات',
+                              '${app.latest_attachments.length} مرفقات',
                               style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 11.sp,
