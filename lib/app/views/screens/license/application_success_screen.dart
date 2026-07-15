@@ -108,54 +108,164 @@ class ApplicationSuccessScreen extends StatelessWidget {
           ],
         );
       }
-
-      pw.Widget buildTripleRow(
-        String label1,
-        String value1, {
-        String? label2,
-        String? value2,
-        String? label3,
-        String? value3,
-        bool alternate = false,
-      }) {
-        final cells = <pw.Widget>[
-          pw.Expanded(child: buildLabelValue(label1, value1)),
-        ];
-        if (label2 != null && value2 != null) {
-          cells.add(pw.SizedBox(width: 8));
-          cells.add(pw.Expanded(child: buildLabelValue(label2, value2)));
-        }
-        if (label3 != null && value3 != null) {
-          cells.add(pw.SizedBox(width: 8));
-          cells.add(pw.Expanded(child: buildLabelValue(label3, value3)));
-        }
-
-        return pw.Container(
-          color: alternate ? PdfColors.grey100 : PdfColors.white,
-          padding: const pw.EdgeInsets.symmetric(vertical: 9, horizontal: 8),
-          child: pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-
-            // textDirection: pw.TextDirection.rtl,
-            children: cells,
+pw.TableRow buildFourColumnRow(
+  String label1,
+  String value1,
+  String label2,
+  String value2, {
+  bool alternate = false,
+}) {
+  return pw.TableRow(
+    children: [
+      pw.Container(
+        padding: const pw.EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+        alignment: pw.Alignment.centerRight,
+        decoration: pw.BoxDecoration(
+          color: PdfColors.white,
+        ),
+        child: pw.Text(
+          value2.isEmpty ? '-' : value2,
+          textAlign: pw.TextAlign.right,
+          style: pw.TextStyle(fontSize: 10),
+        ),
+      ),
+      pw.Container(
+        padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        alignment: pw.Alignment.centerRight,
+        decoration: pw.BoxDecoration(
+          color: PdfColors.grey100,
+        ),
+        child: pw.Text(
+          label2,
+          textAlign: pw.TextAlign.right,
+          style: pw.TextStyle(
+            fontSize: 10,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColors.green800,
           ),
-        );
-      }
+        ),
+      ),
+      pw.Container(
+        padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        alignment: pw.Alignment.centerRight,
+        decoration: pw.BoxDecoration(
+          color: PdfColors.white,
+        ),
+        child: pw.Text(
+          value1.isEmpty ? '-' : value1,
+          textAlign: pw.TextAlign.right,
+          style: pw.TextStyle(fontSize: 10),
+        ),
+      ),
+      pw.Container(
+        padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        alignment: pw.Alignment.centerRight,
+        decoration: pw.BoxDecoration(
+          color: PdfColors.grey100,
+        ),
+        child: pw.Text(
+          label1,
+          textAlign: pw.TextAlign.right,
+          style: pw.TextStyle(
+            fontSize: 10,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColors.green800,
+          ),
+        ),
+      ),
+    ],
+  );
+}
 
-      pw.Widget buildSection(String title, List<pw.Widget> rows) {
+      // pw.TableRow buildFourColumnRow(
+      //   String label1,
+      //   String value1,
+      //   String label2,
+      //   String value2, {
+      //   bool alternate = false,
+      // }) {
+      //   return pw.TableRow(
+          
+      //     decoration: pw.BoxDecoration(
+      //       color: alternate ? PdfColors.grey100 : PdfColors.white,
+      //     ),
+      //     children: [
+      //       pw.Container(
+      //         padding: const pw.EdgeInsets.symmetric(
+      //           vertical: 10,
+      //           horizontal: 8,
+      //         ),
+      //         alignment: pw.Alignment.centerRight,
+      //         child: pw.Text(
+      //           label1,
+      //           textAlign: pw.TextAlign.right,
+      //           style: pw.TextStyle(
+      //             fontSize: 10,
+      //             fontWeight: pw.FontWeight.bold,
+      //             color: PdfColors.green800,
+      //           ),
+      //         ),
+      //       ),
+      //       pw.Container(
+      //         padding: const pw.EdgeInsets.symmetric(
+      //           vertical: 10,
+      //           horizontal: 8,
+      //         ),
+      //         alignment: pw.Alignment.centerRight,
+      //         child: pw.Text(
+      //           value1.isEmpty ? '-' : value1,
+      //           textAlign: pw.TextAlign.right,
+      //           style: pw.TextStyle(fontSize: 10),
+      //         ),
+      //       ),
+      //       pw.Container(
+      //         padding: const pw.EdgeInsets.symmetric(
+      //           vertical: 10,
+      //           horizontal: 8,
+      //         ),
+      //         alignment: pw.Alignment.centerRight,
+      //         child: pw.Text(
+      //           label2,
+      //           textAlign: pw.TextAlign.right,
+      //           style: pw.TextStyle(
+      //             fontSize: 10,
+      //             fontWeight: pw.FontWeight.bold,
+      //             color: PdfColors.green800,
+      //           ),
+      //         ),
+      //       ),
+      //       pw.Container(
+      //         padding: const pw.EdgeInsets.symmetric(
+      //           vertical: 10,
+      //           horizontal: 8,
+      //         ),
+      //         alignment: pw.Alignment.centerRight,
+      //         child: pw.Text(
+      //           value2.isEmpty ? '-' : value2,
+      //           textAlign: pw.TextAlign.right,
+      //           style: pw.TextStyle(fontSize: 10),
+      //         ),
+      //       ),
+      //     ],
+      //   );
+      // }
+
+      pw.Widget buildSection(String title, List<pw.TableRow> rows) {
         return pw.Container(
-          margin: const pw.EdgeInsets.only(bottom: 16),
+          margin: const pw.EdgeInsets.only(bottom: 4),
           decoration: pw.BoxDecoration(
             border: pw.Border.all(color: PdfColors.grey300),
             borderRadius: pw.BorderRadius.circular(8),
           ),
           child: pw.Column(
+        
+
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Container(
                 padding: const pw.EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 10,
+                  vertical: 4,
+                  horizontal: 2,
                 ),
                 decoration: pw.BoxDecoration(
                   color: PdfColors.grey200,
@@ -174,7 +284,19 @@ class ApplicationSuccessScreen extends StatelessWidget {
                 ),
               ),
               pw.Divider(color: PdfColors.grey300, height: 1),
-              ...rows,
+              pw.Table(
+                border: pw.TableBorder.symmetric(
+                  inside: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
+                  outside: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
+                ),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(4),
+                  1: const pw.FlexColumnWidth(2),
+                  2: const pw.FlexColumnWidth(4),
+                  3: const pw.FlexColumnWidth(2),
+                },
+                children: rows,
+              ),
             ],
           ),
         );
@@ -198,7 +320,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
             pw.Directionality(
               textDirection: pw.TextDirection.rtl,
               child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -278,107 +400,35 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  pw.SizedBox(height: 20),
+                  pw.SizedBox(height: 10),
 
                   buildSection('بيانات الطلب', [
-                    buildTripleRow(
-                      'رقم الطلب',
-                      applicationNumber,
-                      label2: 'نوع الطلب',
-                      value2: requestTypeLabel,
-                      label3: 'حالة الطلب',
-                      value3: 'قيد الدراسة',
-                    ),
-                    buildTripleRow(
-                      'تاريخ التقديم',
-                      '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                      label2: 'مدة الدراسة',
-                      value2: '1.0',
-                      label3: 'فئة المحطة',
-                      value3: stationCategoryLabel,
-                      alternate: true,
-                    ),
-                    buildTripleRow(
-                      'رقم الترخيص السابق',
-                      settlementLicenseNumber,
-                      label2: 'اسم مقدم الطلب',
-                      value2: applicantFullName,
-                      alternate: false,
-                    ),
+                    buildFourColumnRow('رقم الطلب', applicationNumber, 'نوع الطلب', requestTypeLabel),
+                    buildFourColumnRow('حالة الطلب', 'قيد الدراسة', 'تاريخ التقديم', '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}', alternate: true),
+                    buildFourColumnRow('مدة الدراسة', '1.0', 'فئة المحطة', stationCategoryLabel),
+                    buildFourColumnRow('رقم الترخيص السابق', settlementLicenseNumber, 'اسم مقدم الطلب', applicantFullName, alternate: true),
                     if (ctrl.investorType.value == 'company')
-                      buildTripleRow(
-                        'اسم الشركة',
-                        ctrl.companyNameController.text.trim(),
-                        label2: 'رقم ترخيص الشركة',
-                        value2: companyLicenseNumber,
-                        label3: 'تاريخ ترخيص الشركة',
-                        value3: companyLicenseDateLabel,
-                        alternate: true,
-                      ),
+                      buildFourColumnRow('اسم الشركة', ctrl.companyNameController.text.trim(), 'رقم ترخيص الشركة', companyLicenseNumber),
+                    if (ctrl.investorType.value == 'company')
+                      buildFourColumnRow('تاريخ ترخيص الشركة', companyLicenseDateLabel, '', ''),
                   ]),
                   buildSection('بيانات مقدم الطلب', [
-                    buildTripleRow(
-                      'الاسم الكامل',
-                      applicantFullName,
-                      label2: 'الرقم الوطني',
-                      value2: ctrl.nationalIdController.text.trim(),
-                      label3: 'مكان الولادة',
-                      value3: ctrl.birthPlaceController.text.trim(),
-                    ),
-                    buildTripleRow(
-                      'تاريخ الولادة',
-                      birthDate,
-                      label2: 'البريد الإلكتروني',
-                      value2: ctrl.emailController.text.trim(),
-                      label3: 'رقم التواصل',
-                      value3: ctrl.phoneController.text.trim(),
-                      alternate: true,
-                    ),
+                    buildFourColumnRow('الاسم الكامل', applicantFullName, 'الرقم الوطني', ctrl.nationalIdController.text.trim()),
+                    buildFourColumnRow('مكان الولادة', ctrl.birthPlaceController.text.trim(), 'تاريخ الولادة', birthDate, alternate: true),
+                    buildFourColumnRow('البريد الإلكتروني', ctrl.emailController.text.trim(), 'رقم التواصل', ctrl.phoneController.text.trim()),
                     if (ctrl.phone2Controller.text.trim().isNotEmpty)
-                      buildTripleRow(
-                        'الهاتف الثانوي',
-                        ctrl.phone2Controller.text.trim(),
-                        alternate: false,
-                      ),
+                      buildFourColumnRow('الهاتف الثانوي', ctrl.phone2Controller.text.trim(), '', ''),
                     if (ctrl.investorType.value == 'company')
-                      buildTripleRow(
-                        'اسم الشركة',
-                        ctrl.companyNameController.text.trim(),
-                        label2: 'الشركاء',
-                        value2: partners.isNotEmpty
-                            ? partners.join('، ')
-                            : 'غير محدد',
-                        alternate: true,
-                      ),
+                      buildFourColumnRow('اسم الشركة', ctrl.companyNameController.text.trim(), 'الشركاء', partners.isNotEmpty ? partners.join('، ') : 'غير محدد', alternate: true),
                   ]),
                   buildSection('بيانات الموقع والتصنيف', [
-                    buildTripleRow(
-                      'المحافظة',
-                      governorate,
-                      label2: 'المنطقة',
-                      value2: district,
-                      label3: 'القضاء',
-                      value3: subdistrict,
-                    ),
-                    buildTripleRow(
-                      'الناحية',
-                      town,
-                      label2: 'نوع الطريق',
-                      value2: roadTypeLabel,
-                      label3: 'فئة المحطة',
-                      value3: stationCategoryLabel,
-                      alternate: true,
-                    ),
-                    buildTripleRow(
-                      'خط الطول',
-                      longitude,
-                      label2: 'دائرة العرض',
-                      value2: latitude,
-                      label3: 'حالة التنظيم',
-                      value3: planningLocationLabel,
-                    ),
+                    buildFourColumnRow('المحافظة', governorate, 'المنطقة', district),
+                    buildFourColumnRow('القضاء', subdistrict, 'الناحية', town, alternate: true),
+                    buildFourColumnRow('نوع الطريق', roadTypeLabel, 'فئة المحطـة', stationCategoryLabel),
+                    buildFourColumnRow('خط الطول', longitude, 'دائرة العرض', latitude, alternate: true),
+                    buildFourColumnRow('حالة التنظيم', planningLocationLabel, '', ''),
                   ]),
-                  pw.SizedBox(height: 22),
+                  pw.SizedBox(height: 12),
                   pw.Divider(color: PdfColors.grey300),
                   pw.SizedBox(height: 10),
                   pw.Row(

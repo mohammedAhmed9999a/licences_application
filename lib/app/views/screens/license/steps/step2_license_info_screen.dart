@@ -911,6 +911,7 @@ class _IndividualForm extends StatelessWidget {
                             ctrl.validateStep2Field('birthPlace', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.birthPlaceFocus),
+                        enabled: ctrl.isFieldEditable('birthPlace'),
                       ),
                     ),
                   ),
@@ -943,6 +944,7 @@ class _IndividualForm extends StatelessWidget {
                             ctrl.validateStep2Field('birthPlace', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.nationalIdFocus),
+                        enabled: ctrl.isFieldEditable('birthPlace'),
                       ),
                     ),
                   ),
@@ -976,72 +978,80 @@ class _IndividualForm extends StatelessWidget {
         SizedBox(height: 12.h),
         // Birth date
         Obx(
-          () => LabeledField(
-            key: ctrl.birthDateFieldKey,
-            label: 'تاريخ الولادة',
-            required: true,
-            errorText: ctrl.birthDateError.value,
-            child: GestureDetector(
-              onTap: () async {
-                final lastDate = DateTime.now().subtract(
-                  const Duration(days: 365 * 18),
-                );
-                final initialDate = ctrl.birthDate.value != null
-                    ? (ctrl.birthDate.value!.isBefore(lastDate)
-                          ? ctrl.birthDate.value!
-                          : lastDate)
-                    : DateTime(1990);
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: initialDate,
-                  firstDate: DateTime(1920),
-                  lastDate: lastDate,
-                  builder: (ctx, child) => Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: child!,
-                  ),
-                );
-                if (picked != null) {
-                  ctrl.birthDate.value = picked;
-                  ctrl.validateStep2Field('birthDate', '');
-                }
-              },
-              child: Container(
-                height: 48.h,
-                padding: EdgeInsets.symmetric(horizontal: 12.w),
-                decoration: BoxDecoration(
-                  color: surface,
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(color: borderColor),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Obx(
-                      () => Text(
-                        ctrl.birthDate.value != null
-                            ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
-                            : 'انقر لتحديد تاريخ ميلادك',
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 13.sp,
-                          color: ctrl.birthDate.value != null
-                              ? textPrimary
-                              : textHint,
+          () {
+            final birthDateEditable = ctrl.isFieldEditable('birthDate');
+            return LabeledField(
+              key: ctrl.birthDateFieldKey,
+              label: 'تاريخ الولادة',
+              required: true,
+              errorText: ctrl.birthDateError.value,
+              child: GestureDetector(
+                onTap: birthDateEditable
+                    ? () async {
+                        final lastDate = DateTime.now().subtract(
+                          const Duration(days: 365 * 18),
+                        );
+                        final initialDate = ctrl.birthDate.value != null
+                            ? (ctrl.birthDate.value!.isBefore(lastDate)
+                                  ? ctrl.birthDate.value!
+                                  : lastDate)
+                            : DateTime(1990);
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: initialDate,
+                          firstDate: DateTime(1920),
+                          lastDate: lastDate,
+                          builder: (ctx, child) => Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: child!,
+                          ),
+                        );
+                        if (picked != null) {
+                          ctrl.birthDate.value = picked;
+                          ctrl.validateStep2Field('birthDate', '');
+                        }
+                      }
+                    : null,
+                child: AbsorbPointer(
+                  absorbing: !birthDateEditable,
+                  child: Container(
+                    height: 48.h,
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    decoration: BoxDecoration(
+                      color: surface,
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: borderColor),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Obx(
+                          () => Text(
+                            ctrl.birthDate.value != null
+                                ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
+                                : 'انقر لتحديد تاريخ ميلادك',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 13.sp,
+                              color: ctrl.birthDate.value != null
+                                  ? textPrimary
+                                  : textHint,
+                            ),
+                          ),
                         ),
-                      ),
+                        const Spacer(),
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 18.r,
+                          color: textHint,
+                        ),
+                      ],
                     ),
-                    const Spacer(),
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      size: 18.r,
-                      color: textHint,
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
         SizedBox(height: 6.h),
         Text(
@@ -1114,6 +1124,7 @@ class _CompanyForm extends StatelessWidget {
                             ctrl.validateStep2Field('firstName', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.fatherNameFocus),
+                        enabled: ctrl.isFieldEditable('firstName'),
                       ),
                     ),
                   ),
@@ -1165,6 +1176,7 @@ class _CompanyForm extends StatelessWidget {
                             ctrl.validateStep2Field('nickname', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.motherNameFocus),
+                        enabled: ctrl.isFieldEditable('nickname'),
                       ),
                     ),
                   ),
@@ -1190,6 +1202,7 @@ class _CompanyForm extends StatelessWidget {
                             ctrl.validateStep2Field('motherName', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.nationalIdFocus),
+                        enabled: ctrl.isFieldEditable('motherName'),
                       ),
                     ),
                   ),
@@ -1214,6 +1227,7 @@ class _CompanyForm extends StatelessWidget {
                             ctrl.validateStep2Field('nationalId', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.birthPlaceFocus),
+                        enabled: ctrl.isFieldEditable('nationalId'),
                       ),
                     ),
                   ),
@@ -1239,77 +1253,86 @@ class _CompanyForm extends StatelessWidget {
                             ctrl.validateStep2Field('birthPlace', v),
                         onSubmitted: (_) =>
                             ctrl.requestFocus(ctrl.birthDateFocus),
+                        enabled: ctrl.isFieldEditable('birthPlace'),
                       ),
                     ),
                   ),
                   SizedBox(height: 12.h),
                   Obx(
-                    () => LabeledField(
-                      key: ctrl.birthDateFieldKey,
-                      label: 'تاريخ الولادة',
-                      required: true,
-                      errorText: ctrl.birthDateError.value,
-                      child: GestureDetector(
-                        onTap: () async {
-                          final lastDate = DateTime.now().subtract(
-                            const Duration(days: 365 * 18),
-                          );
-                          final initialDate = ctrl.birthDate.value != null
-                              ? (ctrl.birthDate.value!.isBefore(lastDate)
-                                    ? ctrl.birthDate.value!
-                                    : lastDate)
-                              : DateTime(1990);
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate: initialDate,
-                            firstDate: DateTime(1920),
-                            lastDate: lastDate,
-                            builder: (ctx, child) => Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: child!,
-                            ),
-                          );
-                          if (picked != null) {
-                            ctrl.birthDate.value = picked;
-                            ctrl.validateStep2Field('birthDate', '');
-                          }
-                        },
-                        child: Container(
-                          height: 48.h,
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
-                          decoration: BoxDecoration(
-                            color: surface,
-                            borderRadius: BorderRadius.circular(8.r),
-                            border: Border.all(color: borderColor),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Obx(
-                                () => Text(
-                                  ctrl.birthDate.value != null
-                                      ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
-                                      : 'انقر لتحديد تاريخ ميلادك',
-                                  style: TextStyle(
-                                    fontFamily: 'Cairo',
-                                    fontSize: 13.sp,
-                                    color: ctrl.birthDate.value != null
-                                        ? textPrimary
-                                        : textHint,
+                    () {
+                      final birthDateEditable = ctrl.isFieldEditable('birthDate');
+                      return LabeledField(
+                        key: ctrl.birthDateFieldKey,
+                        label: 'تاريخ الولادة',
+                        required: true,
+                        errorText: ctrl.birthDateError.value,
+                        child: GestureDetector(
+                          onTap: birthDateEditable
+                              ? () async {
+                                  final lastDate = DateTime.now().subtract(
+                                    const Duration(days: 365 * 18),
+                                  );
+                                  final initialDate = ctrl.birthDate.value != null
+                                      ? (ctrl.birthDate.value!.isBefore(lastDate)
+                                            ? ctrl.birthDate.value!
+                                            : lastDate)
+                                      : DateTime(1990);
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: initialDate,
+                                    firstDate: DateTime(1920),
+                                    lastDate: lastDate,
+                                    builder: (ctx, child) => Directionality(
+                                      textDirection: TextDirection.rtl,
+                                      child: child!,
+                                    ),
+                                  );
+                                  if (picked != null) {
+                                    ctrl.birthDate.value = picked;
+                                    ctrl.validateStep2Field('birthDate', '');
+                                  }
+                                }
+                              : null,
+                          child: AbsorbPointer(
+                            absorbing: !birthDateEditable,
+                            child: Container(
+                              height: 48.h,
+                              padding: EdgeInsets.symmetric(horizontal: 12.w),
+                              decoration: BoxDecoration(
+                                color: surface,
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border.all(color: borderColor),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Obx(
+                                    () => Text(
+                                      ctrl.birthDate.value != null
+                                          ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
+                                          : 'انقر لتحديد تاريخ ميلادك',
+                                      style: TextStyle(
+                                        fontFamily: 'Cairo',
+                                        fontSize: 13.sp,
+                                        color: ctrl.birthDate.value != null
+                                            ? textPrimary
+                                            : textHint,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  const Spacer(),
+                                  Icon(
+                                    Icons.calendar_today_outlined,
+                                    size: 18.r,
+                                    color: textHint,
+                                  ),
+                                ],
                               ),
-                              const Spacer(),
-                              Icon(
-                                Icons.calendar_today_outlined,
-                                size: 18.r,
-                                color: textHint,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ],
               );
@@ -1439,72 +1462,80 @@ class _CompanyForm extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Obx(
-                        () => LabeledField(
-                          key: ctrl.birthDateFieldKey,
-                          label: 'تاريخ الولادة',
-                          required: true,
-                          errorText: ctrl.birthDateError.value,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final lastDate = DateTime.now().subtract(
-                                const Duration(days: 365 * 18),
-                              );
-                              final initialDate = ctrl.birthDate.value != null
-                                  ? (ctrl.birthDate.value!.isBefore(lastDate)
-                                        ? ctrl.birthDate.value!
-                                        : lastDate)
-                                  : DateTime(1990);
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: initialDate,
-                                firstDate: DateTime(1920),
-                                lastDate: lastDate,
-                                builder: (ctx, child) => Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: child!,
-                                ),
-                              );
-                              if (picked != null) {
-                                ctrl.birthDate.value = picked;
-                                ctrl.validateStep2Field('birthDate', '');
-                              }
-                            },
-                            child: Container(
-                              height: 48.h,
-                              padding: EdgeInsets.symmetric(horizontal: 12.w),
-                              decoration: BoxDecoration(
-                                color: surface,
-                                borderRadius: BorderRadius.circular(8.r),
-                                border: Border.all(color: borderColor),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Obx(
-                                    () => Text(
-                                      ctrl.birthDate.value != null
-                                          ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
-                                          : 'انقر لتحديد تاريخ ميلادك',
-                                      style: TextStyle(
-                                        fontFamily: 'Cairo',
-                                        fontSize: 13.sp,
-                                        color: ctrl.birthDate.value != null
-                                            ? textPrimary
-                                            : textHint,
+                        () {
+                          final birthDateEditable = ctrl.isFieldEditable('birthDate');
+                          return LabeledField(
+                            key: ctrl.birthDateFieldKey,
+                            label: 'تاريخ الولادة',
+                            required: true,
+                            errorText: ctrl.birthDateError.value,
+                            child: GestureDetector(
+                              onTap: birthDateEditable
+                                  ? () async {
+                                      final lastDate = DateTime.now().subtract(
+                                        const Duration(days: 365 * 18),
+                                      );
+                                      final initialDate = ctrl.birthDate.value != null
+                                          ? (ctrl.birthDate.value!.isBefore(lastDate)
+                                                ? ctrl.birthDate.value!
+                                                : lastDate)
+                                          : DateTime(1990);
+                                      final picked = await showDatePicker(
+                                        context: context,
+                                        initialDate: initialDate,
+                                        firstDate: DateTime(1920),
+                                        lastDate: lastDate,
+                                        builder: (ctx, child) => Directionality(
+                                          textDirection: TextDirection.rtl,
+                                          child: child!,
+                                        ),
+                                      );
+                                      if (picked != null) {
+                                        ctrl.birthDate.value = picked;
+                                        ctrl.validateStep2Field('birthDate', '');
+                                      }
+                                    }
+                                  : null,
+                              child: AbsorbPointer(
+                                absorbing: !birthDateEditable,
+                                child: Container(
+                                  height: 48.h,
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                                  decoration: BoxDecoration(
+                                    color: surface,
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    border: Border.all(color: borderColor),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Obx(
+                                        () => Text(
+                                          ctrl.birthDate.value != null
+                                              ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
+                                              : 'انقر لتحديد تاريخ ميلادك',
+                                          style: TextStyle(
+                                            fontFamily: 'Cairo',
+                                            fontSize: 13.sp,
+                                            color: ctrl.birthDate.value != null
+                                                ? textPrimary
+                                                : textHint,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      const Spacer(),
+                                      Icon(
+                                        Icons.calendar_today_outlined,
+                                        size: 18.r,
+                                        color: textHint,
+                                      ),
+                                    ],
                                   ),
-                                  const Spacer(),
-                                  Icon(
-                                    Icons.calendar_today_outlined,
-                                    size: 18.r,
-                                    color: textHint,
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                     ),
                     SizedBox(width: 12.w),
@@ -1619,65 +1650,78 @@ class _CompanyForm extends StatelessWidget {
 
             // تاريخ ترخيص الشركة
             Obx(
-              () => LabeledField(
-                key: ctrl.companyLicenseDateFieldKey,
-                label: 'تاريخ ترخيص الشركة',
-                required: true,
-                errorText: ctrl.companyLicenseDateError.value,
-                child: GestureDetector(
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate:
-                          ctrl.companyLicenseDate.value ?? DateTime.now(),
-                      firstDate: DateTime(1950),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null) {
-                      ctrl.companyLicenseDate.value = picked;
-                      ctrl.validateStep2Field('companyLicenseDate', '');
-                    }
-                  },
-                  child: Container(
-                    height: 48.h,
-                    padding: EdgeInsets.symmetric(horizontal: 12.w),
-                    decoration: BoxDecoration(
-                      color: surface,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: borderColor),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            ctrl.companyLicenseDate.value != null
-                                ? '${ctrl.companyLicenseDate.value!.day}/${ctrl.companyLicenseDate.value!.month}/${ctrl.companyLicenseDate.value!.year}'
-                                : 'اختر تاريخ الترخيص',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            textAlign: TextAlign.end,
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 13.sp,
-                              color: ctrl.companyLicenseDate.value != null
-                                  ? textPrimary
-                                  : textHint,
+              () {
+                final editable = ctrl.isFieldEditable('companyLicenseDate');
+                return LabeledField(
+                  key: ctrl.companyLicenseDateFieldKey,
+                  label: 'تاريخ ترخيص الشركة',
+                  required: true,
+                  errorText: ctrl.companyLicenseDateError.value,
+                  child: GestureDetector(
+                    onTap: editable
+                        ? () async {
+                            final yesterday = DateTime.now().subtract(
+                              const Duration(days: 1),
+                            );
+                            final initialDate = ctrl.companyLicenseDate.value != null &&
+                                    ctrl.companyLicenseDate.value!.isBefore(yesterday)
+                                ? ctrl.companyLicenseDate.value!
+                                : yesterday;
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: initialDate,
+                              firstDate: DateTime(1950),
+                              lastDate: yesterday,
+                            );
+                            if (picked != null) {
+                              ctrl.companyLicenseDate.value = picked;
+                              ctrl.validateStep2Field('companyLicenseDate', '');
+                            }
+                          }
+                        : null,
+                    child: AbsorbPointer(
+                      absorbing: !editable,
+                      child: Container(
+                        height: 48.h,
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        decoration: BoxDecoration(
+                          color: surface,
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: borderColor),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                ctrl.companyLicenseDate.value != null
+                                    ? '${ctrl.companyLicenseDate.value!.day}/${ctrl.companyLicenseDate.value!.month}/${ctrl.companyLicenseDate.value!.year}'
+                                    : 'اختر تاريخ الترخيص',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                textAlign: TextAlign.end,
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13.sp,
+                                  color: ctrl.companyLicenseDate.value != null
+                                      ? textPrimary
+                                      : textHint,
+                                ),
+                              ),
                             ),
-                          ),
+                            SizedBox(width: 170.w),
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              size: 18.r,
+                              color: textHint,
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 170.w),
-                        // Spacer(),
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          size: 18.r,
-                          color: textHint,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),

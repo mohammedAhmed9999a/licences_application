@@ -12,6 +12,15 @@ val newBuildDir: Directory =
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "com.android.tools" && requested.name == "desugar_jdk_libs") {
+                useVersion("2.1.5")
+                because("Force a compatible desugaring library version for Android release builds.")
+            }
+        }
+    }
+
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }

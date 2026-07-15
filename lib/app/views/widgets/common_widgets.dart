@@ -614,12 +614,12 @@ class ShimmerNotificationCard extends StatelessWidget {
       highlightColor: highlightColor,
       period: const Duration(milliseconds: 1800),
       child: Container(
-        height: height.h,
+        constraints: BoxConstraints(minHeight: height.h),
         margin: EdgeInsets.only(bottom: 12.h),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
             color: Theme.of(context).dividerColor.withOpacity(0.25),
           ),

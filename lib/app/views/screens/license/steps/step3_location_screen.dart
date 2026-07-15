@@ -15,19 +15,52 @@ class Step3LocationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<LicenseApplicationController>();
-    final governorateEditable = ctrl.isFieldEditable('governorate');
-    final locationEditable =
-        governorateEditable ||
-        ctrl.isFieldEditable('latitude') ||
-        ctrl.isFieldEditable('longitude');
-    final planningLocationEditable = ctrl.isFieldEditable('planningLocation');
-    final roadTypeEditable = ctrl.isFieldEditable('roadType');
-    final stationCategoryEditable = ctrl.isFieldEditable('stationCategory');
 
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: SingleChildScrollView(
-        child: Column(
+      child: Obx(() {
+        final governorateEditable = ctrl.isFieldEditable('governorate');
+        final locationEditable = governorateEditable ||
+          ctrl.isFieldEditable('latitude') ||
+          ctrl.isFieldEditable('longitude');
+        final origPlanningRaw =
+          ctrl.originalApplication?.planningLocation?.toLowerCase() ?? '';
+        final origRoadRaw = ctrl.originalApplication?.roadType?.toLowerCase() ?? '';
+        final origCatRaw =
+          ctrl.originalApplication?.stationCategory?.toString().toLowerCase() ?? '';
+
+        final origAllowsInside = origPlanningRaw.isEmpty ||
+          origPlanningRaw.contains('داخل') ||
+          origPlanningRaw.contains('inside');
+        final origAllowsOutside = origPlanningRaw.isEmpty ||
+          origPlanningRaw.contains('خارج') ||
+          origPlanningRaw.contains('outside');
+
+        final origAllowsInternational = origRoadRaw.isEmpty ||
+          origRoadRaw.contains('دولي') ||
+          origRoadRaw.contains('international');
+        final origAllowsCentral = origRoadRaw.isEmpty ||
+          origRoadRaw.contains('مركز') ||
+          origRoadRaw.contains('central');
+        final origAllowsLocal = origRoadRaw.isEmpty ||
+          origRoadRaw.contains('محلي') ||
+          origRoadRaw.contains('local');
+
+        final origAllowsA = origCatRaw.isEmpty ||
+          origCatRaw == 'a' ||
+          origCatRaw.contains('أ') ||
+          origCatRaw.contains('a');
+        final origAllowsB = origCatRaw.isEmpty ||
+          origCatRaw == 'b' ||
+          origCatRaw.contains('ب') ||
+          origCatRaw.contains('b');
+        final origAllowsC = origCatRaw.isEmpty ||
+          origCatRaw == 'c' ||
+          origCatRaw.contains('ج') ||
+          origCatRaw.contains('c');
+
+        return SingleChildScrollView(
+          child: Column(
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ─── 1. Location Data ─────────────────────────────────────────
@@ -430,49 +463,63 @@ class Step3LocationScreen extends StatelessWidget {
                             subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
                             icon: Icons.location_city_outlined,
                             selected: ctrl.planningLocation.value == 'outside',
-                            onTap: () =>
-                                ctrl.planningLocation.value = 'outside',
+                            enabled: ctrl.originalApplication == null,
+                            onTap: ctrl.originalApplication == null
+                                ? () {
+                                    ctrl.planningLocation.value = 'outside';
+                                  }
+                                : null,
                           ),
                           SizedBox(height: 10.h),
-                          ChoiceCard(
-                            title: 'داخل التنظيم',
-                            subtitle:
+                            ChoiceCard(
+                              title: 'داخل التنظيم',
+                              subtitle:
                                 'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
-                            icon: Icons.home_outlined,
-                            selected: ctrl.planningLocation.value == 'inside',
-                            onTap: () => ctrl.planningLocation.value = 'inside',
-                          ),
+                              icon: Icons.home_outlined,
+                              selected: ctrl.planningLocation.value == 'inside',
+                              enabled: ctrl.originalApplication == null,
+                            onTap: ctrl.originalApplication == null
+                              ? () {
+                                  ctrl.planningLocation.value = 'inside';
+                                }
+                              : null,
+                            ),
                         ],
                       );
                     }
+                    
 
                     return Row(
                       textDirection: TextDirection.rtl,
                       children: [
                         Expanded(
-                          child: ChoiceCard(
-                            title: 'خارج التنظيم',
-                            subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
-                            icon: Icons.location_city_outlined,
-                            selected: ctrl.planningLocation.value == 'outside',
-                            enabled: planningLocationEditable,
-                            onTap: planningLocationEditable
-                                ? () => ctrl.planningLocation.value = 'outside'
-                                : null,
+                            child: ChoiceCard(
+                              title: 'خارج التنظيم',
+                              subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
+                              icon: Icons.location_city_outlined,
+                              selected: ctrl.planningLocation.value == 'outside',
+                              enabled: ctrl.originalApplication == null,
+                              onTap: ctrl.originalApplication == null
+                                  ? () {
+                                      ctrl.planningLocation.value = 'outside';
+                                    }
+                                  : null,
                           ),
                         ),
                         SizedBox(width: 10.w),
                         Expanded(
-                          child: ChoiceCard(
-                            title: 'داخل التنظيم',
-                            subtitle:
-                                'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
-                            icon: Icons.home_outlined,
-                            selected: ctrl.planningLocation.value == 'inside',
-                            enabled: planningLocationEditable,
-                            onTap: planningLocationEditable
-                                ? () => ctrl.planningLocation.value = 'inside'
-                                : null,
+                            child: ChoiceCard(
+                              title: 'داخل التنظيم',
+                              subtitle:
+                                  'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
+                              icon: Icons.home_outlined,
+                              selected: ctrl.planningLocation.value == 'inside',
+                              enabled: ctrl.originalApplication == null,
+                              onTap: ctrl.originalApplication == null
+                                  ? () {
+                                      ctrl.planningLocation.value = 'inside';
+                                    }
+                                  : null,
                           ),
                         ),
                       ],
@@ -556,24 +603,27 @@ class Step3LocationScreen extends StatelessWidget {
                                     subtitle: 'يسمح باختيار الفئة أ أو ب.',
                                     icon: Icons.swap_horiz,
                                     selected: ctrl.roadType.value == 'central',
-                                    enabled: roadTypeEditable,
-                                    onTap: roadTypeEditable
-                                        ? () => ctrl.roadType.value = 'central'
-                                        : null,
+                                      enabled: (origAllowsCentral || ctrl.originalApplication == null),
+                                      onTap: (origAllowsCentral || ctrl.originalApplication == null)
+                                          ? () {
+                                              ctrl.roadType.value = 'central';
+                                            }
+                                          : null,
                                   ),
                                   SizedBox(height: 10.h),
-                                  ChoiceCard(
-                                    title: 'طرق دولية (M4 و M5)',
-                                    subtitle: 'يسمح باختيار الفئة أ فقط.',
-                                    icon: Icons.arrow_outward,
-                                    selected:
-                                        ctrl.roadType.value == 'international',
-                                    enabled: roadTypeEditable,
-                                    onTap: roadTypeEditable
-                                        ? () => ctrl.roadType.value =
-                                              'international'
-                                        : null,
-                                  ),
+                                        ChoiceCard(
+                                              title: 'طرق دولية (M4 و M5)',
+                                              subtitle: 'يسمح باختيار الفئة أ فقط.',
+                                              icon: Icons.arrow_outward,
+                                              selected:
+                                                ctrl.roadType.value == 'international',
+                                              enabled: (origAllowsInternational || ctrl.originalApplication == null),
+                                              onTap: (origAllowsInternational || ctrl.originalApplication == null)
+                                                ? () {
+                                                    ctrl.roadType.value = 'international';
+                                                  }
+                                                : null,
+                                              ),
                                 ],
                               )
                             else
@@ -587,11 +637,10 @@ class Step3LocationScreen extends StatelessWidget {
                                       icon: Icons.swap_horiz,
                                       selected:
                                           ctrl.roadType.value == 'central',
-                                      enabled: roadTypeEditable,
-                                      onTap: roadTypeEditable
-                                          ? () =>
-                                                ctrl.roadType.value = 'central'
-                                          : null,
+                                      enabled: (origAllowsCentral || ctrl.originalApplication == null),
+                                      onTap: (origAllowsCentral || ctrl.originalApplication == null)
+                                      ? () => ctrl.roadType.value = 'central'
+                                      : null,
                                     ),
                                   ),
                                   SizedBox(width: 10.w),
@@ -603,11 +652,10 @@ class Step3LocationScreen extends StatelessWidget {
                                       selected:
                                           ctrl.roadType.value ==
                                           'international',
-                                      enabled: roadTypeEditable,
-                                      onTap: roadTypeEditable
-                                          ? () => ctrl.roadType.value =
-                                                'international'
-                                          : null,
+                                      enabled: (origAllowsInternational || ctrl.originalApplication == null),
+                                      onTap: (origAllowsInternational || ctrl.originalApplication == null)
+                                      ? () => ctrl.roadType.value = 'international'
+                                      : null,
                                     ),
                                   ),
                                 ],
@@ -663,20 +711,40 @@ class Step3LocationScreen extends StatelessWidget {
                         final isCentral = ctrl.roadType.value == 'central';
 
                         final canA =
-                            !isInside && (isInternational || isCentral);
+                          !isInside && (isInternational || isCentral);
                         final canB = !isInside && isCentral;
                         final canC = isInside;
 
-                        // Auto-select restricted category
-                        if (isInside && ctrl.stationCategory.value != 'C') {
-                          ctrl.stationCategory.value = 'C';
-                        } else if (isInternational &&
-                            ctrl.stationCategory.value != 'A') {
-                          ctrl.stationCategory.value = 'A';
-                        } else if (isCentral &&
-                            !(ctrl.stationCategory.value == 'A' ||
-                                ctrl.stationCategory.value == 'B')) {
-                          ctrl.stationCategory.value = 'A';
+                        // Restrict available categories based on server response
+                        final origCat = ctrl.originalApplication?.stationCategory
+                            ?.toString()
+                            .trim() ??
+                          '';
+                        final origAllowsA = origCat.isEmpty ||
+                          origCat == 'A' ||
+                          origCat.contains('أ') ||
+                          origCat.toUpperCase() == 'A';
+                        final origAllowsB = origCat.isEmpty ||
+                          origCat == 'B' ||
+                          origCat.contains('ب') ||
+                          origCat.toUpperCase() == 'B';
+                        final origAllowsC = origCat.isEmpty ||
+                          origCat == 'C' ||
+                          origCat.contains('ج') ||
+                          origCat.toUpperCase() == 'C';
+
+                        // Auto-select restricted category (skip during correction)
+                        if (!ctrl.isCorrectionMode.value) {
+                          if (isInside && ctrl.stationCategory.value != 'C') {
+                            ctrl.stationCategory.value = 'C';
+                          } else if (isInternational &&
+                              ctrl.stationCategory.value != 'A') {
+                            ctrl.stationCategory.value = 'A';
+                          } else if (isCentral &&
+                              !(ctrl.stationCategory.value == 'A' ||
+                                  ctrl.stationCategory.value == 'B')) {
+                            ctrl.stationCategory.value = 'A';
+                          }
                         }
 
                         if (useColumnLayout) {
@@ -690,9 +758,11 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق المحلية ضمن حدود الوحدات الإدارية.',
                                   selected: ctrl.stationCategory.value == 'C',
-                                  enabled: canC,
-                                  onTap: canC
-                                      ? () => ctrl.stationCategory.value = 'C'
+                                  enabled: canC && (origAllowsC || ctrl.originalApplication == null),
+                                  onTap: canC && (origAllowsC || ctrl.originalApplication == null)
+                                      ? () {
+                                          ctrl.stationCategory.value = 'C';
+                                        }
                                       : null,
                                 ),
                               if (canC) SizedBox(height: 10.h),
@@ -702,9 +772,11 @@ class Step3LocationScreen extends StatelessWidget {
                                   arabicLetter: 'ب',
                                   description: 'الطرق المركزية بين المحافظات.',
                                   selected: ctrl.stationCategory.value == 'B',
-                                  enabled: canB,
-                                  onTap: canB
-                                      ? () => ctrl.stationCategory.value = 'B'
+                                  enabled: canB && (origAllowsB || ctrl.originalApplication == null),
+                                  onTap: canB && (origAllowsB || ctrl.originalApplication == null)
+                                      ? () {
+                                          ctrl.stationCategory.value = 'B';
+                                        }
                                       : null,
                                 ),
                               if (canB) SizedBox(height: 10.h),
@@ -715,15 +787,16 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
                                   selected: ctrl.stationCategory.value == 'A',
-                                  enabled: canA,
-                                  onTap: canA
-                                      ? () => ctrl.stationCategory.value = 'A'
+                                  enabled: canA && (origAllowsA || ctrl.originalApplication == null),
+                                  onTap: canA && (origAllowsA || ctrl.originalApplication == null)
+                                      ? () {
+                                          ctrl.stationCategory.value = 'A';
+                                        }
                                       : null,
                                 ),
                             ],
                           );
                         }
-
                         return Row(
                           textDirection: TextDirection.rtl,
                           children: [
@@ -735,9 +808,11 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق المحلية ضمن حدود الوحدات الإدارية.',
                                   selected: ctrl.stationCategory.value == 'C',
-                                  enabled: canC && stationCategoryEditable,
-                                  onTap: canC && stationCategoryEditable
-                                      ? () => ctrl.stationCategory.value = 'C'
+                                  enabled: canC && (origAllowsC || ctrl.originalApplication == null),
+                                  onTap: canC && (origAllowsC || ctrl.originalApplication == null)
+                                      ? () {
+                                          ctrl.stationCategory.value = 'C';
+                                        }
                                       : null,
                                 ),
                               ),
@@ -749,9 +824,11 @@ class Step3LocationScreen extends StatelessWidget {
                                   arabicLetter: 'ب',
                                   description: 'الطرق المركزية بين المحافظات.',
                                   selected: ctrl.stationCategory.value == 'B',
-                                  enabled: canB && stationCategoryEditable,
-                                  onTap: canB && stationCategoryEditable
-                                      ? () => ctrl.stationCategory.value = 'B'
+                                  enabled: canB && (origAllowsB || ctrl.originalApplication == null),
+                                  onTap: canB && (origAllowsB || ctrl.originalApplication == null)
+                                      ? () {
+                                          ctrl.stationCategory.value = 'B';
+                                        }
                                       : null,
                                 ),
                               ),
@@ -764,9 +841,11 @@ class Step3LocationScreen extends StatelessWidget {
                                   description:
                                       'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
                                   selected: ctrl.stationCategory.value == 'A',
-                                  enabled: canA && stationCategoryEditable,
-                                  onTap: canA && stationCategoryEditable
-                                      ? () => ctrl.stationCategory.value = 'A'
+                                  enabled: canA && (origAllowsA || ctrl.originalApplication == null),
+                                  onTap: canA && (origAllowsA || ctrl.originalApplication == null)
+                                      ? () {
+                                          ctrl.stationCategory.value = 'A';
+                                        }
                                       : null,
                                 ),
                               ),
@@ -838,9 +917,10 @@ class Step3LocationScreen extends StatelessWidget {
             SizedBox(height: 16.h),
           ],
         ),
-      ),
-    );
-  }
+      );
+    }),
+  );
+}
 
   String _locationStatusText(String status) {
     switch (status) {
@@ -1210,9 +1290,11 @@ class _CategoryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
+    return IgnorePointer(
+      ignoring: !enabled,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -1292,7 +1374,7 @@ class _CategoryCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ),)
     );
   }
 }

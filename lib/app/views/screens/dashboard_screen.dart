@@ -239,7 +239,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final iconColor = isActive
         ? primaryColor
         : theme.colorScheme.onSurface.withOpacity(0.7);
-
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       child: Padding(
@@ -396,7 +395,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   if (dashCtrl.errorMessage.isNotEmpty) {
                     return ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      physics: const ClampingScrollPhysics(),
                       padding: EdgeInsets.zero,
                       children: [
                         Padding(
@@ -418,7 +417,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   }
 
                   return ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+                    physics: const ClampingScrollPhysics(),
                     padding: EdgeInsets.zero,
                     children: [
                       Padding(
@@ -607,7 +606,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final borderColor = context.themeBorder;
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-      physics: const AlwaysScrollableScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       children: [
         Container(
           padding: EdgeInsets.all(16.w),
@@ -731,74 +730,68 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final hintColor = context.themeTextHint;
     final surfaceAlt = context.themeSurfaceAlt;
 
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          minHeight:
-              MediaQuery.of(context).size.height -
-              MediaQuery.of(context).padding.vertical -
-              kToolbarHeight,
+          minHeight: MediaQuery.of(context).size.height * 0.5,
         ),
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 80.w,
-                  height: 80.h,
-                  decoration: BoxDecoration(
-                    color: surfaceAlt,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.description_outlined,
-                    size: 36,
-                    color: hintColor,
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80.w,
+                height: 80.h,
+                decoration: BoxDecoration(
+                  color: surfaceAlt,
+                  shape: BoxShape.circle,
                 ),
-                SizedBox(height: 16.h),
-                Text(
-                  'لا توجد طلبات بعد',
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: textPrimary,
-                  ),
+                child: Icon(
+                  Icons.description_outlined,
+                  size: 36,
+                  color: hintColor,
                 ),
-                SizedBox(height: 8.h),
-                Text(
-                  'قدم طلبا جديدا لترخيص محطة وقود',
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 13.sp,
-                    color: textSecondary,
-                  ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'لا توجد طلبات بعد',
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: textPrimary,
                 ),
-                SizedBox(height: 24.h),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    final licenseCtrl =
-                        Get.find<LicenseApplicationController>();
-                    licenseCtrl.resetForm();
-                    Get.toNamed(AppRoutes.licenseApplication);
-                  },
-                  icon: ThemedIcon(
-                    Icons.add,
-                    type: IconType.button,
-                    customSize: 18.sp,
-                  ),
-                  label: const Text('تقديم طلب جديد'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: onPrimaryColor,
-                  ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                'قدم طلبا جديدا لترخيص محطة وقود',
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 13.sp,
+                  color: textSecondary,
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: 24.h),
+              ElevatedButton.icon(
+                onPressed: () {
+                  final licenseCtrl = Get.find<LicenseApplicationController>();
+                  licenseCtrl.resetForm();
+                  Get.toNamed(AppRoutes.licenseApplication);
+                },
+                icon: ThemedIcon(
+                  Icons.add,
+                  type: IconType.button,
+                  customSize: 18.sp,
+                ),
+                label: const Text('تقديم طلب جديد'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: onPrimaryColor,
+                ),
+              ),
+            ],
           ),
         ),
       ),

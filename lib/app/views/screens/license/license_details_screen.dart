@@ -216,7 +216,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       icon: Icons.description_outlined,
                       isExpanded: _expandedSections['summary'] ?? true,
                       onToggle: () => _toggleSection('summary'),
-                      child: _buildInfoGrid(context, [
+                      child: _buildUniformInfoList(context, [
                         _InfoEntry(
                           'رقم الطلب',
                           detail!.application.applicationNumber,
@@ -236,12 +236,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       icon: Icons.person_outline,
                       isExpanded: _expandedSections['applicant'] ?? true,
                       onToggle: () => _toggleSection('applicant'),
-                      child: _buildInfoCard(context, [
-                        _InfoEntry('اسم مقدم الطلب', detail!.applicantName),
-                        _InfoEntry('البريد الإلكتروني', detail!.email),
-                        _InfoEntry('الهاتف', detail!.phone),
-                        _InfoEntry('الهوية الوطنية', detail!.nationalId),
-                      ]),
+                      child: _buildUniformInfoList(
+                        context,
+                        _buildApplicantEntries(detail!),
+                      ),
                     ),
                     SizedBox(height: 18.h),
                     _buildSectionCard(
@@ -250,7 +248,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       icon: Icons.location_on_outlined,
                       isExpanded: _expandedSections['location'] ?? true,
                       onToggle: () => _toggleSection('location'),
-                      child: _buildInfoCard(context, [
+                      child: _buildUniformInfoList(context, [
                         _InfoEntry('المحافظة', detail!.governorate),
                         _InfoEntry('المنطقة / الحي', detail!.district),
                         _InfoEntry('اسم المحطة', detail!.stationName),
@@ -641,131 +639,130 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     );
   }
 
-  Widget _buildInfoGrid(BuildContext context, List<_InfoEntry> items) {
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: items.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 1,
-        childAspectRatio: 2.9,
-        crossAxisSpacing: 14.w,
-        mainAxisSpacing: 14.h,
-      ),
-      itemBuilder: (context, index) {
-        final entry = items[index];
-        return _buildInfoTile(entry.title, entry.value, context);
-      },
-    );
+  List<_InfoEntry> _buildApplicantEntries(LicenseDetailModel detail) {
+    final app = detail.application;
+    final userName = [
+      app.firstName,
+      app.fatherName,
+      app.lastName,
+    ]
+        .where((value) => (value ?? '').trim().isNotEmpty)
+        .map((value) => value!.trim())
+        .join(' ');
+
+    final fields = <_InfoEntry>[];
+
+    if (_hasMeaningfulValue(detail.applicantName)) {
+      fields.add(_InfoEntry('اسم مقدم الطلب', detail.applicantName));
+    }
+    if (_hasMeaningfulValue(userName)) {
+      fields.add(_InfoEntry('اسم المستخدم', userName));
+    }
+    if (_hasMeaningfulValue(app.nickname)) {
+      fields.add(_InfoEntry('الاسم المستعار', app.nickname!));
+    }
+    if (_hasMeaningfulValue(app.placeOfBirth)) {
+      fields.add(_InfoEntry('محل الميلاد', app.placeOfBirth!));
+    }
+    if (_hasMeaningfulValue(app.dateOfBirth)) {
+      fields.add(_InfoEntry('تاريخ الميلاد', _formatDisplayDate(app.dateOfBirth)));
+    }
+    if (_hasMeaningfulValue(detail.email)) {
+      fields.add(_InfoEntry('البريد الإلكتروني', detail.email));
+    }
+    if (_hasMeaningfulValue(detail.phone)) {
+      fields.add(_InfoEntry('الهاتف', detail.phone));
+    }
+    if (_hasMeaningfulValue(app.secondaryPhone)) {
+      fields.add(_InfoEntry('الهاتف الإضافي', app.secondaryPhone!));
+    }
+    if (_hasMeaningfulValue(detail.nationalId)) {
+      fields.add(_InfoEntry('الهوية الوطنية', detail.nationalId));
+    }
+    if (_hasMeaningfulValue(app.companyName)) {
+      fields.add(_InfoEntry('اسم الشركة', app.companyName!));
+    }
+    if (_hasMeaningfulValue(app.companyLicenseNumber)) {
+      fields.add(_InfoEntry('رقم رخصة الشركة', app.companyLicenseNumber!));
+    }
+    if (_hasMeaningfulValue(app.companyLicenseDate)) {
+      fields.add(
+        _InfoEntry(
+          'تاريخ رخصة الشركة',
+          _formatDisplayDate(app.companyLicenseDate),
+        ),
+      );
+    }
+
+    return fields;
   }
 
-  Widget _buildInfoCard(BuildContext context, List<_InfoEntry> items) {
+  bool _hasMeaningfulValue(String? value) {
+    final normalized = (value ?? '').trim();
+    return normalized.isNotEmpty &&
+        normalized != 'غير متوفر' &&
+        normalized != 'غير محدد';
+  }
+
+  Widget _buildUniformInfoList(BuildContext context, List<_InfoEntry> items) {
     final borderColor = context.themeBorder;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: List.generate(items.length, (index) {
-        final entry = items[index];
-        final isLast = index == items.length - 1;
-        return Column(
-          children: [
-            _buildInfoRow(entry.title, entry.value, context),
-            if (!isLast)
-              Padding(
-                padding: EdgeInsets.only(top: 14.h, bottom: 14.h),
-                child: Container(
-                  height: 1.h,
-                  color: borderColor.withValues(alpha: 0.2),
-                ),
-              ),
-          ],
-        );
-      }),
-    );
-  }
-
-  Widget _buildInfoTile(String title, String value, BuildContext context) {
     final theme = Theme.of(context);
+
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: context.themeBorder.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 11.sp,
-              color: theme.textTheme.bodyMedium?.color,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            value.isEmpty ? 'غير محدد' : value,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            softWrap: true,
-            textAlign: TextAlign.right,
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String title, String value, BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 12.h),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: context.themeBorder.withValues(alpha: 0.3)),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              value.isEmpty ? 'غير محدد' : value,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurface,
+        children: List.generate(items.length, (index) {
+          final entry = items[index];
+          final isLast = index == items.length - 1;
+          return Container(
+            margin: EdgeInsets.only(bottom: isLast ? 0 : 8.h),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(
+                color: borderColor.withValues(alpha: 0.25),
               ),
-              textAlign: TextAlign.right,
             ),
-          ),
-          SizedBox(width: 10.w),
-          Flexible(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 12.sp,
-                color: theme.textTheme.bodyMedium?.color,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.right,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    entry.value.isEmpty ? 'غير محدد' : entry.value,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+                SizedBox(width: 10.w),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 120.w),
+                  child: Text(
+                    entry.title,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 12.sp,
+                      color: theme.textTheme.bodyMedium?.color,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        }),
       ),
     );
   }
@@ -1467,9 +1464,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       case 'licenseDetails':
         return 'تفاصيل الترخيص';
       case 'settlementDetails':
+      
         return 'بيانات التسوية';
       case 'applicantInfo':
-        return 'معلومات مقدم الطلب';
+        return 'معلومات مقدم الطلب';        
       case 'identityDocument':
         return 'وثائق الهوية';
       case 'currentLocation':

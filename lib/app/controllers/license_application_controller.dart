@@ -65,6 +65,7 @@ class LicenseApplicationController extends GetxController {
   final currentStep = 0.obs; // 0-based (0=Step1 … 3=Step4)
   final applicationId = ''.obs;
   final isLoading = false.obs;
+  final step3CardsUnlocked = true.obs;
   final isGovernoratesLoading = false.obs;
   final isDistrictsLoading = false.obs;
   final isSubdistrictsLoading = false.obs;
@@ -210,6 +211,7 @@ class LicenseApplicationController extends GetxController {
   final editApplicationId = ''.obs;
   final correctionTargets = <String>[].obs;
   ApplicationModel? _originalApplication;
+  ApplicationModel? get originalApplication => _originalApplication;
 
   // Map local field keys to server correction target ids.
   // Add more mappings here as new fields are added.
@@ -221,23 +223,23 @@ class LicenseApplicationController extends GetxController {
     'requestType': 'licenseDetails',
     'previousLicenseNumber': 'settlementDetails',
     'settledAgreed': 'settlementDetails',
-    'firstName': 'applicantInfo',
-    'fatherName': 'applicantInfo',
-    'motherName': 'applicantInfo',
-    'nickname': 'applicantInfo',
-    'lastName': 'applicantInfo',
-    'nationalId': 'identityDocument',
-    'birthPlace': 'applicantInfo',
-    'birthDate': 'applicantInfo',
-    'companyName': 'companyInfo',
-    'companyLicenseNumber': 'companyInfo',
-    'companyLicenseDate': 'companyInfo',
-    'governorate': 'currentLocation',
-    'district': 'currentLocation',
-    'subdistrict': 'currentLocation',
-    'town': 'currentLocation',
-    'latitude': 'currentLocation',
-    'longitude': 'currentLocation',
+    'firstName': 'licenseDetails',
+    'fatherName': 'licenseDetails',
+    'motherName': 'licenseDetails',
+    'nickname': 'licenseDetails',
+    'lastName': 'licenseDetails',
+    'nationalId': 'licenseDetails',
+    'birthPlace': 'licenseDetails',
+    'birthDate': 'licenseDetails',
+    'companyName': 'licenseDetails',
+    'companyLicenseNumber': 'licenseDetails',
+    'companyLicenseDate': 'licenseDetails',
+    'governorate': 'locationClassification',
+    'district': 'locationClassification',
+    'subdistrict': 'locationClassification',
+    'town': 'locationClassification',
+    'latitude': 'locationClassification',
+    'longitude': 'locationClassification',
     'planningLocation': 'locationClassification',
     'roadType': 'locationClassification',
     'stationCategory': 'locationClassification',
@@ -396,7 +398,6 @@ class LicenseApplicationController extends GetxController {
     required dynamic data,
     // dio.Options? options,
   }) async {
-    // ةخشااثةmohammed ahed
     return _patch_att(
       '/v1/license-applications/$applicationId',
       data: data,
@@ -574,19 +575,38 @@ class LicenseApplicationController extends GetxController {
         companyLicenseDate.value = parsed;
       }
     }
-    planningLocation.value =
-        application.planningLocation.toLowerCase().contains('outside')
-        ? 'outside'
-        : 'inside';
-    roadType.value = application.roadType.toLowerCase().contains('local')
-        ? 'local'
-        : application.roadType.toLowerCase().contains('central')
-        ? 'central'
-        : 'international';
-    stationCategory.value =
-        application.stationCategory?.trim().isNotEmpty == true
-        ? application.stationCategory!.trim()
-        : 'A';
+    // Normalize planning location (handle Arabic and English responses)
+    final planningRaw = application.planningLocation?.toLowerCase() ?? '';
+    if (planningRaw.contains('outside') || planningRaw.contains('خارج')) {
+      planningLocation.value = 'outside';
+    } else {
+      planningLocation.value = 'inside';
+    }
+
+    // Normalize road type
+    final roadRaw = application.roadType?.toLowerCase() ?? '';
+    if (roadRaw.contains('local') || roadRaw.contains('محلي')) {
+      roadType.value = 'local';
+    } else if (roadRaw.contains('central') || roadRaw.contains('مركز') || roadRaw.contains('مركزية')) {
+      roadType.value = 'central';
+    } else {
+      roadType.value = 'international';
+    }
+
+    // Normalize station category (A/B/C) from Arabic or latin representations
+    final catRaw = application.stationCategory?.trim() ?? '';
+    final catLower = catRaw.toLowerCase();
+    if (catLower.contains('أ') || catLower.contains('a')) {
+      stationCategory.value = 'A';
+    } else if (catLower.contains('ب') || catLower.contains('b')) {
+      stationCategory.value = 'B';
+    } else if (catLower.contains('ج') || catLower.contains('c')) {
+      stationCategory.value = 'C';
+    } else if (catRaw.trim().isNotEmpty) {
+      stationCategory.value = catRaw.trim().toUpperCase();
+    } else {
+      stationCategory.value = 'A';
+    }
     latitudeController.text = application.latitude ?? '';
     longitudeController.text = application.longitude ?? '';
     if (application.latitude?.isNotEmpty == true &&
@@ -713,7 +733,7 @@ class LicenseApplicationController extends GetxController {
       }
     }
 
-    if (correctionTargets.contains('currentLocation')) {
+    if (correctionTargets.contains('locationClassification')) {
       final location = <String, dynamic>{};
       if (selectedGovernorate.value?.id != null &&
           (original == null ||
@@ -1522,10 +1542,12 @@ class LicenseApplicationController extends GetxController {
         if (value.trim().isEmpty) {
           settlementPreviousLicenseError.value =
               'يرجى إدخال رقم الترخيص السابق';
-        } else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(value.trim())) {
-          settlementPreviousLicenseError.value =
-              'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
-        } else {
+        } 
+        // else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(value.trim())) {
+        //   settlementPreviousLicenseError.value =
+        //       'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
+        // } 
+        else {
           settlementPreviousLicenseError.value = '';
         }
         if (settlementPreviousLicenseError.value.isNotEmpty) {
@@ -1538,7 +1560,19 @@ class LicenseApplicationController extends GetxController {
         if (companyLicenseDate.value == null) {
           companyLicenseDateError.value = 'يرجى اختيار تاريخ ترخيص الشركة';
         } else {
-          companyLicenseDateError.value = '';
+          final now = DateTime.now();
+          final selectedDate = DateTime(
+            companyLicenseDate.value!.year,
+            companyLicenseDate.value!.month,
+            companyLicenseDate.value!.day,
+          );
+          final today = DateTime(now.year, now.month, now.day);
+          if (!selectedDate.isBefore(today)) {
+            companyLicenseDateError.value =
+                'يجب أن يكون التاريخ من أمس أو قبله';
+          } else {
+            companyLicenseDateError.value = '';
+          }
         }
         if (companyLicenseDateError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -342,30 +342,33 @@ class _ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      leading: Icon(icon, color: danger ? AppColors.error : AppColors.primary),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 13.sp,
-          fontWeight: FontWeight.w600,
-          color: danger
-              ? AppColors.error
-              : Theme.of(context).colorScheme.onSurface,
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        onTap: onTap,
+        leading: Icon(icon, color: danger ? AppColors.error : AppColors.primary),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: danger
+                ? AppColors.error
+                : Theme.of(context).colorScheme.onSurface,
+          ),
         ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(fontFamily: 'Cairo', fontSize: 11.sp),
+        ),
+        trailing: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          textDirection: TextDirection.ltr,
+          size: 16,
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.h),
       ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(fontFamily: 'Cairo', fontSize: 11.sp),
-      ),
-      trailing: const Icon(
-        Icons.arrow_back_ios_new_rounded,
-        textDirection: TextDirection.ltr,
-        size: 16,
-      ),
-      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 4.h),
     );
   }
 }
