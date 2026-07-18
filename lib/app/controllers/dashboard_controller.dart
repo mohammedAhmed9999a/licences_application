@@ -41,4 +41,6 @@ class DashboardController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  //
 }
