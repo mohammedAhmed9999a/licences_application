@@ -38,4 +38,14 @@ void main() {
     expect(error, isNotNull);
     expect(error, contains('العربية'));
   });
+
+  test('does not attempt login when password validation fails', () async {
+    controller.emailController.text = 'user@example.com';
+    controller.passwordController.text = '123';
+
+    await controller.login();
+
+    expect(controller.isLoading.value, isFalse);
+    expect(controller.errorMessage.value, contains('كلمة المرور'));
+  });
 }

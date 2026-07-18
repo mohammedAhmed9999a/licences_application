@@ -587,7 +587,9 @@ class LicenseApplicationController extends GetxController {
     final roadRaw = application.roadType?.toLowerCase() ?? '';
     if (roadRaw.contains('local') || roadRaw.contains('محلي')) {
       roadType.value = 'local';
-    } else if (roadRaw.contains('central') || roadRaw.contains('مركز') || roadRaw.contains('مركزية')) {
+    } else if (roadRaw.contains('central') ||
+        roadRaw.contains('مركز') ||
+        roadRaw.contains('مركزية')) {
       roadType.value = 'central';
     } else {
       roadType.value = 'international';
@@ -687,8 +689,8 @@ class LicenseApplicationController extends GetxController {
     if (shouldSendUserInfo || shouldSendCompanyInfo) {
       final firstName = firstNameController.text.trim();
       final fatherName = fatherNameController.text.trim();
-      final lastName = lastNameController.text.trim().isNotEmpty
-          ? lastNameController.text.trim()
+      final lastName = nicknameController.text.trim().isNotEmpty
+          ? nicknameController.text.trim()
           : nicknameController.text.trim();
       final motherName = motherNameController.text.trim();
       final nationalId = nationalIdController.text.trim();
@@ -853,19 +855,40 @@ class LicenseApplicationController extends GetxController {
   }
 
   void scrollToStep1Error() {
-    switch (step1ErrorField.value) {
-      case 'phone':
-        scrollToStep1Field(phoneFieldKey);
-        break;
-      case 'email':
-        scrollToStep1Field(emailFieldKey);
-        break;
-      case 'phone2':
-        scrollToStep1Field(secondaryPhoneFieldKey);
-        break;
-      case 'terms':
-        scrollToStep1Field(termsFieldKey);
-        break;
+    if (step1ErrorField.value == 'phone' &&
+        phoneFieldKey.currentContext != null) {
+      scrollToStep1Field(phoneFieldKey);
+      return;
+    }
+    if (step1ErrorField.value == 'email' &&
+        emailFieldKey.currentContext != null) {
+      scrollToStep1Field(emailFieldKey);
+      return;
+    }
+    if (step1ErrorField.value == 'phone2' &&
+        secondaryPhoneFieldKey.currentContext != null) {
+      scrollToStep1Field(secondaryPhoneFieldKey);
+      return;
+    }
+    if (step1ErrorField.value == 'terms' &&
+        termsFieldKey.currentContext != null) {
+      scrollToStep1Field(termsFieldKey);
+      return;
+    }
+
+    if (phoneController.text.trim().isEmpty &&
+        phoneFieldKey.currentContext != null) {
+      scrollToStep1Field(phoneFieldKey);
+      return;
+    }
+    if (emailController.text.trim().isEmpty &&
+        emailFieldKey.currentContext != null) {
+      scrollToStep1Field(emailFieldKey);
+      return;
+    }
+    if (!agreedToTerms.value && termsFieldKey.currentContext != null) {
+      scrollToStep1Field(termsFieldKey);
+      return;
     }
   }
 
@@ -1542,11 +1565,11 @@ class LicenseApplicationController extends GetxController {
         if (value.trim().isEmpty) {
           settlementPreviousLicenseError.value =
               'يرجى إدخال رقم الترخيص السابق';
-        } 
+        }
         // else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(value.trim())) {
         //   settlementPreviousLicenseError.value =
         //       'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
-        // } 
+        // }
         else {
           settlementPreviousLicenseError.value = '';
         }

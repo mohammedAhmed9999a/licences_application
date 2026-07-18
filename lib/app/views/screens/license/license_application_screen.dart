@@ -37,7 +37,24 @@ class LicenseApplicationScreen extends StatelessWidget {
       body: Column(
         children: [
           // Step indicator
-          Obx(() => StepIndicatorWidget(currentStep: ctrl.currentStep.value)),
+          Obx(
+            () => StepIndicatorWidget(
+              currentStep: ctrl.currentStep.value,
+              onStepTapped: (index) {
+                ctrl.currentStep.value = index;
+              },
+              onBlockedStepTap: (_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'يرجى إكمال الخطوة الحالية أولاً قبل الانتقال إلى الخطوة التالية',
+                    ),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+            ),
+          ),
 
           // Page content
           Expanded(

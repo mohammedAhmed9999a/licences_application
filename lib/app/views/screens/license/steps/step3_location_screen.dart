@@ -20,384 +20,492 @@ class Step3LocationScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Obx(() {
         final governorateEditable = ctrl.isFieldEditable('governorate');
-        final locationEditable = governorateEditable ||
-          ctrl.isFieldEditable('latitude') ||
-          ctrl.isFieldEditable('longitude');
+        final locationEditable =
+            governorateEditable ||
+            ctrl.isFieldEditable('latitude') ||
+            ctrl.isFieldEditable('longitude');
         final origPlanningRaw =
-          ctrl.originalApplication?.planningLocation?.toLowerCase() ?? '';
-        final origRoadRaw = ctrl.originalApplication?.roadType?.toLowerCase() ?? '';
+            ctrl.originalApplication?.planningLocation?.toLowerCase() ?? '';
+        final origRoadRaw =
+            ctrl.originalApplication?.roadType?.toLowerCase() ?? '';
         final origCatRaw =
-          ctrl.originalApplication?.stationCategory?.toString().toLowerCase() ?? '';
+            ctrl.originalApplication?.stationCategory
+                ?.toString()
+                .toLowerCase() ??
+            '';
 
-        final origAllowsInside = origPlanningRaw.isEmpty ||
-          origPlanningRaw.contains('داخل') ||
-          origPlanningRaw.contains('inside');
-        final origAllowsOutside = origPlanningRaw.isEmpty ||
-          origPlanningRaw.contains('خارج') ||
-          origPlanningRaw.contains('outside');
+        final origAllowsInside =
+            origPlanningRaw.isEmpty ||
+            origPlanningRaw.contains('داخل') ||
+            origPlanningRaw.contains('inside');
+        final origAllowsOutside =
+            origPlanningRaw.isEmpty ||
+            origPlanningRaw.contains('خارج') ||
+            origPlanningRaw.contains('outside');
 
-        final origAllowsInternational = origRoadRaw.isEmpty ||
-          origRoadRaw.contains('دولي') ||
-          origRoadRaw.contains('international');
-        final origAllowsCentral = origRoadRaw.isEmpty ||
-          origRoadRaw.contains('مركز') ||
-          origRoadRaw.contains('central');
-        final origAllowsLocal = origRoadRaw.isEmpty ||
-          origRoadRaw.contains('محلي') ||
-          origRoadRaw.contains('local');
+        final origAllowsInternational =
+            origRoadRaw.isEmpty ||
+            origRoadRaw.contains('دولي') ||
+            origRoadRaw.contains('international');
+        final origAllowsCentral =
+            origRoadRaw.isEmpty ||
+            origRoadRaw.contains('مركز') ||
+            origRoadRaw.contains('central');
+        final origAllowsLocal =
+            origRoadRaw.isEmpty ||
+            origRoadRaw.contains('محلي') ||
+            origRoadRaw.contains('local');
 
-        final origAllowsA = origCatRaw.isEmpty ||
-          origCatRaw == 'a' ||
-          origCatRaw.contains('أ') ||
-          origCatRaw.contains('a');
-        final origAllowsB = origCatRaw.isEmpty ||
-          origCatRaw == 'b' ||
-          origCatRaw.contains('ب') ||
-          origCatRaw.contains('b');
-        final origAllowsC = origCatRaw.isEmpty ||
-          origCatRaw == 'c' ||
-          origCatRaw.contains('ج') ||
-          origCatRaw.contains('c');
-
+        final origAllowsA =
+            origCatRaw.isEmpty ||
+            origCatRaw == 'a' ||
+            origCatRaw.contains('أ') ||
+            origCatRaw.contains('a');
+        final origAllowsB =
+            origCatRaw.isEmpty ||
+            origCatRaw == 'b' ||
+            origCatRaw.contains('ب') ||
+            origCatRaw.contains('b');
+        final origAllowsC =
+            origCatRaw.isEmpty ||
+            origCatRaw == 'c' ||
+            origCatRaw.contains('ج') ||
+            origCatRaw.contains('c');
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return SingleChildScrollView(
           child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ─── 1. Location Data ─────────────────────────────────────────
-            SectionCard(
-              title: 'الموقع والتصنيف',
-              subtitle:
-                  'أدخل العنوان الكامل، الإحداثيات، ثم اختر موقع المحطة بالنسبة للتنظيم والفئة المناسبة.',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const RequiredFieldsBanner(),
-                  SizedBox(height: 14.h),
-                ],
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ─── 1. Location Data ─────────────────────────────────────────
+              SectionCard(
+                title: 'الموقع والتصنيف',
+                subtitle:
+                    'أدخل العنوان الكامل، الإحداثيات، ثم اختر موقع المحطة بالنسبة للتنظيم والفئة المناسبة.',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const RequiredFieldsBanner(),
+                    SizedBox(height: 14.h),
+                  ],
+                ),
               ),
-            ),
 
-            // ─── Location Data Card ───────────────────────────────────────
-            SectionCard(
-              title: 'بيانات الموقع',
-              stepNumber: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // Address / Coordinates tab
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundAlt,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 10.h),
-                            decoration: BoxDecoration(
-                              color: AppColors.backgroundAlt,
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: Text(
-                              'العنوان والإحداثيات',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 12.sp,
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w600,
+              // ─── Location Data Card ───────────────────────────────────────
+              SectionCard(
+                title: 'بيانات الموقع',
+                stepNumber: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Address / Coordinates tab
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.backgroundAlt,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 10.h),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppColors.forest1
+                                    : AppColors.backgroundAlt,
+                                borderRadius: BorderRadius.circular(8.r),
                               ),
-                              textAlign: TextAlign.center,
+                              child: Text(
+                                'العنوان والإحداثيات',
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 12.sp,
+                                  color: isDark
+                                      ? AppColors.backgroundAlt
+                                      : AppColors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 22.h),
+                    SizedBox(height: 22.h),
 
-                  // SizedBox(height: 6.h),
-                  // Location status
-                  Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          _locationStatusText(ctrl.locationStatus.value),
-                          style: TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: 11.sp,
-                            color: _locationStatusColor(
-                              ctrl.locationStatus.value,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          'الحالة:',
-                          style: TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: 11.sp,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 16.h),
-                  // Governorate dropdowns
-                  LabeledField(
-                    label: 'المحافظة',
-                    required: true,
-                    child: Obx(
-                      () => _DropdownField(
-                        hint: 'اختر المحافظة',
-                        value: ctrl.selectedGovernorate.value?.name,
-                        items: ctrl.governorates.map((g) => g.name).toList(),
-                        isLoading: ctrl.isGovernoratesLoading.value,
-                        enabled: governorateEditable,
-                        loadingLabel: 'جاري تحميل المحافظات...',
-                        onRefresh: governorateEditable
-                            ? () => ctrl.refreshGovernorates()
-                            : null,
-                        onChanged: (val) {
-                          if (!governorateEditable) return;
-                          final gov = ctrl.governorates.firstWhereOrNull(
-                            (g) => g.name == val,
-                          );
-                          //
-                          ctrl.onGovernorateChanged(gov);
-                        },
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 12.h),
-                  LabeledField(
-                    label: 'المنطقة',
-                    required: true,
-                    child: Obx(
-                      () => _DropdownField(
-                        hint: 'اختر المنطقة',
-                        value: ctrl.selectedDistrict.value?.name,
-                        items: ctrl.districts.map((g) => g.name).toList(),
-                        isLoading: ctrl.isDistrictsLoading.value,
-                        enabled: governorateEditable,
-                        loadingLabel: 'جاري تحميل المناطق...',
-                        onRefresh: governorateEditable
-                            ? () => ctrl.refreshDistricts()
-                            : null,
-                        onChanged: (val) {
-                          if (!governorateEditable) return;
-                          final d = ctrl.districts.firstWhereOrNull(
-                            (g) => g.name == val,
-                          );
-                          ctrl.onDistrictChanged(d);
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  LabeledField(
-                    label: 'الناحية',
-                    required: true,
-                    child: Obx(
-                      () => _DropdownField(
-                        hint: 'اختر الناحية',
-                        value: ctrl.selectedSubdistrict.value?.name,
-                        items: ctrl.subdistricts.map((g) => g.name).toList(),
-                        isLoading: ctrl.isSubdistrictsLoading.value,
-                        enabled: governorateEditable,
-                        loadingLabel: 'جاري تحميل النواحي...',
-                        onRefresh: governorateEditable
-                            ? () => ctrl.refreshSubdistricts()
-                            : null,
-                        onChanged: (val) {
-                          if (!governorateEditable) return;
-                          final s = ctrl.subdistricts.firstWhereOrNull(
-                            (g) => g.name == val,
-                          );
-                          ctrl.onSubdistrictChanged(s);
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  LabeledField(
-                    label: 'البلدة',
-                    required: true,
-                    child: Obx(
-                      () => _DropdownField(
-                        hint: 'اختر البلدة',
-                        value: ctrl.selectedTown.value?.name,
-                        items: ctrl.towns.map((g) => g.name).toList(),
-                        isLoading: ctrl.isTownsLoading.value,
-                        enabled: governorateEditable,
-                        loadingLabel: 'جاري تحميل البلديات...',
-                        onRefresh: governorateEditable
-                            ? () => ctrl.refreshTowns()
-                            : null,
-                        onChanged: (val) {
-                          if (!governorateEditable) return;
-                          final t = ctrl.towns.firstWhereOrNull(
-                            (g) => g.name == val,
-                          );
-                          ctrl.selectedTown.value = t;
-                          if (t?.latitude != null && t?.longitude != null) {
-                            ctrl.setLocation(t!.latitude!, t.longitude!);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  // Map instruction box
-                  Container(
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundAlt,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          'تحديد الموقع على الخريطة',
-                          style: TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textDirection: TextDirection.rtl,
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          'حدد موقع المحطة بإحدى الطرق الثلاث: اكتب الإحداثيات يدوياً، أو اضغط على الخريطة لوضع الدبوس، أو اضغط زر "أنا في المحطة الآن استخدم موقعي" لتحديد موقع المحطة تلقائياً إذا كنت هناك الآن.',
-                          style: TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: 11.sp,
-                            color: AppColors.textSecondary,
-                            height: 1.5,
-                          ),
-                          textDirection: TextDirection.rtl,
-                        ),
-                        SizedBox(height: 10.h),
-                        // Use my location button
-                        OutlinedButton.icon(
-                          onPressed: locationEditable
-                              ? () => _useMyLocation(ctrl, context)
-                              : null,
-                          icon: Icon(Icons.my_location, size: 15.sp),
-                          label: Text(
-                            'أنا في المحطة الآن استخدم موقعي',
+                    // SizedBox(height: 6.h),
+                    // Location status
+                    Obx(
+                      () => Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            _locationStatusText(ctrl.locationStatus.value),
                             style: TextStyle(
-                              fontSize: 12.sp,
                               fontFamily: 'Cairo',
+                              fontSize: 11.sp,
+                              color: _locationStatusColor(
+                                ctrl.locationStatus.value,
+                              ),
                             ),
                           ),
-                          style: OutlinedButton.styleFrom(
-                            minimumSize: Size(double.infinity, 38.h),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'الحالة:',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 11.sp,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: 16.h),
+                    // Governorate dropdowns
+                    LabeledField(
+                      label: 'المحافظة',
+                      required: true,
+                      child: Obx(
+                        () => _DropdownField(
+                          hint: 'اختر المحافظة',
+                          value: ctrl.selectedGovernorate.value?.name,
+                          items: ctrl.governorates.map((g) => g.name).toList(),
+                          isLoading: ctrl.isGovernoratesLoading.value,
+                          enabled: governorateEditable,
+                          loadingLabel: 'جاري تحميل المحافظات...',
+                          onRefresh: governorateEditable
+                              ? () => ctrl.refreshGovernorates()
+                              : null,
+                          onChanged: (val) {
+                            if (!governorateEditable) return;
+                            final gov = ctrl.governorates.firstWhereOrNull(
+                              (g) => g.name == val,
+                            );
+                            //
+                            ctrl.onGovernorateChanged(gov);
+                          },
                         ),
-                        SizedBox(height: 8.h),
-                        // Warning
-                        Container(
-                          padding: EdgeInsets.all(8.w),
-                          decoration: BoxDecoration(
-                            color: AppColors.warning.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(6.r),
-                            border: Border.all(
-                              color: AppColors.warning.withOpacity(0.3),
+                      ),
+                    ),
+
+                    SizedBox(height: 12.h),
+                    LabeledField(
+                      label: 'المنطقة',
+                      required: true,
+                      child: Obx(
+                        () => _DropdownField(
+                          hint: 'اختر المنطقة',
+                          value: ctrl.selectedDistrict.value?.name,
+                          items: ctrl.districts.map((g) => g.name).toList(),
+                          isLoading: ctrl.isDistrictsLoading.value,
+                          enabled: governorateEditable,
+                          loadingLabel: 'جاري تحميل المناطق...',
+                          onRefresh: governorateEditable
+                              ? () => ctrl.refreshDistricts()
+                              : null,
+                          onChanged: (val) {
+                            if (!governorateEditable) return;
+                            final d = ctrl.districts.firstWhereOrNull(
+                              (g) => g.name == val,
+                            );
+                            ctrl.onDistrictChanged(d);
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    LabeledField(
+                      label: 'الناحية',
+                      required: true,
+                      child: Obx(
+                        () => _DropdownField(
+                          hint: 'اختر الناحية',
+                          value: ctrl.selectedSubdistrict.value?.name,
+                          items: ctrl.subdistricts.map((g) => g.name).toList(),
+                          isLoading: ctrl.isSubdistrictsLoading.value,
+                          enabled: governorateEditable,
+                          loadingLabel: 'جاري تحميل النواحي...',
+                          onRefresh: governorateEditable
+                              ? () => ctrl.refreshSubdistricts()
+                              : null,
+                          onChanged: (val) {
+                            if (!governorateEditable) return;
+                            final s = ctrl.subdistricts.firstWhereOrNull(
+                              (g) => g.name == val,
+                            );
+                            ctrl.onSubdistrictChanged(s);
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    LabeledField(
+                      label: 'البلدة',
+                      required: true,
+                      child: Obx(
+                        () => _DropdownField(
+                          hint: 'اختر البلدة',
+                          value: ctrl.selectedTown.value?.name,
+                          items: ctrl.towns.map((g) => g.name).toList(),
+                          isLoading: ctrl.isTownsLoading.value,
+                          enabled: governorateEditable,
+                          loadingLabel: 'جاري تحميل البلديات...',
+                          onRefresh: governorateEditable
+                              ? () => ctrl.refreshTowns()
+                              : null,
+                          onChanged: (val) {
+                            if (!governorateEditable) return;
+                            final t = ctrl.towns.firstWhereOrNull(
+                              (g) => g.name == val,
+                            );
+                            ctrl.selectedTown.value = t;
+                            if (t?.latitude != null && t?.longitude != null) {
+                              ctrl.setLocation(t!.latitude!, t.longitude!);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    // Map instruction box
+                    Container(
+                      padding: EdgeInsets.all(12.w),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.forest : AppColors.background,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: isDark ? AppColors.forest2 : AppColors.border,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'تحديد الموقع على الخريطة',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textDirection: TextDirection.rtl,
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            'حدد موقع المحطة بإحدى الطرق الثلاث: اكتب الإحداثيات يدوياً، أو اضغط على الخريطة لوضع الدبوس، أو اضغط زر "أنا في المحطة الآن استخدم موقعي" لتحديد موقع المحطة تلقائياً إذا كنت هناك الآن.',
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 11.sp,
+                              color: isDark
+                                  ? AppColors.background
+                                  : AppColors.textSecondary,
+                              height: 1.5,
+                            ),
+                            textDirection: TextDirection.rtl,
+                          ),
+                          SizedBox(height: 10.h),
+                          // Use my location button
+                          OutlinedButton.icon(
+                            onPressed: locationEditable
+                                ? () => _useMyLocation(ctrl, context)
+                                : null,
+                            icon: Icon(Icons.my_location, size: 15.sp),
+                            label: Text(
+                              'أنا في المحطة الآن استخدم موقعي',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                fontFamily: 'Cairo',
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: Size(double.infinity, 38.h),
                             ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  'يرجى تحديد موقع محطة الوقود الفعلي بدقة على الخريطة. تجنب اختيار موقع عشوائي؛ إذ قد يؤثر عدم دقة الموقع على سير معالجة الطلب.',
-                                  style: TextStyle(
-                                    fontFamily: 'Cairo',
-                                    fontSize: 10.sp,
-                                    color: AppColors.warning,
+                          SizedBox(height: 8.h),
+                          // Warning
+                          Container(
+                            padding: EdgeInsets.all(8.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.warning.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(6.r),
+                              border: Border.all(
+                                color: AppColors.warning.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    'يرجى تحديد موقع محطة الوقود الفعلي بدقة على الخريطة. تجنب اختيار موقع عشوائي؛ إذ قد يؤثر عدم دقة الموقع على سير معالجة الطلب.',
+                                    style: TextStyle(
+                                      fontFamily: 'Cairo',
+                                      fontSize: 10.sp,
+                                      color: AppColors.warning,
+                                    ),
+                                    textDirection: TextDirection.rtl,
                                   ),
-                                  textDirection: TextDirection.rtl,
+                                ),
+                                SizedBox(width: 6.w),
+                                Icon(
+                                  Icons.info_outline,
+                                  color: AppColors.warning,
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+
+                    // Actual map picker
+                    Container(
+                      height: 280.h,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: _LocationPickerMap(
+                          latitudeController: ctrl.latitudeController,
+                          longitudeController: ctrl.longitudeController,
+                          enabled: locationEditable,
+                          onLocationSelected: (position) {
+                            if (!locationEditable) return;
+                            ctrl.setLocation(
+                              position.latitude,
+                              position.longitude,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    // Lat / Long
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final useColumnLayout = constraints.maxWidth < 360;
+
+                        if (useColumnLayout) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              LabeledField(
+                                label: 'خط العرض',
+                                required: true,
+                                child: RtlTextField(
+                                  controller: ctrl.latitudeController,
+                                  hintText: '33.xxxxxx',
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                  enabled: ctrl.isFieldEditable('latitude'),
                                 ),
                               ),
-                              SizedBox(width: 6.w),
-                              Icon(
-                                Icons.info_outline,
-                                color: AppColors.warning,
-                                size: 16,
+                              SizedBox(height: 12.h),
+                              LabeledField(
+                                label: 'خط الطول',
+                                required: true,
+                                child: RtlTextField(
+                                  controller: ctrl.longitudeController,
+                                  hintText: '36.xxxxxx',
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                  enabled: ctrl.isFieldEditable('longitude'),
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-
-                  // Actual map picker
-                  Container(
-                    height: 280.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
-                      child: _LocationPickerMap(
-                        latitudeController: ctrl.latitudeController,
-                        longitudeController: ctrl.longitudeController,
-                        enabled: locationEditable,
-                        onLocationSelected: (position) {
-                          if (!locationEditable) return;
-                          ctrl.setLocation(
-                            position.latitude,
-                            position.longitude,
                           );
-                        },
-                      ),
-                    ),
-                  ),
-                  // Lat / Long
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final useColumnLayout = constraints.maxWidth < 360;
+                        }
 
+                        return Row(
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            Expanded(
+                              child: LabeledField(
+                                label: 'خط الطول',
+                                required: true,
+                                child: RtlTextField(
+                                  controller: ctrl.longitudeController,
+                                  hintText: '36.xxxxxx',
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                  enabled: ctrl.isFieldEditable('longitude'),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: LabeledField(
+                                label: 'خط العرض',
+                                required: true,
+                                child: RtlTextField(
+                                  controller: ctrl.latitudeController,
+                                  hintText: '33.xxxxxx',
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                  enabled: ctrl.isFieldEditable('latitude'),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // ─── 2. Planning Location ─────────────────────────────────────
+              SectionCard(
+                title: 'موقع المحطة بالنسبة للتنظيم',
+                stepNumber: 2,
+                badgeText: 'اختيار واحد',
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final useColumnLayout = constraints.maxWidth < 360;
+                    return Obx(() {
                       if (useColumnLayout) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            LabeledField(
-                              label: 'خط العرض',
-                              required: true,
-                              child: RtlTextField(
-                                controller: ctrl.latitudeController,
-                                hintText: '33.xxxxxx',
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                      decimal: true,
-                                    ),
-                                enabled: ctrl.isFieldEditable('latitude'),
-                              ),
+                            ChoiceCard(
+                              title: 'خارج التنظيم',
+                              subtitle:
+                                  'يتطلب تحديد نوع الطريق والفئة المناسبة.',
+                              icon: Icons.location_city_outlined,
+                              selected:
+                                  ctrl.planningLocation.value == 'outside',
+                              enabled: ctrl.originalApplication == null,
+                              onTap: ctrl.originalApplication == null
+                                  ? () {
+                                      ctrl.planningLocation.value = 'outside';
+                                    }
+                                  : null,
                             ),
-                            SizedBox(height: 12.h),
-                            LabeledField(
-                              label: 'خط الطول',
-                              required: true,
-                              child: RtlTextField(
-                                controller: ctrl.longitudeController,
-                                hintText: '36.xxxxxx',
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                      decimal: true,
-                                    ),
-                                enabled: ctrl.isFieldEditable('longitude'),
-                              ),
+                            SizedBox(height: 10.h),
+                            ChoiceCard(
+                              title: 'داخل التنظيم',
+                              subtitle:
+                                  'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
+                              icon: Icons.home_outlined,
+                              selected: ctrl.planningLocation.value == 'inside',
+                              enabled: ctrl.originalApplication == null,
+                              onTap: ctrl.originalApplication == null
+                                  ? () {
+                                      ctrl.planningLocation.value = 'inside';
+                                    }
+                                  : null,
                             ),
                           ],
                         );
@@ -407,107 +515,23 @@ class Step3LocationScreen extends StatelessWidget {
                         textDirection: TextDirection.rtl,
                         children: [
                           Expanded(
-                            child: LabeledField(
-                              label: 'خط الطول',
-                              required: true,
-                              child: RtlTextField(
-                                controller: ctrl.longitudeController,
-                                hintText: '36.xxxxxx',
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                      decimal: true,
-                                    ),
-                                enabled: ctrl.isFieldEditable('longitude'),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          Expanded(
-                            child: LabeledField(
-                              label: 'خط العرض',
-                              required: true,
-                              child: RtlTextField(
-                                controller: ctrl.latitudeController,
-                                hintText: '33.xxxxxx',
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                      decimal: true,
-                                    ),
-                                enabled: ctrl.isFieldEditable('latitude'),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            // ─── 2. Planning Location ─────────────────────────────────────
-            SectionCard(
-              title: 'موقع المحطة بالنسبة للتنظيم',
-              stepNumber: 2,
-              badgeText: 'اختيار واحد',
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final useColumnLayout = constraints.maxWidth < 360;
-                  return Obx(() {
-                    if (useColumnLayout) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          ChoiceCard(
-                            title: 'خارج التنظيم',
-                            subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
-                            icon: Icons.location_city_outlined,
-                            selected: ctrl.planningLocation.value == 'outside',
-                            enabled: ctrl.originalApplication == null,
-                            onTap: ctrl.originalApplication == null
-                                ? () {
-                                    ctrl.planningLocation.value = 'outside';
-                                  }
-                                : null,
-                          ),
-                          SizedBox(height: 10.h),
-                            ChoiceCard(
-                              title: 'داخل التنظيم',
-                              subtitle:
-                                'الفئة ج للطرق المحلية ضمن حدود الوحدات الإدارية.',
-                              icon: Icons.home_outlined,
-                              selected: ctrl.planningLocation.value == 'inside',
-                              enabled: ctrl.originalApplication == null,
-                            onTap: ctrl.originalApplication == null
-                              ? () {
-                                  ctrl.planningLocation.value = 'inside';
-                                }
-                              : null,
-                            ),
-                        ],
-                      );
-                    }
-                    
-
-                    return Row(
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        Expanded(
                             child: ChoiceCard(
                               title: 'خارج التنظيم',
-                              subtitle: 'يتطلب تحديد نوع الطريق والفئة المناسبة.',
+                              subtitle:
+                                  'يتطلب تحديد نوع الطريق والفئة المناسبة.',
                               icon: Icons.location_city_outlined,
-                              selected: ctrl.planningLocation.value == 'outside',
+                              selected:
+                                  ctrl.planningLocation.value == 'outside',
                               enabled: ctrl.originalApplication == null,
                               onTap: ctrl.originalApplication == null
                                   ? () {
                                       ctrl.planningLocation.value = 'outside';
                                     }
                                   : null,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 10.w),
-                        Expanded(
+                          SizedBox(width: 10.w),
+                          Expanded(
                             child: ChoiceCard(
                               title: 'داخل التنظيم',
                               subtitle:
@@ -520,407 +544,489 @@ class Step3LocationScreen extends StatelessWidget {
                                       ctrl.planningLocation.value = 'inside';
                                     }
                                   : null,
+                            ),
+                          ),
+                        ],
+                      );
+                    });
+                  },
+                ),
+              ),
+
+              // ─── 3. Road Type & Category ──────────────────────────────────
+              SectionCard(
+                title: 'نوع الطريق والفئة',
+                stepNumber: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Planning badge
+                    Obx(() {
+                      final isInside = ctrl.planningLocation.value == 'inside';
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 4.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          isInside
+                              ? 'داخل التنظيم: تظهر الفئة ج فقط'
+                              : 'خارج التنظيم: تظهر الفئات أ، ب، ج',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 11.sp,
+                            color: AppColors.primary,
                           ),
                         ),
-                      ],
-                    );
-                  });
-                },
-              ),
-            ),
+                      );
+                    }),
+                    SizedBox(height: 14.h),
 
-            // ─── 3. Road Type & Category ──────────────────────────────────
-            SectionCard(
-              title: 'نوع الطريق والفئة',
-              stepNumber: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Planning badge
-                  Obx(() {
-                    final isInside = ctrl.planningLocation.value == 'inside';
-                    return Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      child: Text(
-                        isInside
-                            ? 'داخل التنظيم: تظهر الفئة ج فقط'
-                            : 'خارج التنظيم: تظهر الفئات أ، ب، ج',
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 11.sp,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    );
-                  }),
-                  SizedBox(height: 14.h),
-
-                  // Road type - only for outside planning
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final useColumnLayout = constraints.maxWidth < 360;
-                      return Obx(() {
-                        if (ctrl.planningLocation.value == 'inside') {
-                          return const SizedBox.shrink();
-                        }
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'نوع الطريق',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textDirection: TextDirection.rtl,
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              'اختيار نوع الطريق يحدد الفئات المتاحة تلقائياً.',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 11.sp,
-                                color: AppColors.textSecondary,
-                              ),
-                              textDirection: TextDirection.rtl,
-                            ),
-                            //
-                            SizedBox(height: 10.h),
-                            if (useColumnLayout)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  ChoiceCard(
-                                    title: 'طرق مركزية بين المحافظات',
-                                    subtitle: 'يسمح باختيار الفئة أ أو ب.',
-                                    icon: Icons.swap_horiz,
-                                    selected: ctrl.roadType.value == 'central',
-                                      enabled: (origAllowsCentral || ctrl.originalApplication == null),
-                                      onTap: (origAllowsCentral || ctrl.originalApplication == null)
-                                          ? () {
-                                              ctrl.roadType.value = 'central';
-                                            }
-                                          : null,
-                                  ),
-                                  SizedBox(height: 10.h),
-                                        ChoiceCard(
-                                              title: 'طرق دولية (M4 و M5)',
-                                              subtitle: 'يسمح باختيار الفئة أ فقط.',
-                                              icon: Icons.arrow_outward,
-                                              selected:
-                                                ctrl.roadType.value == 'international',
-                                              enabled: (origAllowsInternational || ctrl.originalApplication == null),
-                                              onTap: (origAllowsInternational || ctrl.originalApplication == null)
-                                                ? () {
-                                                    ctrl.roadType.value = 'international';
-                                                  }
-                                                : null,
-                                              ),
-                                ],
-                              )
-                            else
-                              Row(
+                    // Road type - only for outside planning
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final useColumnLayout = constraints.maxWidth < 360;
+                        return Obx(() {
+                          if (ctrl.planningLocation.value == 'inside') {
+                            return const SizedBox.shrink();
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'نوع الطريق',
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
                                 textDirection: TextDirection.rtl,
-                                children: [
-                                  Expanded(
-                                    child: ChoiceCard(
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                'اختيار نوع الطريق يحدد الفئات المتاحة تلقائياً.',
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 11.sp,
+                                  color: AppColors.textSecondary,
+                                ),
+                                textDirection: TextDirection.rtl,
+                              ),
+                              //
+                              SizedBox(height: 10.h),
+                              if (useColumnLayout)
+                                Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    ChoiceCard(
                                       title: 'طرق مركزية بين المحافظات',
                                       subtitle: 'يسمح باختيار الفئة أ أو ب.',
                                       icon: Icons.swap_horiz,
                                       selected:
                                           ctrl.roadType.value == 'central',
-                                      enabled: (origAllowsCentral || ctrl.originalApplication == null),
-                                      onTap: (origAllowsCentral || ctrl.originalApplication == null)
-                                      ? () => ctrl.roadType.value = 'central'
-                                      : null,
+                                      enabled:
+                                          (origAllowsCentral ||
+                                          ctrl.originalApplication == null),
+                                      onTap:
+                                          (origAllowsCentral ||
+                                              ctrl.originalApplication == null)
+                                          ? () {
+                                              ctrl.roadType.value = 'central';
+                                            }
+                                          : null,
                                     ),
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  Expanded(
-                                    child: ChoiceCard(
+                                    SizedBox(height: 10.h),
+                                    ChoiceCard(
                                       title: 'طرق دولية (M4 و M5)',
                                       subtitle: 'يسمح باختيار الفئة أ فقط.',
                                       icon: Icons.arrow_outward,
                                       selected:
                                           ctrl.roadType.value ==
                                           'international',
-                                      enabled: (origAllowsInternational || ctrl.originalApplication == null),
-                                      onTap: (origAllowsInternational || ctrl.originalApplication == null)
-                                      ? () => ctrl.roadType.value = 'international'
-                                      : null,
+                                      enabled:
+                                          (origAllowsInternational ||
+                                          ctrl.originalApplication == null),
+                                      onTap:
+                                          (origAllowsInternational ||
+                                              ctrl.originalApplication == null)
+                                          ? () {
+                                              ctrl.roadType.value =
+                                                  'international';
+                                            }
+                                          : null,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            SizedBox(height: 16.h),
-                          ],
-                        );
-                      });
-                    },
-                  ),
-
-                  // Category
-                  Text(
-                    'الفئة',
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w600,
+                                  ],
+                                )
+                              else
+                                Row(
+                                  textDirection: TextDirection.rtl,
+                                  children: [
+                                    Expanded(
+                                      child: ChoiceCard(
+                                        title: 'طرق مركزية بين المحافظات',
+                                        subtitle: 'يسمح باختيار الفئة أ أو ب.',
+                                        icon: Icons.swap_horiz,
+                                        selected:
+                                            ctrl.roadType.value == 'central',
+                                        enabled:
+                                            (origAllowsCentral ||
+                                            ctrl.originalApplication == null),
+                                        onTap:
+                                            (origAllowsCentral ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                            ? () => ctrl.roadType.value =
+                                                  'central'
+                                            : null,
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Expanded(
+                                      child: ChoiceCard(
+                                        title: 'طرق دولية (M4 و M5)',
+                                        subtitle: 'يسمح باختيار الفئة أ فقط.',
+                                        icon: Icons.arrow_outward,
+                                        selected:
+                                            ctrl.roadType.value ==
+                                            'international',
+                                        enabled:
+                                            (origAllowsInternational ||
+                                            ctrl.originalApplication == null),
+                                        onTap:
+                                            (origAllowsInternational ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                            ? () => ctrl.roadType.value =
+                                                  'international'
+                                            : null,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              SizedBox(height: 16.h),
+                            ],
+                          );
+                        });
+                      },
                     ),
-                    textDirection: TextDirection.rtl,
-                  ),
-                  SizedBox(height: 4.h),
-                  Obx(() {
-                    final isInside = ctrl.planningLocation.value == 'inside';
-                    final isInternational =
-                        ctrl.roadType.value == 'international';
-                    final subtitle = isInside
-                        ? 'داخل التنظيم يسمح بالفئة ج فقط.'
-                        : isInternational
-                        ? 'خارج التنظيم مع طرق دولية (M4 و M5) يسمح بالفئة أ فقط.'
-                        : 'خارج التنظيم مع طرق مركزية بين المحافظات يسمح بالفئة أ أو ب.';
-                    return Text(
-                      subtitle,
+
+                    // Category
+                    Text(
+                      'الفئة',
                       style: TextStyle(
                         fontFamily: 'Cairo',
-                        fontSize: 11.sp,
-                        color: AppColors.textSecondary,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
                       ),
                       textDirection: TextDirection.rtl,
-                    );
-                  }),
-                  SizedBox(height: 10.h),
+                    ),
+                    SizedBox(height: 4.h),
+                    Obx(() {
+                      final isInside = ctrl.planningLocation.value == 'inside';
+                      final isInternational =
+                          ctrl.roadType.value == 'international';
+                      final subtitle = isInside
+                          ? 'داخل التنظيم يسمح بالفئة ج فقط.'
+                          : isInternational
+                          ? 'خارج التنظيم مع طرق دولية (M4 و M5) يسمح بالفئة أ فقط.'
+                          : 'خارج التنظيم مع طرق مركزية بين المحافظات يسمح بالفئة أ أو ب.';
+                      return Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 11.sp,
+                          color: isDark
+                              ? AppColors.background
+                              : AppColors.textPrimary,
+                        ),
+                        textDirection: TextDirection.rtl,
+                      );
+                    }),
+                    SizedBox(height: 10.h),
 
-                  // Category buttons
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final useColumnLayout = constraints.maxWidth < 360;
-                      return Obx(() {
-                        final isInside =
-                            ctrl.planningLocation.value == 'inside';
-                        final isInternational =
-                            ctrl.roadType.value == 'international';
-                        final isCentral = ctrl.roadType.value == 'central';
+                    // Category buttons
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final useColumnLayout = constraints.maxWidth < 360;
+                        return Obx(() {
+                          final isInside =
+                              ctrl.planningLocation.value == 'inside';
+                          final isInternational =
+                              ctrl.roadType.value == 'international';
+                          final isCentral = ctrl.roadType.value == 'central';
 
-                        final canA =
-                          !isInside && (isInternational || isCentral);
-                        final canB = !isInside && isCentral;
-                        final canC = isInside;
+                          final canA =
+                              !isInside && (isInternational || isCentral);
+                          final canB = !isInside && isCentral;
+                          final canC = isInside;
 
-                        // Restrict available categories based on server response
-                        final origCat = ctrl.originalApplication?.stationCategory
-                            ?.toString()
-                            .trim() ??
-                          '';
-                        final origAllowsA = origCat.isEmpty ||
-                          origCat == 'A' ||
-                          origCat.contains('أ') ||
-                          origCat.toUpperCase() == 'A';
-                        final origAllowsB = origCat.isEmpty ||
-                          origCat == 'B' ||
-                          origCat.contains('ب') ||
-                          origCat.toUpperCase() == 'B';
-                        final origAllowsC = origCat.isEmpty ||
-                          origCat == 'C' ||
-                          origCat.contains('ج') ||
-                          origCat.toUpperCase() == 'C';
+                          // Restrict available categories based on server response
+                          final origCat =
+                              ctrl.originalApplication?.stationCategory
+                                  ?.toString()
+                                  .trim() ??
+                              '';
+                          final origAllowsA =
+                              origCat.isEmpty ||
+                              origCat == 'A' ||
+                              origCat.contains('أ') ||
+                              origCat.toUpperCase() == 'A';
+                          final origAllowsB =
+                              origCat.isEmpty ||
+                              origCat == 'B' ||
+                              origCat.contains('ب') ||
+                              origCat.toUpperCase() == 'B';
+                          final origAllowsC =
+                              origCat.isEmpty ||
+                              origCat == 'C' ||
+                              origCat.contains('ج') ||
+                              origCat.toUpperCase() == 'C';
 
-                        // Auto-select restricted category (skip during correction)
-                        if (!ctrl.isCorrectionMode.value) {
-                          if (isInside && ctrl.stationCategory.value != 'C') {
-                            ctrl.stationCategory.value = 'C';
-                          } else if (isInternational &&
-                              ctrl.stationCategory.value != 'A') {
-                            ctrl.stationCategory.value = 'A';
-                          } else if (isCentral &&
-                              !(ctrl.stationCategory.value == 'A' ||
-                                  ctrl.stationCategory.value == 'B')) {
-                            ctrl.stationCategory.value = 'A';
+                          // Auto-select restricted category (skip during correction)
+                          if (!ctrl.isCorrectionMode.value) {
+                            if (isInside && ctrl.stationCategory.value != 'C') {
+                              ctrl.stationCategory.value = 'C';
+                            } else if (isInternational &&
+                                ctrl.stationCategory.value != 'A') {
+                              ctrl.stationCategory.value = 'A';
+                            } else if (isCentral &&
+                                !(ctrl.stationCategory.value == 'A' ||
+                                    ctrl.stationCategory.value == 'B')) {
+                              ctrl.stationCategory.value = 'A';
+                            }
                           }
-                        }
 
-                        if (useColumnLayout) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                          if (useColumnLayout) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (canC)
+                                  _CategoryCard(
+                                    label: 'الفئة ج',
+                                    arabicLetter: 'ج',
+                                    description:
+                                        'الطرق المحلية ضمن حدود الوحدات الإدارية.',
+                                    selected: ctrl.stationCategory.value == 'C',
+                                    enabled:
+                                        canC &&
+                                        (origAllowsC ||
+                                            ctrl.originalApplication == null),
+                                    onTap:
+                                        canC &&
+                                            (origAllowsC ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                        ? () {
+                                            ctrl.stationCategory.value = 'C';
+                                          }
+                                        : null,
+                                  ),
+                                if (canC) SizedBox(height: 10.h),
+                                if (canB)
+                                  _CategoryCard(
+                                    label: 'الفئة ب',
+                                    arabicLetter: 'ب',
+                                    description:
+                                        'الطرق المركزية بين المحافظات.',
+                                    selected: ctrl.stationCategory.value == 'B',
+                                    enabled:
+                                        canB &&
+                                        (origAllowsB ||
+                                            ctrl.originalApplication == null),
+                                    onTap:
+                                        canB &&
+                                            (origAllowsB ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                        ? () {
+                                            ctrl.stationCategory.value = 'B';
+                                          }
+                                        : null,
+                                  ),
+                                if (canB) SizedBox(height: 10.h),
+                                if (canA)
+                                  _CategoryCard(
+                                    label: 'الفئة أ',
+                                    arabicLetter: 'أ',
+                                    description:
+                                        'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
+                                    selected: ctrl.stationCategory.value == 'A',
+                                    enabled:
+                                        canA &&
+                                        (origAllowsA ||
+                                            ctrl.originalApplication == null),
+                                    onTap:
+                                        canA &&
+                                            (origAllowsA ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                        ? () {
+                                            ctrl.stationCategory.value = 'A';
+                                          }
+                                        : null,
+                                  ),
+                              ],
+                            );
+                          }
+                          return Row(
+                            textDirection: TextDirection.rtl,
                             children: [
                               if (canC)
-                                _CategoryCard(
-                                  label: 'الفئة ج',
-                                  arabicLetter: 'ج',
-                                  description:
-                                      'الطرق المحلية ضمن حدود الوحدات الإدارية.',
-                                  selected: ctrl.stationCategory.value == 'C',
-                                  enabled: canC && (origAllowsC || ctrl.originalApplication == null),
-                                  onTap: canC && (origAllowsC || ctrl.originalApplication == null)
-                                      ? () {
-                                          ctrl.stationCategory.value = 'C';
-                                        }
-                                      : null,
+                                Expanded(
+                                  child: _CategoryCard(
+                                    label: 'الفئة ج',
+                                    arabicLetter: 'ج',
+                                    description:
+                                        'الطرق المحلية ضمن حدود الوحدات الإدارية.',
+                                    selected: ctrl.stationCategory.value == 'C',
+                                    enabled:
+                                        canC &&
+                                        (origAllowsC ||
+                                            ctrl.originalApplication == null),
+                                    onTap:
+                                        canC &&
+                                            (origAllowsC ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                        ? () {
+                                            ctrl.stationCategory.value = 'C';
+                                          }
+                                        : null,
+                                  ),
                                 ),
-                              if (canC) SizedBox(height: 10.h),
+                              if (canC) SizedBox(width: 8.w),
                               if (canB)
-                                _CategoryCard(
-                                  label: 'الفئة ب',
-                                  arabicLetter: 'ب',
-                                  description: 'الطرق المركزية بين المحافظات.',
-                                  selected: ctrl.stationCategory.value == 'B',
-                                  enabled: canB && (origAllowsB || ctrl.originalApplication == null),
-                                  onTap: canB && (origAllowsB || ctrl.originalApplication == null)
-                                      ? () {
-                                          ctrl.stationCategory.value = 'B';
-                                        }
-                                      : null,
+                                Expanded(
+                                  child: _CategoryCard(
+                                    label: 'الفئة ب',
+                                    arabicLetter: 'ب',
+                                    description:
+                                        'الطرق المركزية بين المحافظات.',
+                                    selected: ctrl.stationCategory.value == 'B',
+                                    enabled:
+                                        canB &&
+                                        (origAllowsB ||
+                                            ctrl.originalApplication == null),
+                                    onTap:
+                                        canB &&
+                                            (origAllowsB ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                        ? () {
+                                            ctrl.stationCategory.value = 'B';
+                                          }
+                                        : null,
+                                  ),
                                 ),
-                              if (canB) SizedBox(height: 10.h),
+                              if (canB) SizedBox(width: 8.w),
                               if (canA)
-                                _CategoryCard(
-                                  label: 'الفئة أ',
-                                  arabicLetter: 'أ',
-                                  description:
-                                      'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
-                                  selected: ctrl.stationCategory.value == 'A',
-                                  enabled: canA && (origAllowsA || ctrl.originalApplication == null),
-                                  onTap: canA && (origAllowsA || ctrl.originalApplication == null)
-                                      ? () {
-                                          ctrl.stationCategory.value = 'A';
-                                        }
-                                      : null,
+                                Expanded(
+                                  child: _CategoryCard(
+                                    label: 'الفئة أ',
+                                    arabicLetter: 'أ',
+                                    description:
+                                        'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
+                                    selected: ctrl.stationCategory.value == 'A',
+                                    enabled:
+                                        canA &&
+                                        (origAllowsA ||
+                                            ctrl.originalApplication == null),
+                                    onTap:
+                                        canA &&
+                                            (origAllowsA ||
+                                                ctrl.originalApplication ==
+                                                    null)
+                                        ? () {
+                                            ctrl.stationCategory.value = 'A';
+                                          }
+                                        : null,
+                                  ),
                                 ),
                             ],
                           );
-                        }
-                        return Row(
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            if (canC)
-                              Expanded(
-                                child: _CategoryCard(
-                                  label: 'الفئة ج',
-                                  arabicLetter: 'ج',
-                                  description:
-                                      'الطرق المحلية ضمن حدود الوحدات الإدارية.',
-                                  selected: ctrl.stationCategory.value == 'C',
-                                  enabled: canC && (origAllowsC || ctrl.originalApplication == null),
-                                  onTap: canC && (origAllowsC || ctrl.originalApplication == null)
-                                      ? () {
-                                          ctrl.stationCategory.value = 'C';
-                                        }
-                                      : null,
-                                ),
-                              ),
-                            if (canC) SizedBox(width: 8.w),
-                            if (canB)
-                              Expanded(
-                                child: _CategoryCard(
-                                  label: 'الفئة ب',
-                                  arabicLetter: 'ب',
-                                  description: 'الطرق المركزية بين المحافظات.',
-                                  selected: ctrl.stationCategory.value == 'B',
-                                  enabled: canB && (origAllowsB || ctrl.originalApplication == null),
-                                  onTap: canB && (origAllowsB || ctrl.originalApplication == null)
-                                      ? () {
-                                          ctrl.stationCategory.value = 'B';
-                                        }
-                                      : null,
-                                ),
-                              ),
-                            if (canB) SizedBox(width: 8.w),
-                            if (canA)
-                              Expanded(
-                                child: _CategoryCard(
-                                  label: 'الفئة أ',
-                                  arabicLetter: 'أ',
-                                  description:
-                                      'الطرق الدولية أو المسارات الأعلى تصنيفاً.',
-                                  selected: ctrl.stationCategory.value == 'A',
-                                  enabled: canA && (origAllowsA || ctrl.originalApplication == null),
-                                  onTap: canA && (origAllowsA || ctrl.originalApplication == null)
-                                      ? () {
-                                          ctrl.stationCategory.value = 'A';
-                                        }
-                                      : null,
-                                ),
-                              ),
-                          ],
-                        );
-                      });
-                    },
-                  ),
+                        });
+                      },
+                    ),
 
-                  // Available badge
-                  Obx(() {
-                    final isInside = ctrl.planningLocation.value == 'inside';
-                    final isInternational =
-                        ctrl.roadType.value == 'international';
-                    final available = isInside
-                        ? 'المتاح: ج'
-                        : isInternational
-                        ? 'المتاح: أ'
-                        : 'المتاح: أ، ب';
-                    return Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 10),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 4.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.backgroundAlt,
-                          borderRadius: BorderRadius.circular(20.r),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Text(
-                          available,
-                          style: TextStyle(
-                            fontFamily: 'Cairo',
-                            fontSize: 11.sp,
-                            color: AppColors.textSecondary,
+                    // Available badge
+                    Obx(() {
+                      final isInside = ctrl.planningLocation.value == 'inside';
+                      final isInternational =
+                          ctrl.roadType.value == 'international';
+                      final available = isInside
+                          ? 'المتاح: ج'
+                          : isInternational
+                          ? 'المتاح: أ'
+                          : 'المتاح: أ، ب';
+                      return Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.forest1.withAlpha(200)
+                                : AppColors.backgroundAlt,
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.forest1
+                                  : AppColors.border,
+                            ),
+                          ),
+                          child: Text(
+                            available,
+                            style: TextStyle(
+                              fontFamily: 'Cairo',
+                              fontSize: 11.sp,
+                              color: isDark
+                                  ? AppColors.textHint
+                                  : AppColors.textSecondary,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-                ],
+                      );
+                    }),
+                  ],
+                ),
               ),
-            ),
 
-            // Error
-            Obx(() => ErrorBanner(message: ctrl.errorMessage.value)),
+              // Error
+              Obx(() => ErrorBanner(message: ctrl.errorMessage.value)),
 
-            // Navigation
-            Obx(
-              () => NavigationButtons(
-                onNext: ctrl.submitStep3,
-                onPrev: ctrl.goToPreviousStep,
-                isLoading: ctrl.isLoading.value,
+              // Navigation
+              Obx(
+                () => NavigationButtons(
+                  onNext: ctrl.submitStep3,
+                  onPrev: ctrl.goToPreviousStep,
+                  isLoading: ctrl.isLoading.value,
+                ),
               ),
-            ),
 
-            SizedBox(height: 16.h),
-            Text(
-              'وزارة الطاقة © 2026',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 11.sp,
-                color: AppColors.textHint,
+              SizedBox(height: 16.h),
+              Text(
+                'وزارة الطاقة © 2026',
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 11.sp,
+                  color: AppColors.textHint,
+                ),
               ),
-            ),
-            SizedBox(height: 16.h),
-          ],
-        ),
-      );
-    }),
-  );
-}
+              SizedBox(height: 16.h),
+            ],
+          ),
+        );
+      }),
+    );
+  }
 
   String _locationStatusText(String status) {
     switch (status) {
@@ -1290,91 +1396,316 @@ class _CategoryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    final Color bgColor = selected
+        ? (isDark
+              ? AppColors.primary.withOpacity(0.18)
+              : AppColors.primary.withOpacity(0.08))
+        : enabled
+        ? (isDark ? AppColors.darkSurfaceVariant : Colors.white)
+        : (isDark
+              ? AppColors.darkSurface.withOpacity(0.5)
+              : AppColors.backgroundAlt);
+
+    final Color borderColor = selected
+        ? AppColors.primary
+        : enabled
+        ? (isDark ? AppColors.darkBorder.withOpacity(0.5) : AppColors.border)
+        : (isDark
+              ? AppColors.darkBorder.withOpacity(0.25)
+              : AppColors.borderLight);
+
+    final Color titleColor = selected
+        ? AppColors.primary
+        : enabled
+        ? (isDark ? AppColors.darkText : AppColors.textPrimary)
+        : (isDark ? AppColors.darkTextHint : AppColors.textHint);
+
+    final Color descColor = selected
+        ? isDark
+              ? AppColors.textHint
+              : AppColors.primary.withOpacity(0.85)
+        : enabled
+        ? (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)
+        : (isDark ? AppColors.darkTextHint : AppColors.textHint);
+
     return IgnorePointer(
       ignoring: !enabled,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: enabled ? onTap : null,
         child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: selected
-              ? (isDark
-                    ? AppColors.selectedCardDark1
-                    : AppColors.selectedCardLight)
-              : enabled
-              ? AppColors.surface
-              : AppColors.backgroundAlt,
-          borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(
-            color: selected
-                ? AppColors.primary
-                : enabled
-                ? AppColors.border
-                : AppColors.borderLight,
-            width: selected ? 1.5 : 1,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(14.r),
+            border: Border.all(color: borderColor, width: selected ? 1.6 : 1),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.18),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
           ),
-        ),
-        child: Column(
-          children: [
-            Radio<bool>(
-              value: true,
-              groupValue: selected,
-              onChanged: enabled ? (_) => onTap?.call() : null,
-              activeColor: AppColors.primary,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            Container(
-              width: 32.w,
-              height: 32.h,
-              decoration: BoxDecoration(
-                color: selected
-                    ? AppColors.primary
-                    : enabled
-                    ? AppColors.backgroundAlt
-                    : AppColors.borderLight,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  arabicLetter,
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: selected ? Colors.white : AppColors.textHint,
+          child: Row(
+            textDirection: TextDirection.rtl,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // دائرة الحرف
+              Container(
+                width: 44.w,
+                height: 44.h,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: selected
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.primary,
+                            AppColors.primary.withOpacity(0.75),
+                          ],
+                        )
+                      : null,
+                  color: selected
+                      ? null
+                      : enabled
+                      ? (isDark
+                            ? AppColors.darkSurfaceAlt
+                            : AppColors.backgroundAlt)
+                      : (isDark
+                            ? AppColors.darkBorder.withOpacity(0.3)
+                            : AppColors.borderLight),
+                ),
+                child: Center(
+                  child: Text(
+                    arabicLetter,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: selected
+                          ? Colors.white
+                          : enabled
+                          ? (isDark ? AppColors.darkText : AppColors.primary)
+                          : AppColors.textHint,
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 12.sp,
-                fontWeight: FontWeight.bold,
-                color: selected
-                    ? AppColors.primary
-                    : enabled
-                    ? AppColors.textPrimary
-                    : AppColors.textHint,
+              SizedBox(width: 12.w),
+
+              // النص (العنوان + الوصف)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: titleColor,
+                      ),
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 3.h),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 10.sp,
+                        color: descColor,
+                        height: 1.3,
+                      ),
+                      textAlign: TextAlign.right,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Text(
-              description,
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 9.sp,
-                color: AppColors.textSecondary,
+              SizedBox(width: 8.w),
+
+              // شارة الاختيار
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: selected
+                    ? Container(
+                        key: const ValueKey('selected'),
+                        width: 22.w,
+                        height: 22.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.4),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.check,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Container(
+                        key: const ValueKey('unselected'),
+                        width: 22.w,
+                        height: 22.w,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: borderColor, width: 1.4),
+                        ),
+                      ),
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
-      ),)
+      ),
     );
   }
 }
+// class _CategoryCard extends StatelessWidget {
+//   final String label;
+//   final String arabicLetter;
+//   final String description;
+//   final bool selected;
+//   final bool enabled;
+//   final VoidCallback? onTap;
+
+//   const _CategoryCard({
+//     required this.label,
+//     required this.arabicLetter,
+//     required this.description,
+//     required this.selected,
+//     required this.enabled,
+//     required this.onTap,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
+//     final isDark = theme.brightness == Brightness.dark;
+
+//     return IgnorePointer(
+//       ignoring: !enabled,
+//       child: GestureDetector(
+//         onTap: enabled ? onTap : null,
+//         child: AnimatedContainer(
+//           duration: const Duration(milliseconds: 200),
+//           padding: const EdgeInsets.all(10),
+//           decoration: BoxDecoration(
+//             color: selected
+//                 ? (isDark
+//                       ? AppColors.selectedCardDark1
+//                       : AppColors.selectedCardLight)
+//                 : enabled
+//                 ? AppColors.primary.withOpacity(0.05)
+//                 : AppColors.backgroundAlt,
+//             borderRadius: BorderRadius.circular(10.r),
+//             border: Border.all(
+//               color: selected
+//                   ? isDark
+//                         ? AppColors.background
+//                         : AppColors.primary
+//                   : enabled
+//                   ? isDark
+//                         ? AppColors.primary
+//                         : AppColors.backgroundAlt
+//                   : isDark
+//                   ? AppColors.borderLight
+//                   : AppColors.borderDark,
+//               width: selected ? 1.5 : 1,
+//             ),
+//           ),
+//           child: Column(
+//             children: [
+//               Radio<bool>(
+//                 value: true,
+//                 groupValue: selected,
+//                 onChanged: enabled ? (_) => onTap?.call() : null,
+//                 activeColor: AppColors.primary,
+//                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+//               ),
+//               Container(
+//                 width: 32.w,
+//                 height: 32.h,
+//                 decoration: BoxDecoration(
+//                   color: selected
+//                       ? AppColors.primary
+//                       : enabled
+//                       ? AppColors.backgroundAlt
+//                       : AppColors.borderLight,
+//                   shape: BoxShape.circle,
+//                 ),
+//                 child: Center(
+//                   child: Text(
+//                     arabicLetter,
+//                     style: TextStyle(
+//                       fontFamily: 'Cairo',
+//                       fontSize: 14.sp,
+//                       fontWeight: FontWeight.bold,
+//                       color: selected ? Colors.white : AppColors.textHint,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               SizedBox(height: 6.h),
+//               Text(
+//                 label,
+//                 style: TextStyle(
+//                   fontFamily: 'Cairo',
+//                   fontSize: 12.sp,
+//                   fontWeight: FontWeight.bold,
+//                   color: selected
+//                       ? isDark
+//                             ? AppColors.backgroundAlt
+//                             : AppColors.primary
+//                       : enabled
+//                       ? isDark
+//                             ? AppColors.backgroundAlt
+//                             : AppColors.primary
+//                       : isDark
+//                       ? AppColors.backgroundAlt
+//                       : AppColors.primary,
+//                 ),
+//               ),
+//               Text(
+//                 description,
+//                 style: TextStyle(
+//                   fontFamily: 'Cairo',
+//                   fontSize: 9.sp,
+//                   color: selected
+//                       ? isDark
+//                             ? AppColors.backgroundAlt
+//                             : AppColors.primary
+//                       : enabled
+//                       ? isDark
+//                             ? AppColors.backgroundAlt
+//                             : AppColors.primary
+//                       : isDark
+//                       ? AppColors.backgroundAlt
+//                       : AppColors.primary,
+//                 ),
+//                 textAlign: TextAlign.center,
+//                 maxLines: 2,
+//                 overflow: TextOverflow.ellipsis,
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

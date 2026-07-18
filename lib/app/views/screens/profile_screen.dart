@@ -16,22 +16,28 @@ class ProfileScreen extends StatelessWidget {
     authCtrl.loadProfile();
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
+    final primaryGradientEnd = primaryColor.withOpacity(
+      theme.brightness == Brightness.dark ? 0.95 : 0.8,
+    );
     final surface = theme.colorScheme.surface;
     final borderColor = theme.dividerColor;
-
+    final isDark = Get.isDarkMode;
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/splash_background.png'),
+          image: AssetImage('assets/images/background.png'),
           fit: BoxFit.cover,
         ),
       ),
       child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(180),
 
         // appBar: AppBar(title: Text("الملف الشخصي ",)),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(10.w),
           child: Directionality(
             textDirection:
                 TextDirection.ltr, // Force LTR for layout consistency
@@ -41,10 +47,18 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 SizedBox(height: 8.h),
                 Container(
-                  padding: EdgeInsets.all(20.w),
+                  padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/background.png'),
+                      opacity: 0.1,
+                      fit: BoxFit.cover,
+                    ),
+                    // color: Theme.of(
+                    //   context,
+                    // ).scaffoldBackgroundColor.withAlpha(125),
                     gradient: LinearGradient(
-                      colors: [primaryColor, primaryColor.withOpacity(0.8)],
+                      colors: [AppColors.forest1, AppColors.forest1],
                       begin: Alignment.topRight,
                       end: Alignment.bottomLeft,
                     ),
@@ -65,7 +79,7 @@ class ProfileScreen extends StatelessWidget {
                                 fontFamily: 'Cairo',
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: onPrimary,
                               ),
                             ),
                             SizedBox(height: 6.h),
@@ -77,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
                                 fontFamily: 'Cairo',
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: onPrimary,
                               ),
                             ),
                             SizedBox(height: 4.h),
@@ -88,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 12.sp,
-                                color: Colors.white.withOpacity(0.9),
+                                color: onPrimary.withOpacity(0.9),
                               ),
                             ),
                           ],
@@ -191,13 +205,13 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _ActionTile(
-                          icon: Icons.settings_outlined,
-                          title: 'الإعدادات',
-                          subtitle: 'تغيير اللغة والمظهر',
-                          onTap: () => Get.toNamed(AppRoutes.settings),
-                        ),
-                        Divider(height: 1.h, color: borderColor),
+                        // _ActionTile(
+                        //   icon: Icons.settings_outlined,
+                        //   title: 'الإعدادات',
+                        //   subtitle: 'تغيير اللغة والمظهر',
+                        //   onTap: () => Get.toNamed(AppRoutes.settings),
+                        // ),
+                        // Divider(height: 1.h, color: borderColor),
                         _ActionTile(
                           icon: Icons.lock_outline,
                           title: 'الأمان',
@@ -346,7 +360,10 @@ class _ActionTile extends StatelessWidget {
       color: Colors.transparent,
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: danger ? AppColors.error : AppColors.primary),
+        leading: Icon(
+          icon,
+          color: danger ? AppColors.error : AppColors.primary,
+        ),
         title: Text(
           title,
           style: TextStyle(

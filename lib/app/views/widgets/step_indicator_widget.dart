@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constant/app_colors.dart';
-import '../../theme/app_theme.dart';
 
 class StepIndicatorWidget extends StatelessWidget {
   final int currentStep; // 0-based
   final int totalSteps;
+  final ValueChanged<int>? onStepTapped;
+  final ValueChanged<int>? onBlockedStepTap;
 
   const StepIndicatorWidget({
     super.key,
     required this.currentStep,
     this.totalSteps = 4,
+    this.onStepTapped,
+    this.onBlockedStepTap,
   });
 
   static const _steps = [
@@ -99,12 +101,32 @@ class StepIndicatorWidget extends StatelessWidget {
   Widget _buildStep(int stepIndex) {
     final isDone = stepIndex < currentStep;
     final isActive = stepIndex == currentStep;
+    final isEnabled = stepIndex <= currentStep;
 
     Color bgColor;
     Color textColor;
     Widget leadingIcon;
 
-    if (isDone) {
+    if (!isEnabled) {
+      bgColor = AppColors.surface.withOpacity(0.55);
+      textColor = AppColors.textHint;
+      leadingIcon = Container(
+        width: 28.w,
+        height: 28.h,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.borderLight, width: 2.w),
+        ),
+        child: Center(
+          child: Icon(
+            _steps[stepIndex].icon,
+            color: AppColors.textHint,
+            size: 14.sp,
+          ),
+        ),
+      );
+    } else if (isDone) {
       bgColor = AppColors.surface;
       textColor = AppColors.textSecondary;
       leadingIcon = Container(
@@ -160,56 +182,69 @@ class StepIndicatorWidget extends StatelessWidget {
       );
     }
 
-    return Container(
-      constraints: const BoxConstraints(minWidth: 90),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border(
-          bottom: BorderSide(
-            color: isActive ? AppColors.primary : Colors.transparent,
-            width: 3.w,
+    return GestureDetector(
+      onTap: () {
+        if (isEnabled) {
+          onStepTapped?.call(stepIndex);
+        } else {
+          onBlockedStepTap?.call(stepIndex);
+        }
+      },
+      child: Opacity(
+        opacity: isEnabled ? 1 : 0.6,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 90),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color: bgColor,
+            border: Border(
+              bottom: BorderSide(
+                color: isActive ? AppColors.primary : Colors.transparent,
+                width: 3.w,
+              ),
+              right: BorderSide(color: AppColors.borderLight, width: 0.5),
+            ),
           ),
-          right: BorderSide(color: AppColors.borderLight, width: 0.5),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          leadingIcon,
-          SizedBox(width: 8.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                _steps[stepIndex].title,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
-                  fontFamily: 'Cairo',
-                ),
-                textDirection: TextDirection.rtl,
-              ),
-              Text(
-                _steps[stepIndex].subtitle,
-                style: TextStyle(
-                  fontSize: 9.sp,
-                  color: isActive
-                      ? Colors.white70
-                      : isDone
-                      ? AppColors.textHint
-                      : AppColors.textHint,
-                  fontFamily: 'Cairo',
-                ),
-                textDirection: TextDirection.rtl,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              leadingIcon,
+              SizedBox(width: 8.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _steps[stepIndex].title,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                      fontFamily: 'Cairo',
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
+
+                  Text(
+                    _steps[stepIndex].subtitle,
+                    style: TextStyle(
+                      fontSize: 9.sp,
+                      color: isActive
+                          ? Colors.white70
+                          : isDone
+                          ? AppColors.textHint
+                          : AppColors.textHint,
+                      fontFamily: 'Cairo',
+                    ),
+                    textDirection: TextDirection.rtl,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

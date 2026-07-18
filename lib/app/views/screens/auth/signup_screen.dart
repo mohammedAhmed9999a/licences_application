@@ -93,16 +93,18 @@ class _SignupScreenState extends State<SignupScreen> {
         ? theme.colorScheme.outline.withOpacity(0.35)
         : theme.dividerColor;
     final primaryColor = theme.colorScheme.primary;
-
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/splash_background.png'),
+          image: AssetImage('assets/images/background.png'),
           fit: BoxFit.cover,
         ),
       ),
       child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
         body: SafeArea(
           child: SingleChildScrollView(
             controller: _scrollController,
@@ -157,10 +159,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 // Form Card
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: cardColor,
+                      color: cardColor.withAlpha(140),
                       borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: borderColor),
                       boxShadow: [
@@ -181,6 +183,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
+                            textDirection: TextDirection.ltr,
                             children: [
                               Text(
                                 'بيانات الحساب',

@@ -2,6 +2,8 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'dart:ui' as ui;
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../theme/app_theme.dart';
 import '../../controllers/dashboard_controller.dart';
@@ -249,11 +251,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(
-                  icon,
-                  color: iconColor,
-                  size: 24.sp,
-                ),
+                Icon(icon, color: iconColor, size: 24.sp),
                 if (index == 1)
                   Obx(() {
                     final notifCtrl = Get.find<NotificationsController>();
@@ -299,14 +297,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final onPrimaryColor = theme.colorScheme.onPrimary;
     final surface = context.themeSurface;
     final borderColor = context.themeBorder;
-
+    final isDark = Get.find<SettingsController>().isDark;
     return Stack(
       children: [
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/splash_background.png'),
+                image: AssetImage('assets/images/background.png'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -318,11 +316,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               gradient: LinearGradient(
                 begin: Alignment.center,
                 end: Alignment.bottomCenter,
-                colors: [
-                  surface,
-                  surface.withOpacity(0.58),
-                  surface.withOpacity(0.28),
-                ],
+                colors: isDark
+                    ? [
+                        surface,
+                        surface.withOpacity(0.88),
+                        surface.withOpacity(0.88),
+                      ]
+                    : [
+                        surface,
+                        surface.withOpacity(0.58),
+                        surface.withOpacity(0.28),
+                      ],
               ),
             ),
           ),
@@ -395,7 +399,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   if (dashCtrl.errorMessage.isNotEmpty) {
                     return ListView(
-                      physics: const ClampingScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       children: [
                         Padding(
@@ -417,7 +421,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   }
 
                   return ListView(
-                    physics: const ClampingScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
                     children: [
                       Padding(
@@ -521,7 +525,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          textDirection: TextDirection.rtl,
+          textDirection: ui.TextDirection.rtl,
           children: [
             Text(
               'إحصائيات الطلبات',
@@ -546,6 +550,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               itemBuilder: (context, index) {
                 final stat = stats[index];
                 final isSelected = selectedStatus == stat.statusKey;
+                final isDark = Get.find<SettingsController>().isDark;
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -563,6 +568,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ? stat.color.withOpacity(0.2)
                           : stat.color.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12.r),
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/background.png'),
+                        fit: BoxFit.cover,
+                        opacity: isDark ? 0.08 : 0.6,
+                      ),
                       border: Border.all(
                         color: isSelected ? stat.color : Colors.transparent,
                         width: 1.2,
@@ -980,7 +990,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(width: 6.w),
                       Expanded(
                         child: Text(
-                          app.createdAt,
+                          DateFormat(
+                            'dd/MM/yyyy - hh:mm a',
+                            'ar',
+                          ).format(DateTime.parse(app.createdAt)),
+                          // app.createdAt,
                           style: TextStyle(
                             fontFamily: 'Cairo',
                             fontSize: 11.sp,

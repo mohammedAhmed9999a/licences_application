@@ -24,6 +24,11 @@ class ApplicationSuccessScreen extends StatelessWidget {
     final ctrl = Get.find<LicenseApplicationController>();
 
     Future<void> exportApplicationPdf() async {
+      final now = DateTime.now();
+      final submissionDateLabel = DateFormat(
+        'dd/MM/yyyy - hh:mm a',
+        'ar',
+      ).format(now);
       final applicationNumber = ctrl.submittedApplicationNumber.value.isNotEmpty
           ? ctrl.submittedApplicationNumber.value
           : 'غير محدد';
@@ -86,96 +91,85 @@ class ApplicationSuccessScreen extends StatelessWidget {
       final logoData = await rootBundle.load('assets/images/h-logo.webp');
 
       final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
-      pw.Widget buildLabelValue(String label, String value) {
-        return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
+      pw.TableRow buildFourColumnRow(
+        String label1,
+        String value1,
+        String label2,
+        String value2, {
+        bool alternate = false,
+      }) {
+        return pw.TableRow(
           children: [
-            pw.Text(
-              label,
-              textAlign: pw.TextAlign.right,
-              style: pw.TextStyle(
-                fontSize: 9.5,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.green800,
+            pw.Container(
+              height: 20.h,
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 1,
+                horizontal: 4,
+              ),
+              alignment: pw.Alignment.centerRight,
+              decoration: pw.BoxDecoration(color: PdfColors.white),
+              child: pw.Text(
+                value2.isEmpty ? '-' : value2,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(fontSize: 10),
               ),
             ),
-            pw.SizedBox(height: 4),
-            pw.Text(
-              value.isEmpty ? '-' : value,
-              textAlign: pw.TextAlign.right,
-              style: pw.TextStyle(fontSize: 10),
+            pw.Container(
+              height: 20.h,
+
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 4,
+              ),
+              alignment: pw.Alignment.centerRight,
+              decoration: pw.BoxDecoration(color: PdfColors.grey100),
+              child: pw.Text(
+                label2,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(
+                  fontSize: 10,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.green800,
+                ),
+              ),
+            ),
+            pw.Container(
+              height: 20.h,
+
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 4,
+              ),
+              alignment: pw.Alignment.centerRight,
+              decoration: pw.BoxDecoration(color: PdfColors.white),
+              child: pw.Text(
+                value1.isEmpty ? '-' : value1,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(fontSize: 10),
+              ),
+            ),
+            pw.Container(
+              height: 20.h,
+
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 4,
+              ),
+              alignment: pw.Alignment.centerRight,
+              decoration: pw.BoxDecoration(color: PdfColors.grey100),
+              child: pw.Text(
+                label1,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(
+                  fontSize: 10,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.green800,
+                ),
+              ),
             ),
           ],
         );
       }
-pw.TableRow buildFourColumnRow(
-  String label1,
-  String value1,
-  String label2,
-  String value2, {
-  bool alternate = false,
-}) {
-  return pw.TableRow(
-    children: [
-      pw.Container(
-        padding: const pw.EdgeInsets.symmetric(vertical: 1, horizontal: 4),
-        alignment: pw.Alignment.centerRight,
-        decoration: pw.BoxDecoration(
-          color: PdfColors.white,
-        ),
-        child: pw.Text(
-          value2.isEmpty ? '-' : value2,
-          textAlign: pw.TextAlign.right,
-          style: pw.TextStyle(fontSize: 10),
-        ),
-      ),
-      pw.Container(
-        padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-        alignment: pw.Alignment.centerRight,
-        decoration: pw.BoxDecoration(
-          color: PdfColors.grey100,
-        ),
-        child: pw.Text(
-          label2,
-          textAlign: pw.TextAlign.right,
-          style: pw.TextStyle(
-            fontSize: 10,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.green800,
-          ),
-        ),
-      ),
-      pw.Container(
-        padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-        alignment: pw.Alignment.centerRight,
-        decoration: pw.BoxDecoration(
-          color: PdfColors.white,
-        ),
-        child: pw.Text(
-          value1.isEmpty ? '-' : value1,
-          textAlign: pw.TextAlign.right,
-          style: pw.TextStyle(fontSize: 10),
-        ),
-      ),
-      pw.Container(
-        padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-        alignment: pw.Alignment.centerRight,
-        decoration: pw.BoxDecoration(
-          color: PdfColors.grey100,
-        ),
-        child: pw.Text(
-          label1,
-          textAlign: pw.TextAlign.right,
-          style: pw.TextStyle(
-            fontSize: 10,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.green800,
-          ),
-        ),
-      ),
-    ],
-  );
-}
 
       // pw.TableRow buildFourColumnRow(
       //   String label1,
@@ -185,7 +179,7 @@ pw.TableRow buildFourColumnRow(
       //   bool alternate = false,
       // }) {
       //   return pw.TableRow(
-          
+
       //     decoration: pw.BoxDecoration(
       //       color: alternate ? PdfColors.grey100 : PdfColors.white,
       //     ),
@@ -258,8 +252,6 @@ pw.TableRow buildFourColumnRow(
             borderRadius: pw.BorderRadius.circular(8),
           ),
           child: pw.Column(
-        
-
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Container(
@@ -302,16 +294,66 @@ pw.TableRow buildFourColumnRow(
         );
       }
 
+      final bgData = await rootBundle.load('assets/images/logo2.png');
+      debugPrint('حجم البيانات: ${bgData.lengthInBytes}');
+      final bgImage = pw.MemoryImage(bgData.buffer.asUint8List());
+      debugPrint('عرض الصورة: ${bgImage.width}, ارتفاعها: ${bgImage.height}');
       document.addPage(
         pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
-          theme: pw.ThemeData.withFont(
-            base: font,
-            bold: font,
-            italic: font,
-            boldItalic: font,
+          pageTheme: pw.PageTheme(
+            pageFormat: PdfPageFormat.a4,
+            theme: pw.ThemeData.withFont(
+              base: font,
+              bold: font,
+              italic: font,
+              boldItalic: font,
+            ),
+            margin: const pw.EdgeInsets.all(24),
+            buildBackground: (context) {
+              return pw.Container(
+                width: PdfPageFormat.a4.width,
+                height: PdfPageFormat.a4.height,
+                child: pw.Opacity(
+                  opacity: 0.12,
+                  child: pw.Image(
+                    bgImage,
+                    fit: pw.BoxFit.cover,
+                    width: PdfPageFormat.a4.width,
+                    height: PdfPageFormat.a4.height,
+                  ),
+                ),
+              );
+            },
           ),
-          margin: const pw.EdgeInsets.all(24),
+          footer: (context) => pw.Directionality(
+            textDirection: pw.TextDirection.rtl,
+            child: pw.Column(
+              mainAxisSize: pw.MainAxisSize.min,
+              children: [
+                pw.Divider(color: PdfColors.grey300),
+                pw.SizedBox(height: 6),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
+                      style: pw.TextStyle(
+                        fontSize: 9,
+                        color: PdfColors.grey600,
+                      ),
+                    ),
+                    pw.Text(
+                      'وزارة الطاقة © ${DateTime.now().year}',
+                      style: pw.TextStyle(
+                        fontSize: 9,
+                        color: PdfColors.grey600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
           build: (context) => [
             // pw.SvgImage(svg: svg, fit: pw.BoxFit.cover),
             // pw.Positioned.fill(
@@ -366,8 +408,8 @@ pw.TableRow buildFourColumnRow(
                         child: pw.BarcodeWidget(
                           data: applicationNumber,
                           barcode: pw.Barcode.qrCode(),
-                          width: 80,
-                          height: 80,
+                          width: 50.w,
+                          height: 50.h,
                         ),
                       ),
                     ],
@@ -394,7 +436,8 @@ pw.TableRow buildFourColumnRow(
                           ),
                         ),
                         pw.Text(
-                          'تاريخ التقديم: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                          'تاريخ التقديم: $submissionDateLabel',
+                          // 'تاريخ التقديم: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
                           style: pw.TextStyle(fontSize: 10),
                         ),
                       ],
@@ -403,53 +446,141 @@ pw.TableRow buildFourColumnRow(
                   pw.SizedBox(height: 10),
 
                   buildSection('بيانات الطلب', [
-                    buildFourColumnRow('رقم الطلب', applicationNumber, 'نوع الطلب', requestTypeLabel),
-                    buildFourColumnRow('حالة الطلب', 'قيد الدراسة', 'تاريخ التقديم', '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}', alternate: true),
-                    buildFourColumnRow('مدة الدراسة', '1.0', 'فئة المحطة', stationCategoryLabel),
-                    buildFourColumnRow('رقم الترخيص السابق', settlementLicenseNumber, 'اسم مقدم الطلب', applicantFullName, alternate: true),
+                    buildFourColumnRow(
+                      'رقم الطلب',
+                      applicationNumber,
+                      'نوع الطلب',
+                      requestTypeLabel,
+                    ),
+                    buildFourColumnRow(
+                      'حالة الطلب',
+                      'قيد الدراسة',
+                      'تاريخ التقديم',
+
+                      submissionDateLabel,
+                      // '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                      alternate: true,
+                    ),
+                    buildFourColumnRow(
+                      'مدة الدراسة',
+                      '1.0',
+                      'فئة المحطة',
+                      stationCategoryLabel,
+                    ),
+                    buildFourColumnRow(
+                      'رقم الترخيص السابق',
+                      settlementLicenseNumber,
+                      'اسم مقدم الطلب',
+                      applicantFullName,
+                      alternate: true,
+                    ),
                     if (ctrl.investorType.value == 'company')
-                      buildFourColumnRow('اسم الشركة', ctrl.companyNameController.text.trim(), 'رقم ترخيص الشركة', companyLicenseNumber),
+                      buildFourColumnRow(
+                        'اسم الشركة',
+                        ctrl.companyNameController.text.trim(),
+                        'رقم ترخيص الشركة',
+                        companyLicenseNumber,
+                      ),
                     if (ctrl.investorType.value == 'company')
-                      buildFourColumnRow('تاريخ ترخيص الشركة', companyLicenseDateLabel, '', ''),
+                      buildFourColumnRow(
+                        'تاريخ ترخيص الشركة',
+                        companyLicenseDateLabel,
+                        '',
+                        '',
+                      ),
                   ]),
                   buildSection('بيانات مقدم الطلب', [
-                    buildFourColumnRow('الاسم الكامل', applicantFullName, 'الرقم الوطني', ctrl.nationalIdController.text.trim()),
-                    buildFourColumnRow('مكان الولادة', ctrl.birthPlaceController.text.trim(), 'تاريخ الولادة', birthDate, alternate: true),
-                    buildFourColumnRow('البريد الإلكتروني', ctrl.emailController.text.trim(), 'رقم التواصل', ctrl.phoneController.text.trim()),
+                    buildFourColumnRow(
+                      'الاسم الكامل',
+                      applicantFullName,
+                      'الرقم الوطني',
+                      ctrl.nationalIdController.text.trim(),
+                    ),
+                    buildFourColumnRow(
+                      'مكان الولادة',
+                      ctrl.birthPlaceController.text.trim(),
+                      'تاريخ الولادة',
+                      birthDate,
+                      alternate: true,
+                    ),
+                    buildFourColumnRow(
+                      'البريد الإلكتروني',
+                      ctrl.emailController.text.trim(),
+                      'رقم التواصل',
+                      ctrl.phoneController.text.trim(),
+                    ),
                     if (ctrl.phone2Controller.text.trim().isNotEmpty)
-                      buildFourColumnRow('الهاتف الثانوي', ctrl.phone2Controller.text.trim(), '', ''),
+                      buildFourColumnRow(
+                        'الهاتف الثانوي',
+                        ctrl.phone2Controller.text.trim(),
+                        '',
+                        '',
+                      ),
                     if (ctrl.investorType.value == 'company')
-                      buildFourColumnRow('اسم الشركة', ctrl.companyNameController.text.trim(), 'الشركاء', partners.isNotEmpty ? partners.join('، ') : 'غير محدد', alternate: true),
+                      buildFourColumnRow(
+                        'اسم الشركة',
+                        ctrl.companyNameController.text.trim(),
+                        'الشركاء',
+                        partners.isNotEmpty ? partners.join('، ') : 'غير محدد',
+                        alternate: true,
+                      ),
                   ]),
                   buildSection('بيانات الموقع والتصنيف', [
-                    buildFourColumnRow('المحافظة', governorate, 'المنطقة', district),
-                    buildFourColumnRow('القضاء', subdistrict, 'الناحية', town, alternate: true),
-                    buildFourColumnRow('نوع الطريق', roadTypeLabel, 'فئة المحطـة', stationCategoryLabel),
-                    buildFourColumnRow('خط الطول', longitude, 'دائرة العرض', latitude, alternate: true),
-                    buildFourColumnRow('حالة التنظيم', planningLocationLabel, '', ''),
+                    buildFourColumnRow(
+                      'المحافظة',
+                      governorate,
+                      'المنطقة',
+                      district,
+                    ),
+                    buildFourColumnRow(
+                      'القضاء',
+                      subdistrict,
+                      'الناحية',
+                      town,
+                      alternate: true,
+                    ),
+                    buildFourColumnRow(
+                      'نوع الطريق',
+                      roadTypeLabel,
+                      'فئة المحطـة',
+                      stationCategoryLabel,
+                    ),
+                    buildFourColumnRow(
+                      'خط الطول',
+                      longitude,
+                      'دائرة العرض',
+                      latitude,
+                      alternate: true,
+                    ),
+                    buildFourColumnRow(
+                      'حالة التنظيم',
+                      planningLocationLabel,
+                      '',
+                      '',
+                    ),
                   ]),
-                  pw.SizedBox(height: 12),
-                  pw.Divider(color: PdfColors.grey300),
-                  pw.SizedBox(height: 10),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
-                        style: pw.TextStyle(
-                          fontSize: 9,
-                          color: PdfColors.grey600,
-                        ),
-                      ),
-                      pw.Text(
-                        'وزارة الطاقة © ${DateTime.now().year}',
-                        style: pw.TextStyle(
-                          fontSize: 9,
-                          color: PdfColors.grey600,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // pw.SizedBox(height: 12),
+                  // pw.Divider(color: PdfColors.grey300),
+                  // pw.SizedBox(height: 10),
+                  // pw.Row(
+                  //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     pw.Text(
+                  //       'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
+                  //       style: pw.TextStyle(
+                  //         fontSize: 9,
+                  //         color: PdfColors.grey600,
+                  //       ),
+                  //     ),
+                  //     pw.Text(
+                  //       'وزارة الطاقة © ${DateTime.now().year}',
+                  //       style: pw.TextStyle(
+                  //         fontSize: 9,
+                  //         color: PdfColors.grey600,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
@@ -457,11 +588,44 @@ pw.TableRow buildFourColumnRow(
         ),
       );
 
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/طلب_ترخيص_$applicationNumber.pdf');
-      await file.writeAsBytes(await document.save());
+      try {
+        final dir = await getApplicationDocumentsDirectory();
+        final safeApplicationNumber = applicationNumber.replaceAll(
+          RegExp(r'[^A-Za-z0-9\u0600-\u06FF._-]'),
+          '_',
+        );
+        final file = File('${dir.path}/طلب_ترخيص_$safeApplicationNumber.pdf');
+        await file.writeAsBytes(await document.save());
 
-      Get.to(() => TermsPdfViewerScreen(pdfPath: file.path));
+        if (!await file.exists()) {
+          throw Exception('لم يتم إنشاء ملف PDF');
+        }
+
+        Get.snackbar(
+          'تم التصدير',
+          'تم فتح ملف PDF بنجاح',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.primary,
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(16),
+          borderRadius: 8,
+          duration: const Duration(seconds: 2),
+        );
+
+        await Get.to(() => TermsPdfViewerScreen(pdfPath: file.path));
+      } catch (e) {
+        debugPrint('PDF export failed: $e');
+        Get.snackbar(
+          'خطأ',
+          'تعذر فتح ملف PDF. يرجى المحاولة مرة أخرى.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(16),
+          borderRadius: 8,
+          duration: const Duration(seconds: 3),
+        );
+      }
     }
 
     return Scaffold(

@@ -13,16 +13,18 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ctrl = Get.find<SettingsController>();
     final theme = Theme.of(context);
-
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/splash_background.png'),
+          image: AssetImage('assets/images/background.png'),
           fit: BoxFit.cover,
         ),
       ),
       child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(180),
 
         // appBar: const MinistryAppBar(title: null),
         body: SingleChildScrollView(

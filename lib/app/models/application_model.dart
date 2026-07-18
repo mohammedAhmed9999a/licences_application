@@ -242,7 +242,19 @@ class ApplicationModel {
         _asStringKeyedMap(json['applicantable']) ?? <String, dynamic>{};
     final user = _asStringKeyedMap(json['user']) ?? <String, dynamic>{};
 
-    var applicantName = applicantable['full_name']?.toString() ?? '';
+    final applicantTypeRaw = json['applicantable_type']?.toString() ?? '';
+    final applicantTypeNormalized = _normalizeApplicantType(applicantTypeRaw);
+
+    final personalName = [
+      user['first_name']?.toString() ?? '',
+      user['father_name']?.toString() ?? '',
+      user['last_name']?.toString() ?? '',
+    ].where((value) => value.trim().isNotEmpty).join(' ');
+
+    var applicantName = personalName;
+    if (applicantName.isEmpty) {
+      applicantName = applicantable['full_name']?.toString() ?? '';
+    }
     if (applicantName.isEmpty) {
       applicantName = applicantable['company_name']?.toString() ?? '';
     }
@@ -309,6 +321,19 @@ class ApplicationModel {
       longitude,
     ].where((part) => part.isNotEmpty).join(', ');
 
+    final firstName = user['first_name']?.toString() ?? '';
+    final fatherName = user['father_name']?.toString() ?? '';
+    final lastName = user['last_name']?.toString() ?? '';
+    final motherName = user['mother_name']?.toString() ?? '';
+    final nickName = user['nickname']?.toString() ?? '';
+    final placeOfBirth = user['place_of_birth']?.toString() ?? '';
+    final dateOfBirth = user['date_of_birth']?.toString() ?? '';
+    final companyName = applicantable['company_name']?.toString() ?? '';
+    final companyLicenseNumber =
+        applicantable['company_license_number']?.toString() ?? '';
+    final companyLicenseDate =
+        applicantable['company_license_date']?.toString() ?? '';
+
     final latestAttachmentItems =
         (json['latest_attachments'] as List?)
             ?.map((item) {
@@ -362,19 +387,23 @@ class ApplicationModel {
       status: statusValue,
       statusLabel: _statusLabel(statusValue),
       requestType: _normalizeRequestType(rawRequestType),
-      investorType: json['applicantable_type']?.toString() ?? '',
+      investorType: applicantTypeNormalized,
       correctionTargets: correctionTargets,
       needsCorrection: needsCorrection,
-      firstName: user['first_name']?.toString(),
-      fatherName: user['father_name']?.toString(),
-      lastName: user['last_name']?.toString(),
-      motherName: user['mother_name']?.toString(),
-      nickname: user['nickname']?.toString(),
-      placeOfBirth: user['place_of_birth']?.toString(),
-      dateOfBirth: user['date_of_birth']?.toString(),
-      companyName: applicantable['company_name']?.toString(),
-      companyLicenseNumber: applicantable['company_license_number']?.toString(),
-      companyLicenseDate: applicantable['company_license_date']?.toString(),
+      firstName: firstName.isNotEmpty ? firstName : null,
+      fatherName: fatherName.isNotEmpty ? fatherName : null,
+      lastName: lastName.isNotEmpty ? lastName : null,
+      motherName: motherName.isNotEmpty ? motherName : null,
+      nickname: nickName.isNotEmpty ? nickName : null,
+      placeOfBirth: placeOfBirth.isNotEmpty ? placeOfBirth : null,
+      dateOfBirth: dateOfBirth.isNotEmpty ? dateOfBirth : null,
+      companyName: companyName.isNotEmpty ? companyName : null,
+      companyLicenseNumber: companyLicenseNumber.isNotEmpty
+          ? companyLicenseNumber
+          : null,
+      companyLicenseDate: companyLicenseDate.isNotEmpty
+          ? companyLicenseDate
+          : null,
       secondaryPhone: json['secondary_phone']?.toString(),
       governorateId:
           location['governorate_id']?.toString() ??
@@ -388,7 +417,7 @@ class ApplicationModel {
       townId: location['town_id']?.toString() ?? townMap?['id']?.toString(),
       latitude: latitude,
       longitude: longitude,
-      applicantType: json['applicantable_type']?.toString(),
+      applicantType: applicantTypeNormalized,
       termsAccepted:
           json['terms_accepted'] == true || json['terms_accepted'] == 1,
       createdAt: json['created_at']?.toString() ?? '',
@@ -513,6 +542,21 @@ class ApplicationModel {
     ];
   }
 
+  String get displayApplicantName {
+    final personalName = [
+      firstName,
+      fatherName,
+      lastName,
+    ].where((value) => (value ?? '').trim().isNotEmpty).join(' ');
+
+    if (personalName.isNotEmpty) {
+      return personalName;
+    }
+
+    final fallback = (applicantName ?? '').trim();
+    return fallback.isNotEmpty ? fallback : '';
+  }
+
   String get requestTypeLabel {
     final type = requestType.toLowerCase();
     switch (type) {
@@ -543,6 +587,17 @@ class ApplicationModel {
       default:
         return investorType.isNotEmpty ? investorType : 'نوع المستثمر';
     }
+  }
+
+  static String _normalizeApplicantType(String value) {
+    final normalized = value.trim().toLowerCase();
+    if (normalized.contains('company') || normalized.contains('شركة')) {
+      return 'applicant_company';
+    }
+    if (normalized.contains('individual') || normalized.contains('فرد')) {
+      return 'applicant_individual';
+    }
+    return normalized.isNotEmpty ? normalized : 'applicant_individual';
   }
 
   String get displayStationName => stationName ?? 'غير محددة';

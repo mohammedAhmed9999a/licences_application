@@ -25,19 +25,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final settingsCtrl = Get.find<SettingsController>();
+    final isDark = settingsCtrl.isDark;
 
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/splash_background.png'),
+          image: AssetImage('assets/images/background.png'),
           fit: BoxFit.cover,
         ),
       ),
       child: Scaffold(
         // backgroundColor: Colors.black,
-        backgroundColor: Theme.of(
-          context,
-        ).scaffoldBackgroundColor.withAlpha(248),
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _handleRefresh,
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    padding: EdgeInsets.symmetric(horizontal: 10.w),
                     child: Align(
                       alignment: AlignmentDirectional.centerStart,
                       child: Obx(
@@ -66,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 40.h),
+                  // SizedBox(height: 10.h),
                   // Ministry Logo & Welcome
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -78,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           period: const Duration(seconds: 2),
                           child: Container(
                             width: 300.w,
-                            height: 120.h,
+                            height: 80.h,
                             decoration: const BoxDecoration(
                               image: DecorationImage(
                                 image: AssetImage('assets/images/h-logo.webp'),
@@ -119,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 36.h),
+                  SizedBox(height: 16.h),
 
                   // Auth Cards Column
                   Padding(
@@ -152,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 40.h),
+                  SizedBox(height: 16.h),
 
                   // Usage Guide Section
                   Padding(
@@ -357,7 +358,7 @@ class _AuthCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: theme.cardColor.withAlpha(140),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: theme.dividerColor, width: 0.5),
         boxShadow: [

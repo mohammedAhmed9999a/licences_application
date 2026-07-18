@@ -104,7 +104,9 @@ class LicenseDetailModel {
   factory LicenseDetailModel.fromApplication(ApplicationModel app) {
     return LicenseDetailModel(
       application: app,
-      applicantName: app.applicantName ?? 'غير متوفر',
+      applicantName: app.displayApplicantName.isNotEmpty
+          ? app.displayApplicantName
+          : 'غير متوفر',
       email: app.email.isNotEmpty ? app.email : 'غير متوفر',
       phone: app.phone.isNotEmpty ? app.phone : 'غير متوفر',
       nationalId: app.nationalId.isNotEmpty ? app.nationalId : 'غير متوفر',

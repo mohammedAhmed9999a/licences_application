@@ -20,17 +20,19 @@ class MyApplicationsScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/splash_background.png'),
+          image: AssetImage('assets/images/background.png'),
           fit: BoxFit.cover,
         ),
       ),
       child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor.withAlpha(248),
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
         appBar: const MinistryAppBar(title: 'طلباتي'),
         body: Obx(() {
           if (ctrl.isLoading.value) {
             return ListView.builder(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.all(10.w),
               itemCount: 4,
               physics: const AlwaysScrollableScrollPhysics(),
               itemBuilder: (context, index) => const ShimmerLoadingCard(),
@@ -61,7 +63,7 @@ class MyApplicationsScreen extends StatelessWidget {
             );
           }
           return ListView.builder(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(10.w),
             itemCount: ctrl.applications.length,
             itemBuilder: (ctx, i) {
               final app = ctrl.applications[i];
@@ -82,7 +84,7 @@ class MyApplicationsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16.r),
                 child: Container(
                   margin: EdgeInsets.only(bottom: 12.h),
-                  padding: EdgeInsets.all(16.w),
+                  padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
                     color: surface,
                     borderRadius: BorderRadius.circular(18.r),

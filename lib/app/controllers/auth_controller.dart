@@ -110,13 +110,12 @@ class AuthController extends GetxController {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
-      errorMessage.value = 'يرجى إدخال البريد الإلكتروني وكلمة المرور';
-      return;
-    }
+    final emailError = validateEmailField(email);
+    final passwordError = validateLoginPasswordField(password);
 
-    if (!FormValidator.isValidEmail(email)) {
-      errorMessage.value = 'يرجى إدخال بريد إلكتروني صحيح';
+    if (emailError != null || passwordError != null) {
+      errorMessage.value =
+          emailError ?? passwordError ?? 'يرجى مراجعة البيانات المدرجة';
       return;
     }
 

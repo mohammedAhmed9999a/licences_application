@@ -174,7 +174,7 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return Directionality(
       textDirection:
-          TextDirection.ltr, // Force LTR for AppBar to keep back button on left
+          TextDirection.rtl, // Force LTR for AppBar to keep back button on left
       child: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
@@ -196,7 +196,7 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
                       children: [
                         Icon(
                           Icons.arrow_forward_ios,
-                          textDirection: TextDirection.rtl,
+                          textDirection: TextDirection.ltr,
                           size: 13,
                           color: isDark
                               ? AppColors.textSecondaryDark
@@ -246,6 +246,7 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ],
             ),
+
             // Right: ministry branding
             // Row(
             //   children: [
@@ -294,6 +295,7 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             ),
+            Container(),
           ],
         ),
         actions: actions,

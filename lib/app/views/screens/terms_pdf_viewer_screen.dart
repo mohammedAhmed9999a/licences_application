@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:licences_application/core/constant/app_colors.dart';
 import '../widgets/common_widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -177,6 +178,7 @@ class _TermsPdfViewerScreenState extends State<TermsPdfViewerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.borderDark,
         title: Text(
           widget.pdfPath != null ? 'عرض ملف PDF' : 'الشروط والأحكام',
           style: TextStyle(fontFamily: 'Cairo', fontSize: 16.sp),
@@ -209,19 +211,19 @@ class _TermsPdfViewerScreenState extends State<TermsPdfViewerScreen> {
             )
           : Column(
               children: [
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 14.w,
-                    vertical: 8.h,
-                  ),
-                  color: Colors.grey.shade100,
-                  child: Text(
-                    'المسار الداخلي: ${displayPdfPath ?? pdfAssetPath}',
-                    style: TextStyle(fontFamily: 'Cairo', fontSize: 11.sp),
-                    textDirection: TextDirection.rtl,
-                  ),
-                ),
+                // Container(
+                //   width: double.infinity,
+                //   padding: EdgeInsets.symmetric(
+                //     horizontal: 14.w,
+                //     vertical: 8.h,
+                //   ),
+                //   color: Colors.grey.shade100,
+                //   child: Text(
+                //     'المسار الداخلي: ${displayPdfPath ?? pdfAssetPath}',
+                //     style: TextStyle(fontFamily: 'Cairo', fontSize: 11.sp),
+                //     textDirection: TextDirection.rtl,
+                //   ),
+                // ),
                 Expanded(
                   child: PDFView(
                     filePath: displayPdfPath,

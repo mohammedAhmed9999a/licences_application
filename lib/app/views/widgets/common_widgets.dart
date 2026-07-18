@@ -173,8 +173,8 @@ class LabeledField extends StatelessWidget {
     final labelColor =
         theme.textTheme.titleMedium?.color ?? theme.colorScheme.onSurface;
     final errorTextColor = theme.brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+        ? Colors.red
+        : Colors.red;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -207,75 +207,54 @@ class LabeledField extends StatelessWidget {
           ),
           SizedBox(height: 6.h),
           child,
+
           if (errorText != null && errorText!.isNotEmpty) ...[
             SizedBox(height: 6.h),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-              decoration: BoxDecoration(
-                color: errorContainer.withOpacity(0.22),
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(
-                  color: errorColor.withOpacity(0.35),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Text(
-                      errorText!,
-                      style: TextStyle(
-                        fontSize: 10.sp,
-                        color: errorTextColor,
-                        fontFamily: 'Cairo',
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textDirection: TextDirection.rtl,
-                      textAlign: TextAlign.right,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Text(
+                    errorText!,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: errorTextColor,
+                      fontFamily: 'Cairo',
+                      fontWeight: FontWeight.w600,
                     ),
+                    textDirection: TextDirection.rtl,
+                    textAlign: TextAlign.right,
                   ),
-                  SizedBox(width: 6.w),
-                  Icon(Icons.error_outline, size: 14.sp, color: errorColor),
-                ],
-              ),
+                ),
+                SizedBox(width: 6.w),
+                Icon(Icons.error_outline, size: 14.sp, color: errorColor),
+              ],
             ),
           ] else if (successText != null && successText!.isNotEmpty) ...[
             SizedBox(height: 6.h),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-              decoration: BoxDecoration(
-                color: successColor.withOpacity(0.10),
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(
-                  color: successColor.withOpacity(0.25),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Text(
-                      successText!,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: successColor,
-                        fontFamily: 'Cairo',
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textDirection: TextDirection.rtl,
-                      textAlign: TextAlign.right,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Text(
+                    successText!,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: successColor,
+                      fontFamily: 'Cairo',
+                      fontWeight: FontWeight.w600,
                     ),
+                    textDirection: TextDirection.rtl,
+                    textAlign: TextAlign.right,
                   ),
-                  SizedBox(width: 6.w),
-                  Icon(
-                    Icons.check_circle_outline,
-                    size: 14.sp,
-                    color: successColor,
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(width: 6.w),
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 14.sp,
+                  color: successColor,
+                ),
+              ],
             ),
           ],
         ],
@@ -397,6 +376,20 @@ class ChoiceCard extends StatelessWidget {
     final surfaceAlt = context.themeSurfaceAlt;
     final primaryColor = theme.colorScheme.primary;
     final isDark = theme.brightness == Brightness.dark;
+    final cardColor = selected
+        ? (isDark ? AppColors.selectedCardDark1 : AppColors.selectedCardLight)
+        : enabled
+        ? (isDark ? AppColors.darkSurfaceVariant : AppColors.backgroundAlt)
+        : (isDark
+              ? AppColors.darkSurface.withOpacity(0.6)
+              : AppColors.borderLight.withOpacity(0.16));
+    final cardBorderColor = selected
+        ? primaryColor
+        : enabled
+        ? (isDark ? AppColors.darkBorder.withOpacity(0.45) : AppColors.border)
+        : (isDark
+              ? AppColors.darkBorder.withOpacity(0.25)
+              : AppColors.borderLight);
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -406,20 +399,10 @@ class ChoiceCard extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: selected
-                ? (isDark
-                      ? AppColors.selectedCardDark1
-                      : AppColors.selectedCardLight)
-                : enabled
-                ? surface
-                : AppColors.backgroundAlt,
+            color: cardColor,
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: selected
-                  ? primaryColor
-                  : enabled
-                  ? borderColor
-                  : AppColors.borderLight,
+              color: cardBorderColor,
               width: selected ? 1.5 : 1,
             ),
           ),
