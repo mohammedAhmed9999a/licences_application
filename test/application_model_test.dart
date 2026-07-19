@@ -23,12 +23,27 @@ void main() {
     },
   );
 
+  test('maps under committee review to a dedicated status label', () {
+    final app = ApplicationModel.fromJson({
+      'id': 6,
+      'license_request_number': 'LR-1006',
+      'status': 'UnderCommitteeReview',
+      'created_at': '2026-01-01T00:00:00Z',
+      'location': {},
+      'allowed_category': {},
+      'applicantable': {},
+      'user': {},
+    });
+
+    expect(app.statusLabel, 'إحالة للجنة الفنية');
+  });
+
   test(
     'normalizes Arabic operation_type name to internal requestType values',
     () {
       final settlementApp = ApplicationModel.fromJson({
-        'id': 6,
-        'license_request_number': 'LR-1006',
+        'id': 7,
+        'license_request_number': 'LR-1007',
         'status': 'Pending',
         'created_at': '2026-01-01T00:00:00Z',
         'location': {},
@@ -42,8 +57,8 @@ void main() {
       expect(settlementApp.requestTypeLabel, 'تسوية');
 
       final newApp = ApplicationModel.fromJson({
-        'id': 7,
-        'license_request_number': 'LR-1007',
+        'id': 8,
+        'license_request_number': 'LR-1008',
         'status': 'Pending',
         'created_at': '2026-01-01T00:00:00Z',
         'location': {},

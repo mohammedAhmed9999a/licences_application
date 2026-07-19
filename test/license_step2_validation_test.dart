@@ -1,5 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:licences_application/app/controllers/license_application_controller.dart';
+import 'package:licences_application/app/views/screens/license/steps/step2_license_info_screen.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -66,26 +70,53 @@ void main() {
     expect(controller.errorMessage.value, isEmpty);
   });
 
+  testWidgets('company mode shows all applicant fields while keeping only three required', (
+    tester,
+  ) async {
+    final controller = LicenseApplicationController();
+    controller.investorType.value = 'company';
+    Get.put(controller);
+    addTearDown(Get.reset);
+
+    await tester.pumpWidget(
+      ScreenUtilInit(
+        designSize: const Size(390, 844),
+        builder: (_, __) => GetMaterialApp(home: const Step2LicenseInfoScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('الاسم الأول'), findsWidgets);
+    expect(find.text('اسم الأب'), findsOneWidget);
+    expect(find.text('اسم الأم'), findsOneWidget);
+    expect(find.text('مكان الولادة'), findsOneWidget);
+    expect(find.text('تاريخ الولادة'), findsOneWidget);
+  });
+
   test(
-    'validateStep2 requires both personal and company fields for company requests',
+    'validateStep2 requires only the company representative fields for company requests',
     () {
       final controller = LicenseApplicationController();
       controller.requestType.value = 'new';
       controller.investorType.value = 'company';
-      controller.firstNameController.text = '';
+      controller.firstNameController.text = 'محمد';
       controller.fatherNameController.text = '';
-      controller.nicknameController.text = '';
+      controller.nicknameController.text = 'الكنية';
       controller.motherNameController.text = '';
-      controller.nationalIdController.text = '';
+      controller.nationalIdController.text = '123456789012';
       controller.birthPlaceController.text = '';
       controller.birthDate.value = null;
-      controller.companyNameController.text = '';
-      controller.companyLicenseNumberController.text = '';
-      controller.companyLicenseDate.value = null;
+      controller.companyNameController.text = 'شركة الاختبار';
+      controller.companyLicenseNumberController.text = 'ABC123';
+      controller.companyLicenseDate.value = DateTime.now().subtract(
+        const Duration(days: 2),
+      );
 
-      expect(controller.validateStep2(), isFalse);
-      expect(controller.firstNameError.value, contains('الاسم الأول'));
-      expect(controller.companyNameError.value, contains('اسم الشركة'));
+      expect(controller.validateStep2(), isTrue);
+      expect(controller.firstNameError.value, isEmpty);
+      expect(controller.nicknameError.value, isEmpty);
+      expect(controller.nationalIdError.value, isEmpty);
+      expect(controller.companyNameError.value, isEmpty);
     },
   );
 

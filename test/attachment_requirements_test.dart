@@ -64,6 +64,10 @@ void main() {
               .isRequired,
           isFalse,
         );
+        expect(
+          attachments.where((item) => item.key == 'id_card').first.title,
+          contains('شعار الشركة'),
+        );
       },
     );
 

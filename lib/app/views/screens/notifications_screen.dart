@@ -115,43 +115,43 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Scaffold(
         backgroundColor: isDark
             ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
-            : Theme.of(context).scaffoldBackgroundColor.withAlpha(180),
-        // appBar: AppBar(
-        //   backgroundColor: surface.withOpacity(0.95),
-        //   elevation: 0,
-        //   automaticallyImplyLeading: false,
-        //   titleSpacing: 10.w,
-        //   // leading: IconButton(
-        //   //   onPressed: Get.back,
-        //   //   icon: Icon(Icons.arrow_back_ios_new, color: primaryColor),
-        //   // ),
-        //   // title: Text(
-        //   //   'الإشعارات',
-        //   //   style: TextStyle(
-        //   //     fontFamily: 'Cairo',
-        //   //     fontSize: 18.sp,
-        //   //     fontWeight: FontWeight.bold,
-        //   //     color: textPrimary,
-        //   //   ),
-        //   // ),
-        //   actions: [
-        //     Obx(
-        //       () => _controller.unreadCount > 0
-        //           ? TextButton(
-        //               onPressed: _markAllAsRead,
-        //               child: Text(
-        //                 'تعيين الكل كمقروء',
-        //                 style: TextStyle(
-        //                   fontFamily: 'Cairo',
-        //                   color: primaryColor,
-        //                   fontSize: 13.sp,
-        //                 ),
-        //               ),
-        //             )
-        //           : const SizedBox.shrink(),
-        //     ),
-        //   ],
-        // ),
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
+        appBar: AppBar(
+          backgroundColor: surface.withOpacity(0.95),
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          titleSpacing: 10.w,
+          leading: IconButton(
+            onPressed: Get.back,
+            icon: Icon(Icons.arrow_back_ios_new, color: primaryColor),
+          ),
+          title: Text(
+            'الإشعارات',
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: textPrimary,
+            ),
+          ),
+          // actions: [
+          //   Obx(
+          //     () => _controller.unreadCount > 0
+          //         ? TextButton(
+          //             onPressed: _markAllAsRead,
+          //             child: Text(
+          //               'تعيين الكل كمقروء',
+          //               style: TextStyle(
+          //                 fontFamily: 'Cairo',
+          //                 color: primaryColor,
+          //                 fontSize: 13.sp,
+          //               ),
+          //             ),
+          //           )
+          //         : const SizedBox.shrink(),
+          //   ),
+          // ],
+        ),
         body: Obx(() {
           if (_controller.isLoading.value) {
             return ListView.builder(

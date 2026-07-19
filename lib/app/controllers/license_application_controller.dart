@@ -978,6 +978,7 @@ class LicenseApplicationController extends GetxController {
       if (!hasPreviousLicenseNumber || !hasSettlementAgreement) {
         errorMessage.value = 'يرجى إكمال بيانات التسوية المطلوبة';
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          
           scrollToFirstError();
         });
         return false;
@@ -1131,61 +1132,33 @@ class LicenseApplicationController extends GetxController {
         return false;
       }
     } else if (investorType.value == 'company') {
-      var hasPersonalErrors = false;
+      var hasRepresentativeErrors = false;
       var hasCompanyErrors = false;
 
       final firstName = firstNameController.text.trim();
       if (firstName.isEmpty) {
         firstNameError.value = 'يرجى إدخال الاسم الأول';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else if (firstName.length <= 2) {
         firstNameError.value = 'الاسم يجب أن يكون أكثر من حرفين';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else if (!FormValidator.isArabicName(firstName)) {
         firstNameError.value = 'الاسم يجب أن يكون باللغة العربية حصراً';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else {
         firstNameError.value = '';
-      }
-
-      final fatherName = fatherNameController.text.trim();
-      if (fatherName.isEmpty) {
-        fatherNameError.value = 'يرجى إدخال اسم الأب';
-        hasPersonalErrors = true;
-      } else if (fatherName.length <= 2) {
-        fatherNameError.value = 'اسم الأب يجب أن يكون أكثر من حرفين';
-        hasPersonalErrors = true;
-      } else if (!FormValidator.isArabicName(fatherName)) {
-        fatherNameError.value = 'اسم الأب يجب أن يكون باللغة العربية حصراً';
-        hasPersonalErrors = true;
-      } else {
-        fatherNameError.value = '';
-      }
-
-      final motherName = motherNameController.text.trim();
-      if (motherName.isEmpty) {
-        motherNameError.value = 'يرجى إدخال اسم الأم';
-        hasPersonalErrors = true;
-      } else if (motherName.length <= 2) {
-        motherNameError.value = 'اسم الأم يجب أن يكون أكثر من حرفين';
-        hasPersonalErrors = true;
-      } else if (!FormValidator.isArabicName(motherName)) {
-        motherNameError.value = 'اسم الأم يجب أن يكون باللغة العربية حصراً';
-        hasPersonalErrors = true;
-      } else {
-        motherNameError.value = '';
       }
 
       final nickname = nicknameController.text.trim();
       if (nickname.isEmpty) {
         nicknameError.value = 'يرجى إدخال الكنية';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else if (nickname.length <= 2) {
         nicknameError.value = 'الكنية يجب أن تكون أكثر من حرفين';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else if (!FormValidator.isArabicName(nickname)) {
         nicknameError.value = 'الكنية يجب أن تكون باللغة العربية حصراً';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else {
         nicknameError.value = '';
       }
@@ -1193,49 +1166,15 @@ class LicenseApplicationController extends GetxController {
       final nationalId = nationalIdController.text.trim();
       if (nationalId.isEmpty) {
         nationalIdError.value = 'يرجى إدخال الرقم الوطني';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else if (!RegExp(r'^\d+$').hasMatch(nationalId)) {
         nationalIdError.value = 'الرقم الوطني يجب أن يحتوي على أرقام فقط';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else if (nationalId.length < 8 || nationalId.length > 12) {
         nationalIdError.value = 'الرقم الوطني يجب أن يكون بين 8 و12 رقماً';
-        hasPersonalErrors = true;
+        hasRepresentativeErrors = true;
       } else {
         nationalIdError.value = '';
-      }
-
-      final birthPlace = birthPlaceController.text.trim();
-      if (birthPlace.isEmpty) {
-        birthPlaceError.value = 'يرجى إدخال مكان الولادة';
-        hasPersonalErrors = true;
-      } else if (birthPlace.length <= 2) {
-        birthPlaceError.value = 'مكان الولادة يجب أن يكون أكثر من حرفين';
-        hasPersonalErrors = true;
-      } else if (!FormValidator.isArabicName(birthPlace)) {
-        birthPlaceError.value = 'مكان الولادة يجب أن يكون باللغة العربية حصراً';
-        hasPersonalErrors = true;
-      } else {
-        birthPlaceError.value = '';
-      }
-
-      final selectedBirthDate = birthDate.value;
-      if (selectedBirthDate == null) {
-        birthDateError.value = 'يرجى اختيار تاريخ الولادة';
-        hasPersonalErrors = true;
-      } else {
-        final now = DateTime.now();
-        var age = now.year - selectedBirthDate.year;
-        if (now.month < selectedBirthDate.month ||
-            (now.month == selectedBirthDate.month &&
-                now.day < selectedBirthDate.day)) {
-          age--;
-        }
-        birthDateError.value = age < 18
-            ? 'يجب أن لا يقل عمر مقدم الطلب عن 18 سنة'
-            : '';
-        if (age < 18) {
-          hasPersonalErrors = true;
-        }
       }
 
       final companyName = companyNameController.text.trim();
@@ -1271,7 +1210,7 @@ class LicenseApplicationController extends GetxController {
         companyLicenseDateError.value = '';
       }
 
-      if (hasPersonalErrors || hasCompanyErrors) {
+      if (hasRepresentativeErrors || hasCompanyErrors) {
         errorMessage.value = 'يرجى إدخال البيانات الشخصية والشركة المطلوبة';
         WidgetsBinding.instance.addPostFrameCallback((_) {
           scrollToFirstError();
@@ -1428,6 +1367,10 @@ class LicenseApplicationController extends GetxController {
         }
         break;
       case 'fatherName':
+        if (investorType.value == 'company') {
+          fatherNameError.value = '';
+          return;
+        }
         if (value.trim().isEmpty) {
           fatherNameError.value = 'يرجى إدخال اسم الأب';
         } else if (value.trim().length <= 2) {
@@ -1444,6 +1387,10 @@ class LicenseApplicationController extends GetxController {
         }
         break;
       case 'motherName':
+        if (investorType.value == 'company') {
+          motherNameError.value = '';
+          return;
+        }
         if (value.trim().isEmpty) {
           motherNameError.value = 'يرجى إدخال اسم الأم';
         } else if (value.trim().length <= 2) {
@@ -1492,6 +1439,10 @@ class LicenseApplicationController extends GetxController {
         }
         break;
       case 'birthPlace':
+        if (investorType.value == 'company') {
+          birthPlaceError.value = '';
+          return;
+        }
         if (value.trim().isEmpty) {
           birthPlaceError.value = 'يرجى إدخال مكان الولادة';
         } else if (value.trim().length <= 2) {
@@ -1509,6 +1460,10 @@ class LicenseApplicationController extends GetxController {
         }
         break;
       case 'birthDate':
+        if (investorType.value == 'company') {
+          birthDateError.value = '';
+          return;
+        }
         if (birthDate.value == null) {
           birthDateError.value = 'يرجى اختيار تاريخ الولادة';
         } else {
@@ -1645,9 +1600,11 @@ class LicenseApplicationController extends GetxController {
         : 'بيان قيد عقاري (حديث)';
 
     final attachments = <AttachmentRequirement>[
-      const AttachmentRequirement(
+      AttachmentRequirement(
         key: 'id_card',
-        title: 'صورة عن الهوية (وجه أمامي وخلفي معاً)',
+        title: isCompany
+            ? 'صورة عن الهوية (وجه أمامي وخلفي معاً) / صورة شعار الشركة'
+            : 'صورة عن الهوية (وجه أمامي وخلفي معاً)',
         docType: 'NATIONAL_ID',
       ),
       AttachmentRequirement(

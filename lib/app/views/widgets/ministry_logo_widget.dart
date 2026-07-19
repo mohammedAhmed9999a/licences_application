@@ -174,7 +174,7 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return Directionality(
       textDirection:
-          TextDirection.rtl, // Force LTR for AppBar to keep back button on left
+          TextDirection.ltr, // Force LTR for AppBar to keep back button on left
       child: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
@@ -194,15 +194,6 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
                     onTap: () => Get.back(),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          textDirection: TextDirection.ltr,
-                          size: 13,
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondaryLight,
-                        ),
-                        SizedBox(width: 4.w),
                         Text(
                           'back'.tr,
                           style: TextStyle(
@@ -213,6 +204,26 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 : AppColors.textSecondaryLight,
                           ),
                         ),
+                                                SizedBox(width: 4.w),
+
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          textDirection: TextDirection.ltr,
+                          size: 13,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
+                        ),
+                        // Text(
+                        //   'back'.tr,
+                        //   style: TextStyle(
+                        //     fontSize: 13.sp,
+                        //     fontFamily: 'Cairo',
+                        //     color: isDark
+                        //         ? AppColors.textSecondaryDark
+                        //         : AppColors.textSecondaryLight,
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -223,6 +234,7 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
                     child: Icon(
                       Icons.settings_outlined,
                       size: 22,
+                      // textDirection: TextDirection.ltr,
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,
@@ -280,11 +292,11 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
             //     const MinistryLogoWidget(size: 38, showText: false),
             //   ],
             // ),
-            Shimmer.fromColors(
-              baseColor: AppColors.gold.withOpacity(0.6),
-              highlightColor: Colors.white,
-              period: const Duration(seconds: 2),
-              child: Container(
+            // Container(
+            //   width: 100.w,
+            // ),
+            Spacer(),
+            Container(
                 width: 180.w,
                 height: 40.h,
                 decoration: const BoxDecoration(
@@ -294,7 +306,21 @@ class MinistryAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-            ),
+            // Shimmer.fromColors(
+            //   baseColor: AppColors.gold.withOpacity(0.6),
+            //   highlightColor: Colors.white,
+            //   period: const Duration(seconds: 2),
+            //   child: Container(
+            //     width: 180.w,
+            //     height: 40.h,
+            //     decoration: const BoxDecoration(
+            //       image: DecorationImage(
+            //         image: AssetImage('assets/images/h-logo.webp'),
+            //         fit: BoxFit.contain,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Container(),
           ],
         ),

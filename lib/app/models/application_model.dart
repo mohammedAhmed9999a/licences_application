@@ -608,6 +608,14 @@ class ApplicationModel {
     final normalized = status.trim().toLowerCase();
     if (normalized.isEmpty) return 'غير معروف';
 
+    if (normalized.contains('under_committee_review') ||
+        normalized.contains('under committee') ||
+        normalized.contains('committee review') ||
+        (normalized.contains('committee') &&
+            (normalized.contains('under') || normalized.contains('review')))) {
+      return 'إحالة للجنة الفنية';
+    }
+
     if (normalized.contains('pending') ||
         normalized.contains('in_review') ||
         normalized.contains('under_review') ||
@@ -645,7 +653,6 @@ class ApplicationModel {
     if (normalized.contains('canceled') || normalized.contains('cancelled')) {
       return 'ملغى';
     }
-
     return status;
   }
 }

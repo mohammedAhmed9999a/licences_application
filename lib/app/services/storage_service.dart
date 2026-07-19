@@ -27,6 +27,9 @@ class StorageService extends GetxService {
   Future<void> clearAuth() async {
     await _box.remove('token');
     await _box.remove('user_name');
+    await _box.remove('remember_me');
+    await _box.remove('user_email');
+    
     if (!rememberMe) await _box.remove('user_email');
   }
 }

@@ -1096,500 +1096,228 @@ class _CompanyForm extends StatelessWidget {
           textDirection: TextDirection.rtl,
         ),
         SizedBox(height: 16.h),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final isMobile = MediaQuery.of(context).size.width < 650;
-            if (isMobile) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Obx(
-                    () => LabeledField(
-                      key: ctrl.firstNameFieldKey,
-                      label: 'الاسم الأول',
-                      required: true,
-                      errorText: ctrl.firstNameError.value,
-                      child: RtlTextField(
-                        controller: ctrl.firstNameController,
-                        focusNode: ctrl.firstNameFocus,
-                        hintText: 'الاسم الأول بالهوية الشخصية',
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
-                          ),
-                        ],
-                        maxLength: 50,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (v) =>
-                            ctrl.validateStep2Field('firstName', v),
-                        onSubmitted: (_) =>
-                            ctrl.requestFocus(ctrl.fatherNameFocus),
-                        enabled: ctrl.isFieldEditable('firstName'),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Obx(
-                    () => LabeledField(
-                      key: ctrl.fatherNameFieldKey,
-                      label: 'اسم الأب',
-                      required: true,
-                      errorText: ctrl.fatherNameError.value,
-                      child: RtlTextField(
-                        controller: ctrl.fatherNameController,
-                        focusNode: ctrl.fatherNameFocus,
-                        hintText: 'اسم الأب',
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
-                          ),
-                        ],
-                        maxLength: 50,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (v) =>
-                            ctrl.validateStep2Field('fatherName', v),
-                        onSubmitted: (_) =>
-                            ctrl.requestFocus(ctrl.nicknameFocus),
-                        enabled: ctrl.isFieldEditable('fatherName'),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Obx(
-                    () => LabeledField(
-                      key: ctrl.nicknameFieldKey,
-                      label: 'الكنية',
-                      required: true,
-                      errorText: ctrl.nicknameError.value,
-                      child: RtlTextField(
-                        controller: ctrl.nicknameController,
-                        focusNode: ctrl.nicknameFocus,
-                        hintText: 'الكنية',
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
-                          ),
-                        ],
-                        maxLength: 50,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (v) =>
-                            ctrl.validateStep2Field('nickname', v),
-                        onSubmitted: (_) =>
-                            ctrl.requestFocus(ctrl.motherNameFocus),
-                        enabled: ctrl.isFieldEditable('nickname'),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Obx(
-                    () => LabeledField(
-                      key: ctrl.motherNameFieldKey,
-                      label: 'اسم الأم',
-                      required: true,
-                      errorText: ctrl.motherNameError.value,
-                      child: RtlTextField(
-                        controller: ctrl.motherNameController,
-                        focusNode: ctrl.motherNameFocus,
-                        hintText: 'اسم الأم',
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
-                          ),
-                        ],
-                        maxLength: 50,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (v) =>
-                            ctrl.validateStep2Field('motherName', v),
-                        onSubmitted: (_) =>
-                            ctrl.requestFocus(ctrl.nationalIdFocus),
-                        enabled: ctrl.isFieldEditable('motherName'),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Obx(
-                    () => LabeledField(
-                      key: ctrl.nationalIdFieldKey,
-                      label: 'الرقم الوطني',
-                      required: true,
-                      errorText: ctrl.nationalIdError.value,
-                      child: RtlTextField(
-                        controller: ctrl.nationalIdController,
-                        focusNode: ctrl.nationalIdFocus,
-                        hintText: 'مثال: 070XXXXX',
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        maxLength: 12,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (v) =>
-                            ctrl.validateStep2Field('nationalId', v),
-                        onSubmitted: (_) =>
-                            ctrl.requestFocus(ctrl.birthPlaceFocus),
-                        enabled: ctrl.isFieldEditable('nationalId'),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Obx(
-                    () => LabeledField(
-                      key: ctrl.birthPlaceFieldKey,
-                      label: 'مكان الولادة',
-                      required: true,
-                      errorText: ctrl.birthPlaceError.value,
-                      child: RtlTextField(
-                        controller: ctrl.birthPlaceController,
-                        focusNode: ctrl.birthPlaceFocus,
-                        hintText: 'مكان الولادة',
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
-                          ),
-                        ],
-                        maxLength: 50,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (v) =>
-                            ctrl.validateStep2Field('birthPlace', v),
-                        onSubmitted: (_) =>
-                            ctrl.requestFocus(ctrl.birthDateFocus),
-                        enabled: ctrl.isFieldEditable('birthPlace'),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Obx(
-                    () {
-                      final birthDateEditable = ctrl.isFieldEditable('birthDate');
-                      return LabeledField(
-                        key: ctrl.birthDateFieldKey,
-                        label: 'تاريخ الولادة',
-                        required: true,
-                        errorText: ctrl.birthDateError.value,
-                        child: GestureDetector(
-                          onTap: birthDateEditable
-                              ? () async {
-                                  final lastDate = DateTime.now().subtract(
-                                    const Duration(days: 365 * 18),
-                                  );
-                                  final initialDate = ctrl.birthDate.value != null
-                                      ? (ctrl.birthDate.value!.isBefore(lastDate)
-                                            ? ctrl.birthDate.value!
-                                            : lastDate)
-                                      : DateTime(1990);
-                                  final picked = await showDatePicker(
-                                    context: context,
-                                    initialDate: initialDate,
-                                    firstDate: DateTime(1920),
-                                    lastDate: lastDate,
-                                    builder: (ctx, child) => Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: child!,
-                                    ),
-                                  );
-                                  if (picked != null) {
-                                    ctrl.birthDate.value = picked;
-                                    ctrl.validateStep2Field('birthDate', '');
-                                  }
-                                }
-                              : null,
-                          child: AbsorbPointer(
-                            absorbing: !birthDateEditable,
-                            child: Container(
-                              height: 48.h,
-                              padding: EdgeInsets.symmetric(horizontal: 12.w),
-                              decoration: BoxDecoration(
-                                color: surface,
-                                borderRadius: BorderRadius.circular(8.r),
-                                border: Border.all(color: borderColor),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Obx(
-                                    () => Text(
-                                      ctrl.birthDate.value != null
-                                          ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
-                                          : 'انقر لتحديد تاريخ ميلادك',
-                                      style: TextStyle(
-                                        fontFamily: 'Cairo',
-                                        fontSize: 13.sp,
-                                        color: ctrl.birthDate.value != null
-                                            ? textPrimary
-                                            : textHint,
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Icon(
-                                    Icons.calendar_today_outlined,
-                                    size: 18.r,
-                                    color: textHint,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+        Text(
+          'البيانات الأساسية لممثل الشركة',
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 13.sp,
+            fontWeight: FontWeight.bold,
+            color: textPrimary,
+          ),
+          textDirection: TextDirection.rtl,
+        ),
+        SizedBox(height: 6.h),
+        Text(
+          'يتم طلب الاسم الأول والكنية والرقم الوطني فقط لممثل الشركة؛ ويمكن إدخال باقي بيانات مقدم الطلب اختيارياً.',
+          style: TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 11.sp,
+            color: textSecondary,
+          ),
+          textDirection: TextDirection.rtl,
+        ),
+        SizedBox(height: 12.h),
+        Obx(
+          () => LabeledField(
+            key: ctrl.firstNameFieldKey,
+            label: 'الاسم الأول',
+            required: true,
+            errorText: ctrl.firstNameError.value,
+            child: RtlTextField(
+              controller: ctrl.firstNameController,
+              focusNode: ctrl.firstNameFocus,
+              hintText: 'الاسم الأول',
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+              ],
+              maxLength: 50,
+              textInputAction: TextInputAction.next,
+              onChanged: (v) => ctrl.validateStep2Field('firstName', v),
+              onSubmitted: (_) => ctrl.requestFocus(ctrl.nicknameFocus),
+              enabled: ctrl.isFieldEditable('firstName'),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Obx(
+          () => LabeledField(
+            key: ctrl.nicknameFieldKey,
+            label: 'الكنية',
+            required: true,
+            errorText: ctrl.nicknameError.value,
+            child: RtlTextField(
+              controller: ctrl.nicknameController,
+              focusNode: ctrl.nicknameFocus,
+              hintText: 'الكنية',
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+              ],
+              maxLength: 50,
+              textInputAction: TextInputAction.next,
+              onChanged: (v) => ctrl.validateStep2Field('nickname', v),
+              onSubmitted: (_) => ctrl.requestFocus(ctrl.nationalIdFocus),
+              enabled: ctrl.isFieldEditable('nickname'),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Obx(
+          () => LabeledField(
+            key: ctrl.nationalIdFieldKey,
+            label: 'الرقم الوطني',
+            required: true,
+            errorText: ctrl.nationalIdError.value,
+            child: RtlTextField(
+              controller: ctrl.nationalIdController,
+              focusNode: ctrl.nationalIdFocus,
+              hintText: 'مثال: 070XXXXX',
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              maxLength: 12,
+              textInputAction: TextInputAction.next,
+              onChanged: (v) => ctrl.validateStep2Field('nationalId', v),
+              onSubmitted: (_) => ctrl.requestFocus(ctrl.fatherNameFocus),
+              enabled: ctrl.isFieldEditable('nationalId'),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Obx(
+          () => LabeledField(
+            key: ctrl.fatherNameFieldKey,
+            label: 'اسم الأب',
+            required: false,
+            errorText: ctrl.fatherNameError.value,
+            child: RtlTextField(
+              controller: ctrl.fatherNameController,
+              focusNode: ctrl.fatherNameFocus,
+              hintText: 'اسم الأب',
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+              ],
+              maxLength: 50,
+              textInputAction: TextInputAction.next,
+              onChanged: (v) => ctrl.validateStep2Field('fatherName', v),
+              onSubmitted: (_) => ctrl.requestFocus(ctrl.motherNameFocus),
+              enabled: ctrl.isFieldEditable('fatherName'),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Obx(
+          () => LabeledField(
+            key: ctrl.motherNameFieldKey,
+            label: 'اسم الأم',
+            required: false,
+            errorText: ctrl.motherNameError.value,
+            child: RtlTextField(
+              controller: ctrl.motherNameController,
+              focusNode: ctrl.motherNameFocus,
+              hintText: 'اسم الأم',
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+              ],
+              maxLength: 50,
+              textInputAction: TextInputAction.next,
+              onChanged: (v) => ctrl.validateStep2Field('motherName', v),
+              onSubmitted: (_) => ctrl.requestFocus(ctrl.birthPlaceFocus),
+              enabled: ctrl.isFieldEditable('motherName'),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Obx(
+          () => LabeledField(
+            key: ctrl.birthPlaceFieldKey,
+            label: 'مكان الولادة',
+            required: false,
+            errorText: ctrl.birthPlaceError.value,
+            child: RtlTextField(
+              controller: ctrl.birthPlaceController,
+              focusNode: ctrl.birthPlaceFocus,
+              hintText: 'مكان الولادة',
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+              ],
+              maxLength: 50,
+              textInputAction: TextInputAction.next,
+              onChanged: (v) => ctrl.validateStep2Field('birthPlace', v),
+              onSubmitted: (_) => ctrl.requestFocus(ctrl.birthDateFocus),
+              enabled: ctrl.isFieldEditable('birthPlace'),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Obx(() {
+          final birthDateEditable = ctrl.isFieldEditable('birthDate');
+          return LabeledField(
+            key: ctrl.birthDateFieldKey,
+            label: 'تاريخ الولادة',
+            required: false,
+            errorText: ctrl.birthDateError.value,
+            child: GestureDetector(
+              onTap: birthDateEditable
+                  ? () async {
+                      final lastDate = DateTime.now().subtract(
+                        const Duration(days: 365 * 18),
+                      );
+                      final initialDate = ctrl.birthDate.value != null
+                          ? (ctrl.birthDate.value!.isBefore(lastDate)
+                                ? ctrl.birthDate.value!
+                                : lastDate)
+                          : DateTime(1990);
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: initialDate,
+                        firstDate: DateTime(1920),
+                        lastDate: lastDate,
+                        builder: (ctx, child) => Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: child!,
                         ),
                       );
-                    },
+                      if (picked != null) {
+                        ctrl.birthDate.value = picked;
+                        ctrl.validateStep2Field('birthDate', '');
+                      }
+                    }
+                  : null,
+              child: AbsorbPointer(
+                absorbing: !birthDateEditable,
+                child: Container(
+                  height: 48.h,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: surface,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: borderColor),
                   ),
-                ],
-              );
-            }
-
-            // Desktop/tablet layout: two-column rows
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Obx(
-                        () => LabeledField(
-                          key: ctrl.firstNameFieldKey,
-                          label: 'الاسم الأول',
-                          required: true,
-                          errorText: ctrl.firstNameError.value,
-                          child: RtlTextField(
-                            controller: ctrl.firstNameController,
-                            focusNode: ctrl.firstNameFocus,
-                            hintText: 'الاسم الأول بالهوية الشخصية',
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[\u0600-\u06FF\s]'),
-                              ),
-                            ],
-                            maxLength: 50,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (v) =>
-                                ctrl.validateStep2Field('firstName', v),
-                            onSubmitted: (_) =>
-                                ctrl.requestFocus(ctrl.fatherNameFocus),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Obx(
+                        () => Text(
+                          ctrl.birthDate.value != null
+                              ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
+                              : 'انقر لتحديد تاريخ ميلادك',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 13.sp,
+                            color: ctrl.birthDate.value != null
+                                ? textPrimary
+                                : textHint,
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Obx(
-                        () => LabeledField(
-                          key: ctrl.fatherNameFieldKey,
-                          label: 'اسم الأب',
-                          required: true,
-                          errorText: ctrl.fatherNameError.value,
-                          child: RtlTextField(
-                            controller: ctrl.fatherNameController,
-                            focusNode: ctrl.fatherNameFocus,
-                            hintText: 'اسم الأب',
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[\u0600-\u06FF\s]'),
-                              ),
-                            ],
-                            maxLength: 50,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (v) =>
-                                ctrl.validateStep2Field('fatherName', v),
-                            onSubmitted: (_) =>
-                                ctrl.requestFocus(ctrl.nicknameFocus),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Obx(
-                        () => LabeledField(
-                          key: ctrl.motherNameFieldKey,
-                          label: 'اسم الأم',
-                          required: true,
-                          errorText: ctrl.motherNameError.value,
-                          child: RtlTextField(
-                            controller: ctrl.motherNameController,
-                            focusNode: ctrl.motherNameFocus,
-                            hintText: 'اسم الأم',
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[\u0600-\u06FF\s]'),
-                              ),
-                            ],
-                            maxLength: 50,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (v) =>
-                                ctrl.validateStep2Field('motherName', v),
-                            onSubmitted: (_) =>
-                                ctrl.requestFocus(ctrl.nationalIdFocus),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Obx(
-                        () => LabeledField(
-                          key: ctrl.nicknameFieldKey,
-                          label: 'الكنية',
-                          required: true,
-                          errorText: ctrl.nicknameError.value,
-                          child: RtlTextField(
-                            controller: ctrl.nicknameController,
-                            focusNode: ctrl.nicknameFocus,
-                            hintText: 'الكنية',
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[\u0600-\u06FF\s]'),
-                              ),
-                            ],
-                            maxLength: 50,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (v) =>
-                                ctrl.validateStep2Field('nickname', v),
-                            onSubmitted: (_) =>
-                                ctrl.requestFocus(ctrl.motherNameFocus),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Obx(
-                        () {
-                          final birthDateEditable = ctrl.isFieldEditable('birthDate');
-                          return LabeledField(
-                            key: ctrl.birthDateFieldKey,
-                            label: 'تاريخ الولادة',
-                            required: true,
-                            errorText: ctrl.birthDateError.value,
-                            child: GestureDetector(
-                              onTap: birthDateEditable
-                                  ? () async {
-                                      final lastDate = DateTime.now().subtract(
-                                        const Duration(days: 365 * 18),
-                                      );
-                                      final initialDate = ctrl.birthDate.value != null
-                                          ? (ctrl.birthDate.value!.isBefore(lastDate)
-                                                ? ctrl.birthDate.value!
-                                                : lastDate)
-                                          : DateTime(1990);
-                                      final picked = await showDatePicker(
-                                        context: context,
-                                        initialDate: initialDate,
-                                        firstDate: DateTime(1920),
-                                        lastDate: lastDate,
-                                        builder: (ctx, child) => Directionality(
-                                          textDirection: TextDirection.rtl,
-                                          child: child!,
-                                        ),
-                                      );
-                                      if (picked != null) {
-                                        ctrl.birthDate.value = picked;
-                                        ctrl.validateStep2Field('birthDate', '');
-                                      }
-                                    }
-                                  : null,
-                              child: AbsorbPointer(
-                                absorbing: !birthDateEditable,
-                                child: Container(
-                                  height: 48.h,
-                                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                                  decoration: BoxDecoration(
-                                    color: surface,
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    border: Border.all(color: borderColor),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Obx(
-                                        () => Text(
-                                          ctrl.birthDate.value != null
-                                              ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
-                                              : 'انقر لتحديد تاريخ ميلادك',
-                                          style: TextStyle(
-                                            fontFamily: 'Cairo',
-                                            fontSize: 13.sp,
-                                            color: ctrl.birthDate.value != null
-                                                ? textPrimary
-                                                : textHint,
-                                          ),
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Icon(
-                                        Icons.calendar_today_outlined,
-                                        size: 18.r,
-                                        color: textHint,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Obx(
-                        () => LabeledField(
-                          key: ctrl.nationalIdFieldKey,
-                          label: 'الرقم الوطني',
-                          required: true,
-                          errorText: ctrl.nationalIdError.value,
-                          child: RtlTextField(
-                            controller: ctrl.nationalIdController,
-                            focusNode: ctrl.nationalIdFocus,
-                            hintText: 'مثال: 070XXXXX',
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            maxLength: 12,
-                            onChanged: (v) =>
-                                ctrl.validateStep2Field('nationalId', v),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.h),
-                Obx(
-                  () => LabeledField(
-                    key: ctrl.birthPlaceFieldKey,
-                    label: 'مكان الولادة',
-                    required: true,
-                    errorText: ctrl.birthPlaceError.value,
-                    child: RtlTextField(
-                      controller: ctrl.birthPlaceController,
-                      focusNode: ctrl.birthPlaceFocus,
-                      hintText: 'مكان الولادة',
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'[\u0600-\u06FF\s]'),
-                        ),
-                      ],
-                      maxLength: 50,
-                      textInputAction: TextInputAction.next,
-                      onChanged: (v) =>
-                          ctrl.validateStep2Field('birthPlace', v),
-                    ),
+                      const Spacer(),
+                      Icon(Icons.calendar_today_outlined, size: 18.r, color: textHint),
+                    ],
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ),
+          );
+        }),
 
         Divider(height: 28.h),
 
