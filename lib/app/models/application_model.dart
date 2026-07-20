@@ -124,6 +124,7 @@ class AttachmentItem {
 class ApplicationModel {
   final String id;
   final String applicationNumber;
+  final String licensenumberOld;
   final String status;
   final String statusLabel;
   final String requestType;
@@ -145,6 +146,22 @@ class ApplicationModel {
     return value.trim();
   }
 
+  static String getInvestorTypeLabel(String? value) {
+    if (value == null || value.trim().isEmpty) return 'نوع المستثمر';
+    final normalized = value.trim().toLowerCase();
+    switch (normalized) {
+      case 'applicant_individual':
+      case 'individual':
+        return 'مستثمر فردي';
+      case 'applicant_company':
+      case 'company':
+        return 'شركة';
+      case 'public':
+        return 'جهة عامة';
+      default:
+        return value;
+    }
+  }
   final String? stationCategory;
   final String? stationName;
   final String? applicantName;
@@ -171,6 +188,7 @@ class ApplicationModel {
   final String? companyName;
   final String? companyLicenseNumber;
   final String? companyLicenseDate;
+  final List<String> partners;
   final String? secondaryPhone;
   final String? governorateId;
   final String? districtId;
@@ -216,6 +234,7 @@ class ApplicationModel {
     this.companyName,
     this.companyLicenseNumber,
     this.companyLicenseDate,
+    this.partners = const [],
     this.secondaryPhone,
     this.governorateId,
     this.districtId,
@@ -224,7 +243,7 @@ class ApplicationModel {
     this.latitude,
     this.longitude,
     this.applicantType,
-    this.termsAccepted = false,
+    this.termsAccepted = false, required this.licensenumberOld,
   });
 
   factory ApplicationModel.fromJson(Map<String, dynamic> json) {
@@ -333,6 +352,13 @@ class ApplicationModel {
         applicantable['company_license_number']?.toString() ?? '';
     final companyLicenseDate =
         applicantable['company_license_date']?.toString() ?? '';
+    final partners =
+        (applicantable['partners'] is List)
+            ? (applicantable['partners'] as List)
+                .map((partner) => partner?.toString() ?? '')
+                .where((partner) => partner.trim().isNotEmpty)
+                .toList()
+            : <String>[];
 
     final latestAttachmentItems =
         (json['latest_attachments'] as List?)
@@ -384,6 +410,7 @@ class ApplicationModel {
     return ApplicationModel(
       id: json['id']?.toString() ?? '',
       applicationNumber: json['license_request_number']?.toString() ?? '',
+      licensenumberOld: json['license_number']?.toString()??'',
       status: statusValue,
       statusLabel: _statusLabel(statusValue),
       requestType: _normalizeRequestType(rawRequestType),
@@ -404,6 +431,7 @@ class ApplicationModel {
       companyLicenseDate: companyLicenseDate.isNotEmpty
           ? companyLicenseDate
           : null,
+      partners: partners,
       secondaryPhone: json['secondary_phone']?.toString(),
       governorateId:
           location['governorate_id']?.toString() ??
@@ -478,6 +506,7 @@ class ApplicationModel {
       ApplicationModel(
         id: 'LIC-1001',
         applicationNumber: 'طلب رقم 1001',
+        licensenumberOld: 'test',
         status: 'pending',
         statusLabel: 'قيد المراجعة',
         requestType: 'new',
@@ -510,6 +539,7 @@ class ApplicationModel {
       ApplicationModel(
         id: 'LIC-1002',
         applicationNumber: 'طلب رقم 1002',
+        licensenumberOld: 'test old ',
         status: 'approved',
         statusLabel: 'مقبول',
         requestType: 'settlement',

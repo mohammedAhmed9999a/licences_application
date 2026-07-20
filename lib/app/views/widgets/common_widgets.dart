@@ -859,7 +859,7 @@ class NavigationButtons extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(16.w),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           if (onPrev != null) ...[
             SizedBox(

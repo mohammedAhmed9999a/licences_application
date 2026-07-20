@@ -73,10 +73,31 @@ void main() {
     },
   );
 
-  test('stores attachment document type labels from API payload', () {
+  test('parses company partners from applicantable payload', () {
     final app = ApplicationModel.fromJson({
       'id': 2,
       'license_request_number': 'LR-1002',
+      'status': 'Pending',
+      'created_at': '2026-01-01T00:00:00Z',
+      'location': {},
+      'allowed_category': {},
+      'applicantable': {
+        'company_name': 'شركة الجاسم',
+        'company_license_number': 'GgHIo7399828',
+        'company_license_date': '2026-07-18T00:00:00.000000Z',
+        'partners': ['مهران الشحادات', 'أحمد الشحادات', 'ماهر الجلم'],
+      },
+      'user': {},
+    });
+
+    expect(app.companyName, 'شركة الجاسم');
+    expect(app.partners, ['مهران الشحادات', 'أحمد الشحادات', 'ماهر الجلم']);
+  });
+
+  test('stores attachment document type labels from API payload', () {
+    final app = ApplicationModel.fromJson({
+      'id': 3,
+      'license_request_number': 'LR-1003',
       'status': 'Pending',
       'created_at': '2026-01-01T00:00:00Z',
       'location': {},
@@ -99,8 +120,8 @@ void main() {
 
   test('prefers doc_name when present in attachment payload', () {
     final app = ApplicationModel.fromJson({
-      'id': 3,
-      'license_request_number': 'LR-1003',
+      'id': 4,
+      'license_request_number': 'LR-1004',
       'status': 'Pending',
       'created_at': '2026-01-01T00:00:00Z',
       'location': {},
@@ -122,8 +143,8 @@ void main() {
 
   test('reads attachment name from nested doc_type map', () {
     final app = ApplicationModel.fromJson({
-      'id': 4,
-      'license_request_number': 'LR-1004',
+      'id': 5,
+      'license_request_number': 'LR-1005',
       'status': 'Pending',
       'created_at': '2026-01-01T00:00:00Z',
       'location': {},
@@ -149,8 +170,8 @@ void main() {
 
   test('uses doc_type name as the attachment name instead of file_name', () {
     final app = ApplicationModel.fromJson({
-      'id': 5,
-      'license_request_number': 'LR-1005',
+      'id': 6,
+      'license_request_number': 'LR-1006',
       'status': 'Pending',
       'created_at': '2026-01-01T00:00:00Z',
       'location': {},

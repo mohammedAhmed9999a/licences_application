@@ -24,7 +24,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    _controller.loadNotifications();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _controller.loadNotifications();
+    });
   }
 
   int get unreadCount => _controller.unreadCount.value;

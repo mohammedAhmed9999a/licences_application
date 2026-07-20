@@ -141,6 +141,11 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     final applicationNumber = detail!.application.applicationNumber.isNotEmpty
         ? detail!.application.applicationNumber
         : 'غير محدد';
+    final previousLicenseNumber = detail!.application.licensenumberOld
+            .trim()
+            .isNotEmpty
+        ? detail!.application.licensenumberOld
+        : '';
     final fontData = await rootBundle.load('assets/fonts/arial.ttf');
     final font = pw.Font.ttf(fontData);
     final document = pw.Document();
@@ -202,7 +207,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             height: 20.h,
             padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
             alignment: pw.Alignment.centerRight,
-            decoration: pw.BoxDecoration(color: PdfColors.grey100),
+            decoration: pw.BoxDecoration(color: PdfColor.fromHex('#edebe0')),
             child: pw.Text(
               label2,
               textAlign: pw.TextAlign.right,
@@ -228,7 +233,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             height: 20.h,
             padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
             alignment: pw.Alignment.centerRight,
-            decoration: pw.BoxDecoration(color: PdfColors.grey100),
+            decoration: pw.BoxDecoration(color: PdfColor.fromHex('#edebe0')),
             child: pw.Text(
               label1,
               textAlign: pw.TextAlign.right,
@@ -245,27 +250,15 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
 
     pw.Widget buildSection(String title, List<pw.TableRow> rows) {
       return pw.Container(
-        margin: const pw.EdgeInsets.only(bottom: 6),
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(color: PdfColors.grey300),
-          borderRadius: pw.BorderRadius.circular(8),
-        ),
+        margin:  pw.EdgeInsets.only(bottom: 6.h,top: 6.h),
+        // decoration: pw.BoxDecoration(
+        //   border: pw.Border.all(color: PdfColors.grey300),
+        //   borderRadius: pw.BorderRadius.circular(8),
+        // ),
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Container(
-              padding: const pw.EdgeInsets.symmetric(
-                vertical: 6,
-                horizontal: 8,
-              ),
-              decoration: pw.BoxDecoration(
-                color: PdfColors.grey200,
-                borderRadius: const pw.BorderRadius.only(
-                  topLeft: pw.Radius.circular(8),
-                  topRight: pw.Radius.circular(8),
-                ),
-              ),
-              child: pw.Text(
+            pw.Text(
                 title,
                 textAlign: pw.TextAlign.right,
                 style: pw.TextStyle(
@@ -273,12 +266,33 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
-            ),
+              pw.SizedBox(height: 4.h),
+            // pw.Container(
+            //   padding: const pw.EdgeInsets.symmetric(
+            //     vertical: 6,
+            //     horizontal: 8,
+            //   ),
+            //   decoration: pw.BoxDecoration(
+            //     color: PdfColors.grey200,
+            //     borderRadius: const pw.BorderRadius.only(
+            //       topLeft: pw.Radius.circular(8),
+            //       topRight: pw.Radius.circular(8),
+            //     ),
+            //   ),
+            //   child: pw.Text(
+            //     title,
+            //     textAlign: pw.TextAlign.right,
+            //     style: pw.TextStyle(
+            //       fontSize: 12,
+            //       fontWeight: pw.FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
             pw.Divider(color: PdfColors.grey300, height: 1),
             pw.Table(
               border: pw.TableBorder.symmetric(
-                inside: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
-                outside: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
+                inside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
+                outside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
               ),
               columnWidths: {
                 0: const pw.FlexColumnWidth(4),
@@ -293,7 +307,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       );
     }
 
-    final bgData = await rootBundle.load('assets/images/logo2.png');
+    final bgData = await rootBundle.load('assets/images/pattern-light.png');
     debugPrint('حجم البيانات: ${bgData.lengthInBytes}');
     final bgImage = pw.MemoryImage(bgData.buffer.asUint8List());
     debugPrint('عرض الصورة: ${bgImage.width}, ارتفاعها: ${bgImage.height}');
@@ -307,21 +321,45 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             italic: font,
             boldItalic: font,
           ),
-          margin: const pw.EdgeInsets.all(24),
+          margin:  pw.EdgeInsets.all(24.sp),
           buildBackground: (context) {
-            return pw.Container(
-              width: PdfPageFormat.a4.width,
-              height: PdfPageFormat.a4.height,
-              child: pw.Opacity(
-                opacity: 0.12,
-                child: pw.Image(
-                  bgImage,
-                  fit: pw.BoxFit.cover,
-                  width: PdfPageFormat.a4.width,
-                  height: PdfPageFormat.a4.height,
-                ),
-              ),
-            );
+          return pw.Container(
+  width: PdfPageFormat.a4.width,
+  height: PdfPageFormat.a4.height,
+  child: pw.Opacity(
+    opacity: 0.18,
+    child: pw.Column(
+mainAxisAlignment: pw.MainAxisAlignment.start,
+crossAxisAlignment: pw.CrossAxisAlignment.start,      children: List.generate(
+        158, // عدد الصفوف
+        (_) => pw.Row(
+mainAxisAlignment: pw.MainAxisAlignment.start,
+crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generate(
+            40, // عدد الأعمدة
+            (_) => pw.Image(
+              bgImage,
+              width: 400.w,
+              height: 600.h,
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
+);
+            // return pw.Container(
+            //   width: PdfPageFormat.a4.width,
+            //   height: PdfPageFormat.a4.height,
+            //   child: pw.Opacity(
+            //     opacity: 0.2,
+            //     child: pw.Image(
+            //       bgImage,
+            //       fit: pw.BoxFit.cover,
+            //       width: PdfPageFormat.a4.width,
+            //       height: PdfPageFormat.a4.height,
+            //     ),
+            //   ),
+            // );
           },
         ),
 
@@ -367,214 +405,303 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
         build: (context) => [
           pw.Directionality(
             textDirection: pw.TextDirection.rtl,
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-              children: [
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
-                  children: [
-                    pw.Image(logoImage, width: 140, height: 90),
-                    pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.center,
-                      children: [
-                        pw.Text(
-                          'إدارة خدمات الطاقة',
-                          style: pw.TextStyle(
-                            fontSize: 16,
-                            fontWeight: pw.FontWeight.bold,
-                          ),
-                        ),
-                        pw.SizedBox(height: 4),
-                        pw.Text(
-                          'طلب ترخيص محطة وقود',
-                          style: pw.TextStyle(
-                            fontSize: 13,
-                            color: PdfColors.grey700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(8),
-                      decoration: pw.BoxDecoration(
-                        border: pw.Border.all(color: PdfColors.grey300),
-                        borderRadius: pw.BorderRadius.circular(8),
-                        color: PdfColors.white,
-                      ),
-                      child: pw.BarcodeWidget(
-                        data: applicationNumber,
-                        barcode: pw.Barcode.qrCode(),
-                        width: 50.w,
-                        height: 50.h,
-                      ),
-                    ),
-                  ],
-                ),
-                pw.SizedBox(height: 18),
-                pw.Container(
-                  width: double.infinity,
-                  padding: const pw.EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColors.grey200,
-                    borderRadius: pw.BorderRadius.circular(8),
-                  ),
-                  child: pw.Row(
+            child:pw. Padding(
+              padding: pw. EdgeInsets.all(10.sp),
+              child:pw. Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                children: [
+                
+                  pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
-                      pw.Text(
-                        'رقم الطلب: $applicationNumber',
-                        style: pw.TextStyle(
-                          fontSize: 10,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
+                      pw.Image(logoImage, width: 140.w, height: 70.h),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                        children: [
+                          pw.Text(
+                            'إدارة خدمات الطاقة',
+                            style: pw.TextStyle(
+                              fontSize: 20,
+                              color: PdfColors.green800,
+                              fontWeight: pw.FontWeight.bold,
+                            ),
+                          ),
+                          pw.SizedBox(height: 4),
+                          pw.Text(
+                            'طلب ترخيص محطة وقود',
+                            style: pw.TextStyle(
+                              fontSize: 13,
+                              color: PdfColors.grey700,
+                            ),
+                          ),
+                        ],
                       ),
-                      pw.Text(
-                        'تاريخ التقديم: ${_formatDisplayDate(detail!.application.createdAt)}',
-                        // 'تاريخ التقديم: ${detail!.application.createdAt.isNotEmpty ? detail!.application.createdAt : DateTime.now().toString().split(' ').first}',
-                        style: const pw.TextStyle(fontSize: 10),
+                      pw.Container(
+                        padding:  pw.EdgeInsets.all(6.sp),
+                        decoration: pw.BoxDecoration(
+                          border: pw.Border.all(color: PdfColors.grey300),
+                          borderRadius: pw.BorderRadius.circular(8.r),
+                          color: PdfColors.white,
+                        ),
+                        child: pw.BarcodeWidget(
+                          data: applicationNumber,
+                          barcode: pw.Barcode.qrCode(),
+                          width: 40.w,
+                          height: 40.h,
+                        ),
                       ),
                     ],
                   ),
-                ),
-                pw.SizedBox(height: 10),
-                buildSection('بيانات الطلب', [
-                  buildFourColumnRow(
-                    'رقم الطلب',
-                    applicationNumber,
-                    'نوع الطلب',
-                    requestTypeLabel,
-                  ),
-                  buildFourColumnRow(
-                    'حالة الطلب',
-                    detail!.application.statusLabel,
-                    'تاريخ التقديم',
-                    _formatDisplayDate(detail!.application.createdAt),
-                    // detail!.application.createdAt.isNotEmpty
-                    //     ? detail!.application.createdAt
-                    //     : DateTime.now().toString().split(' ').first,
-                    alternate: true,
-                  ),
-                  buildFourColumnRow(
-                    'اسم مقدم الطلب',
-                    applicantFullName,
-                    'الفئة',
-                    stationCategoryLabel,
-                  ),
-                  if (detail!.application.companyName?.trim().isNotEmpty ==
-                      true)
+                  // pw.SizedBox(height: 18),
+                  pw.Divider(),
+                  // pw.Container(
+                  //   width: double.infinity,
+                  //   padding: const pw.EdgeInsets.symmetric(
+                  //     horizontal: 12,
+                  //     vertical: 10,
+                  //   ),
+                  //   decoration: pw.BoxDecoration(
+                  //     color: PdfColors.grey200,
+                  //     borderRadius: pw.BorderRadius.circular(8),
+                  //   ),
+                  //   child: pw.Row(
+                  //     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       pw.Text(
+                  //         'رقم الطلب: $applicationNumber',
+                  //         style: pw.TextStyle(
+                  //           fontSize: 10,
+                  //           fontWeight: pw.FontWeight.bold,
+                  //         ),
+                  //       ),
+                  //       pw.Text(
+                  //         'تاريخ التقديم: ${_formatDisplayDate(detail!.application.createdAt)}',
+                  //         // 'تاريخ التقديم: ${detail!.application.createdAt.isNotEmpty ? detail!.application.createdAt : DateTime.now().toString().split(' ').first}',
+                  //         style: const pw.TextStyle(fontSize: 10),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  pw.SizedBox(height: 10),
+                  buildSection('بيانات الطلب', [
                     buildFourColumnRow(
-                      'اسم الشركة',
-                      companyName,
-                      'رقم رخصة الشركة',
-                      companyLicenseNumber,
+                      'رقم الطلب',
+                      applicationNumber,
+                      "حالة الطلب",
+                      detail!.application.statusLabel,
+                      // 'نوع الطلب',
+                      // requestTypeLabel,
                     ),
-                  if (detail!.application.companyLicenseDate
-                          ?.trim()
-                          .isNotEmpty ==
-                      true)
+                    if (detail!.application.licensenumberOld.trim().isNotEmpty)
+                      buildFourColumnRow(
+                        'رقم الترخيص السابق',
+                        previousLicenseNumber,
+                        '',
+                        '',
+                      ),
                     buildFourColumnRow(
-                      'تاريخ رخصة الشركة',
-                      companyLicenseDateLabel,
-                      '',
-                      '',
-                    ),
-                ]),
-                buildSection('بيانات مقدم الطلب', [
-                  buildFourColumnRow(
-                    'الاسم الكامل',
-                    applicantFullName,
-                    'الرقم الوطني',
-                    detail!.nationalId,
-                  ),
-                  buildFourColumnRow(
-                    'مكان الولادة',
-                    detail!.application.placeOfBirth?.trim().isNotEmpty == true
-                        ? detail!.application.placeOfBirth!
-                        : 'غير محدد',
-                    'تاريخ الميلاد',
-                    birthDate,
-                    alternate: true,
-                  ),
-                  buildFourColumnRow(
-                    'البريد الإلكتروني',
-                    detail!.email,
-                    'رقم التواصل',
-                    detail!.phone,
-                  ),
-                  if (detail!.application.secondaryPhone?.trim().isNotEmpty ==
-                      true)
-                    buildFourColumnRow(
-                      'الهاتف الثانوي',
-                      detail!.application.secondaryPhone!,
-                      '',
-                      '',
-                    ),
-                  if (detail!.application.companyName?.trim().isNotEmpty ==
-                      true)
-                    buildFourColumnRow(
-                      'اسم الشركة',
-                      companyName,
-                      'رقم الرخصة',
-                      companyLicenseNumber,
+                       'نوع العملية',
+                      requestTypeLabel,
+                      // 'حالة الطلب',
+                      // detail!.application.statusLabel,
+                      'تاريخ التقديم',
+                      _formatDisplayDate(detail!.application.createdAt),
+                      // detail!.application.createdAt.isNotEmpty
+                      //     ? detail!.application.createdAt
+                      //     : DateTime.now().toString().split(' ').first,
                       alternate: true,
                     ),
-                ]),
-                buildSection('بيانات الموقع والتصنيف', [
-                  buildFourColumnRow(
-                    'المحافظة',
-                    governorate,
-                    'المنطقة',
-                    district,
-                  ),
-                  buildFourColumnRow(
-                    'اسم المحطة',
-                    detail!.stationName,
-                    'فئة المحطة',
-                    stationCategoryLabel,
-                    alternate: true,
-                  ),
-                  buildFourColumnRow(
-                    'نوع الطريق',
-                    roadTypeLabel,
-                    'الحالة التنظيمية',
-                    planningLocationLabel,
-                  ),
-                  buildFourColumnRow(
-                    'الإحداثيات',
-                    coordinates,
-                    '',
-                    '',
-                    alternate: true,
-                  ),
-                ]),
-                // pw.SizedBox(height: 12),
-                // pw.Divider(color: PdfColors.grey300),
-                // pw.SizedBox(height: 10),
-                // // Spacer(),
-                // pw.Row(
-                //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     pw.Text(
-                //       'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
-                //       style: pw.TextStyle(
-                //         fontSize: 9,
-                //         color: PdfColors.grey600,
-                //       ),
-                //     ),
-                //     pw.Text(
-                //       'وزارة الطاقة © ${DateTime.now().year}',
-                //       style: pw.TextStyle(
-                //         fontSize: 9,
-                //         color: PdfColors.grey600,
-                //       ),
-                //     ),
-                //   ],
-                // ),
-              ],
+                    buildFourColumnRow(
+                       'نوع مقدم الطلب',
+                       ApplicationModel.getInvestorTypeLabel(detail!.application.investorType),
+                      // detail!.application.investorType.isNotEmpty
+                      //     ? detail!.application.investorType
+                      //     : 'غير محدد',
+                      // 'حالة الطلب',
+                      // detail!.application.statusLabel,
+                     'نسخة الشروط المعتمدة',
+                     '1.0',
+
+                      // detail!.application.createdAt.isNotEmpty
+                      //     ? detail!.application.createdAt
+                      //     : DateTime.now().toString().split(' ').first,
+                      alternate: true,
+                    ),
+                    buildFourColumnRow(
+                      'اسم مقدم الطلب',
+                      applicantFullName,
+                      'الفئة',
+                      stationCategoryLabel,
+                    ),
+                    if (detail!.application.companyName?.trim().isNotEmpty ==
+                        true)
+                      buildFourColumnRow(
+                        'اسم الشركة',
+                        companyName,
+                        'رقم رخصة الشركة',
+                        companyLicenseNumber,
+                      ),
+                    if (detail!.application.companyLicenseDate
+                            ?.trim()
+                            .isNotEmpty ==
+                        true)
+                      
+                      buildFourColumnRow(
+                        'تاريخ رخصة الشركة',
+                        _formatDisplayDate(detail!.application.companyLicenseDate),
+                       detail!.application.partners.isEmpty? ''
+                       : 'شركاء الشركة',
+                        detail!.application.partners.isNotEmpty
+                            ? detail!.application.partners.join(', ')
+                            : 'لا يوجد شركاء',
+                        alternate: true,
+                      ),
+                  ]),
+                  buildSection('بيانات مقدم الطلب', [
+                    buildFourColumnRow(
+                      'الاسم الكامل',
+                      applicantFullName,
+                      'الرقم الوطني',
+                      detail!.nationalId,
+                    ),
+                      buildFourColumnRow(
+                      'اسم الام',
+                      detail!.application.motherName?.trim().isNotEmpty == true
+                          ? detail!.application.motherName!
+                          : 'غير محدد',
+                      'تاريخ الميلاد',
+                      birthDate,
+                      alternate: true,
+                    ),
+                    buildFourColumnRow(
+                      'مكان الولادة',
+                      detail!.application.placeOfBirth?.trim().isNotEmpty == true
+                          ? detail!.application.placeOfBirth!
+                          : 'غير محدد',
+                      'تاريخ الميلاد',
+                      birthDate,
+                      alternate: true,
+                    ),
+                    // buildFourColumnRow(
+                    //   'البريد الإلكتروني',
+                    //   detail!.email,
+                    //   'رقم التواصل',
+                    //   detail!.phone,
+                    // ),
+                    // if (detail!.application.secondaryPhone?.trim().isNotEmpty ==
+                    //     true)
+                    //   buildFourColumnRow(
+                    //     'الهاتف الثانوي',
+                    //     detail!.application.secondaryPhone!,
+                    //     '',
+                    //     '',
+                    //   ),
+                    // if (detail!.application.companyName?.trim().isNotEmpty ==
+                    //     true)
+                    //   buildFourColumnRow(
+                    //    'اسم الشركة',
+                    //     companyName,
+                    //     'رقم الرخصة',
+                    //     companyLicenseNumber,
+                    //     alternate: true,
+                    //   ),
+                    
+                  ]),
+                   buildSection('بيانات  التواصل', [
+                    // buildFourColumnRow(
+                    //   'الاسم الكامل',
+                    //   applicantFullName,
+                    //   'الرقم الوطني',
+                    //   detail!.nationalId,
+                    // ),
+                    // buildFourColumnRow(
+                    //   'مكان الولادة',
+                    //   detail!.application.placeOfBirth?.trim().isNotEmpty == true
+                    //       ? detail!.application.placeOfBirth!
+                    //       : 'غير محدد',
+                    //   'تاريخ الميلاد',
+                    //   birthDate,
+                    //   alternate: true,
+                    // ),
+                    buildFourColumnRow(
+                      'البريد الإلكتروني',
+                      detail!.email,
+                      'رقم التواصل',
+                      detail!.phone,
+                    ),
+                    if (detail!.application.secondaryPhone?.trim().isNotEmpty ==
+                        true)
+                      buildFourColumnRow(
+                        'الهاتف الثانوي',
+                        detail!.application.secondaryPhone!,
+                        '',
+                        '',
+                      ),
+                    // if (detail!.application.companyName?.trim().isNotEmpty ==
+                    //     true)
+                    //   buildFourColumnRow(
+                    //    'اسم الشركة',
+                    //     companyName,
+                    //     'رقم الرخصة',
+                    //     companyLicenseNumber,
+                    //     alternate: true,
+                    //   ),
+                    
+                  ]),
+                  buildSection('بيانات الموقع والتصنيف', [
+                    buildFourColumnRow(
+                      'المحافظة',
+                      governorate,
+                      'المنطقة',
+                      district,
+                    ),
+                    buildFourColumnRow(
+                      'اسم البلدة',
+                      detail!.stationName,
+                      'فئة المحطة',
+                      stationCategoryLabel,
+                      alternate: true,
+                    ),
+                    buildFourColumnRow(
+                      'نوع الطريق',
+                      roadTypeLabel,
+                      'الحالة التنظيمية',
+                      planningLocationLabel,
+                    ),
+                    buildFourColumnRow(
+                      'الإحداثيات',
+                      coordinates,
+                      '',
+                      '',
+                      alternate: true,
+                    ),
+                  ]),
+                  // pw.SizedBox(height: 12),
+                  // pw.Divider(color: PdfColors.grey300),
+                  // pw.SizedBox(height: 10),
+                  // // Spacer(),
+                  // pw.Row(
+                  //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     pw.Text(
+                  //       'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
+                  //       style: pw.TextStyle(
+                  //         fontSize: 9,
+                  //         color: PdfColors.grey600,
+                  //       ),
+                  //     ),
+                  //     pw.Text(
+                  //       'وزارة الطاقة © ${DateTime.now().year}',
+                  //       style: pw.TextStyle(
+                  //         fontSize: 9,
+                  //         color: PdfColors.grey600,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                ],
+              ),
             ),
           ),
         ],
@@ -689,6 +816,11 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                             'رقم الطلب',
                             detail!.application.applicationNumber,
                           ),
+                          if (detail!.application.licensenumberOld.isNotEmpty)
+                            _InfoEntry(
+                              'رقم الترخيص السابق',
+                              detail!.application.licensenumberOld,
+                            ),
                           _InfoEntry('نوع الطلب', detail!.requestTypeLabel),
                           _InfoEntry('نوع المستثمر', detail!.investorTypeLabel),
                           _InfoEntry(

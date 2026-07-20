@@ -146,6 +146,9 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                   );
                                   FocusScope.of(context).unfocus();
                                 },
+                                maxLength: 30,
+                              enabled: ctrl.isFieldEditable('license_number'),
+
                               ),
                             ),
                           ),
@@ -436,7 +439,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                 ),
               ),
 
-              // ─── 3. Applicant Data ────────────────────────────────────────
+              // Applicant Data 
               Obx(
                 () => SectionCard(
                   title: 'بيانات مقدم الطلب',
@@ -572,7 +575,7 @@ class _SettlementPhase extends StatelessWidget {
   }
 }
 
-// ─── Individual Form ──────────────────────────────────────────────────────────
+// Individual Form 
 class _IndividualForm extends StatelessWidget {
   final LicenseApplicationController ctrl;
   const _IndividualForm({required this.ctrl});
@@ -1068,7 +1071,7 @@ class _IndividualForm extends StatelessWidget {
   }
 }
 
-// ─── Company Form ─────────────────────────────────────────────────────────────
+//Company Form Form
 class _CompanyForm extends StatelessWidget {
   final LicenseApplicationController ctrl;
   const _CompanyForm({required this.ctrl});
@@ -1084,7 +1087,7 @@ class _CompanyForm extends StatelessWidget {
 
     return Column(
       // textDirection: TextDirection.ltr,
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'بيانات مقدم الطلب',
@@ -1369,6 +1372,7 @@ class _CompanyForm extends StatelessWidget {
                     );
                     FocusScope.of(context).unfocus();
                   },
+                  maxLength: 30,
                   enabled: ctrl.isFieldEditable('companyLicenseNumber'),
                 ),
               ),

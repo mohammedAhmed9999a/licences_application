@@ -222,6 +222,7 @@ class LicenseApplicationController extends GetxController {
     'agreedToTerms': 'termsContact',
     'requestType': 'licenseDetails',
     'previousLicenseNumber': 'settlementDetails',
+    'license_number': 'licenseDetails',
     'settledAgreed': 'settlementDetails',
     'firstName': 'licenseDetails',
     'fatherName': 'licenseDetails',
@@ -959,11 +960,9 @@ class LicenseApplicationController extends GetxController {
 
       if (!hasPreviousLicenseNumber) {
         settlementPreviousLicenseError.value = 'يرجى إدخال رقم الترخيص السابق';
-      } else if (!RegExp(
-        r'^[A-Za-z0-9]+$',
-      ).hasMatch(previousLicenseNumber.text.trim())) {
+      } else if (!RegExp(r'^[A-Za-z0-9-]+$').hasMatch(previousLicenseNumber.text.trim())) {
         settlementPreviousLicenseError.value =
-            'رقم الترخيص يجب أن يحتوي على حروف إنكليزية وأرقام فقط وبدون مسافات أو رموز';
+            'رقم الترخيص يجب أن يحتوي على أحرف إنكليزية وأرقام وواصلة (-) فقط، بدون مسافات أو رموز أخرى';
       } else {
         settlementPreviousLicenseError.value = '';
       }
@@ -1517,17 +1516,15 @@ class LicenseApplicationController extends GetxController {
         }
         break;
       case 'previousLicenseNumber':
-        if (value.trim().isEmpty) {
-          settlementPreviousLicenseError.value =
-              'يرجى إدخال رقم الترخيص السابق';
-        }
-        // else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(value.trim())) {
-        //   settlementPreviousLicenseError.value =
-        //       'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
-        // }
-        else {
-          settlementPreviousLicenseError.value = '';
-        }
+          if (value.trim().isEmpty) {
+            settlementPreviousLicenseError.value =
+                'يرجى إدخال رقم الترخيص السابق';
+          } else if (!RegExp(r'^[A-Za-z0-9-]+$').hasMatch(value.trim())) {
+            settlementPreviousLicenseError.value =
+                'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام وواصلة (-) فقط.';
+          } else {
+            settlementPreviousLicenseError.value = '';
+          }
         if (settlementPreviousLicenseError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             scrollToFirstError();
