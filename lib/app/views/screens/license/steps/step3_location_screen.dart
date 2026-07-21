@@ -95,8 +95,85 @@ class Step3LocationScreen extends StatelessWidget {
                 title: 'بيانات الموقع',
                 stepNumber: 1,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (ctrl.requestType.value == 'settlement') ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 10.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.forest.withOpacity(0.14)
+                                  : AppColors.backgroundAlt,
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'مسار موقع التسوية',
+                                  style: TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark
+                                        ? AppColors.backgroundAlt
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                                SizedBox(width: 6.w),
+                                Icon(
+                                  Icons.route,
+                                  size: 16.sp,
+                                  color: isDark
+                                      ? AppColors.backgroundAlt
+                                      : AppColors.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10.h),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                child: ChoiceCard(
+                                  title: 'نفس الموقع',
+                                  subtitle: 'استخدم موقع المحطة الحالي.',
+                                  icon: Icons.location_on_outlined,
+                                  selected: !ctrl.settlementRelocation.value,
+                                  onTap: () =>
+                                      ctrl.settlementRelocation.value = false,
+                                ),
+                              ),
+                              SizedBox(height: 10.h),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ChoiceCard(
+                                  title: 'نقل الموقع',
+                                  subtitle: 'أدخل الموقع القديم والجديد.',
+                                  icon: Icons.compare_arrows,
+                                  selected: ctrl.settlementRelocation.value,
+                                  onTap: () =>
+                                      ctrl.settlementRelocation.value = true,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (ctrl.settlementRelocation.value) ...[
+                            SizedBox(height: 14.h),
+                            _OldSettlementLocationForm(ctrl: ctrl),
+                          ],
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
                     // Address / Coordinates tab
                     Container(
                       decoration: BoxDecoration(
@@ -1129,6 +1206,225 @@ class Step3LocationScreen extends StatelessWidget {
 }
 
 // ─── Helper Widgets ───────────────────────────────────────────────────────────
+class _OldSettlementLocationForm extends StatelessWidget {
+  const _OldSettlementLocationForm({required this.ctrl});
+
+  final LicenseApplicationController ctrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final oldSectionColor = isDark
+        ? AppColors.forest.withOpacity(0.18)
+        : AppColors.primary.withOpacity(0.08);
+    final oldSectionBorder = isDark
+        ? AppColors.forest2.withOpacity(0.7)
+        : AppColors.primary.withOpacity(0.25);
+
+    return Obx(
+      () => Container(
+        // padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: oldSectionColor,
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(color: oldSectionBorder),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: double.infinity,
+              // padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.forest1 : AppColors.backgroundAlt,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'الموقع القديم',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 12.sp,
+                      color: isDark
+                          ? AppColors.backgroundAlt
+                          : AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: 6.w),
+                  Icon(
+                    Icons.history,
+                    size: 16.sp,
+                    color: isDark ? AppColors.backgroundAlt : AppColors.primary,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 14.h),
+            _oldDropdown(
+              label: 'المحافظة',
+              value: ctrl.oldSelectedGovernorate.value?.name,
+              items: ctrl.oldGovernorates.map((item) => item.name).toList(),
+              onChanged: (value) {
+                ctrl.onOldGovernorateChanged(
+                  ctrl.oldGovernorates.firstWhereOrNull(
+                    (item) => item.name == value,
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _oldDropdown(
+              label: 'المنطقة',
+              value: ctrl.oldSelectedDistrict.value?.name,
+              items: ctrl.oldDistricts.map((item) => item.name).toList(),
+              onChanged: (value) {
+                ctrl.onOldDistrictChanged(
+                  ctrl.oldDistricts.firstWhereOrNull(
+                    (item) => item.name == value,
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _oldDropdown(
+              label: 'الناحية',
+              value: ctrl.oldSelectedSubdistrict.value?.name,
+              items: ctrl.oldSubdistricts.map((item) => item.name).toList(),
+              onChanged: (value) {
+                ctrl.onOldSubdistrictChanged(
+                  ctrl.oldSubdistricts.firstWhereOrNull(
+                    (item) => item.name == value,
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _oldDropdown(
+              label: 'البلدة',
+              value: ctrl.oldSelectedTown.value?.name,
+              items: ctrl.oldTowns.map((item) => item.name).toList(),
+              onChanged: (value) {
+                final town = ctrl.oldTowns.firstWhereOrNull(
+                  (item) => item.name == value,
+                );
+                ctrl.oldSelectedTown.value = town;
+                if (town?.latitude != null && town?.longitude != null) {
+                  ctrl.oldLatitudeController.text = town!.latitude!
+                      .toStringAsFixed(6);
+                  ctrl.oldLongitudeController.text = town.longitude!
+                      .toStringAsFixed(6);
+                }
+              },
+            ),
+            SizedBox(height: 12.h),
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.forest : AppColors.background,
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: isDark ? AppColors.forest2 : AppColors.border,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'تحديد الموقع على الخريطة',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    'حدد موقع المحطة بإحدى الطرق الثلاث: اكتب الإحداثيات يدوياً، أو اضغط على الخريطة لوضع الدبوس، أو اضغط زر "أنا في المحطة الآن استخدم موقعي" لتحديد موقع المحطة تلقائياً إذا كنت هناك الآن.',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 11.sp,
+                      color: isDark
+                          ? AppColors.background
+                          : AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
+                  SizedBox(height: 10.h),
+                  SizedBox(
+                    height: 220.h,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: _LocationPickerMap(
+                        latitudeController: ctrl.oldLatitudeController,
+                        longitudeController: ctrl.oldLongitudeController,
+                        enabled: true,
+                        onLocationSelected: (position) {
+                          ctrl.oldLatitudeController.text = position.latitude
+                              .toStringAsFixed(6);
+                          ctrl.oldLongitudeController.text = position.longitude
+                              .toStringAsFixed(6);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              textDirection: TextDirection.rtl,
+              children: [
+                Expanded(
+                  child: RtlTextField(
+                    controller: ctrl.oldLongitudeController,
+                    hintText: 'خط الطول',
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: RtlTextField(
+                    controller: ctrl.oldLatitudeController,
+                    hintText: 'خط العرض',
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _oldDropdown({
+    required String label,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return LabeledField(
+      label: label,
+      required: true,
+      child: _DropdownField(
+        hint: 'اختر $label',
+        value: value,
+        items: items,
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
+
 class _LocationPickerMap extends StatefulWidget {
   final TextEditingController latitudeController;
   final TextEditingController longitudeController;
@@ -1316,38 +1612,45 @@ class _DropdownField extends StatelessWidget {
           : Row(
               children: [
                 Expanded(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value,
-                      hint: Text(
-                        hint,
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 13.sp,
-                          color: hintColor,
-                        ),
+                  child: DropdownButtonFormField<String>(
+                    value: value,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                    ),
+                    hint: Text(
+                      hint,
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 13.sp,
+                        color: hintColor,
                       ),
-                      isExpanded: true,
-                      alignment: AlignmentDirectional.centerStart,
-                      icon: Icon(Icons.keyboard_arrow_down, color: iconColor),
-                      items: items
-                          .map(
-                            (item) => DropdownMenuItem(
-                              value: item,
-                              child: Text(
-                                item,
-                                textDirection: TextDirection.rtl,
-                                style: TextStyle(
-                                  fontFamily: 'Cairo',
-                                  fontSize: 13.sp,
-                                  color: textColor,
-                                ),
+                    ),
+                    icon: Icon(Icons.keyboard_arrow_down, color: iconColor),
+                    dropdownColor: fillColor,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 13.sp,
+                      color: textColor,
+                    ),
+                    items: items
+                        .map(
+                          (item) => DropdownMenuItem(
+                            value: item,
+                            child: Text(
+                              item,
+                              textDirection: TextDirection.rtl,
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 13.sp,
+                                color: textColor,
                               ),
                             ),
-                          )
-                          .toList(),
-                      onChanged: enabled ? onChanged : null,
-                    ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: enabled ? onChanged : null,
                   ),
                 ),
                 if (onRefresh != null && enabled)

@@ -171,6 +171,19 @@ class LicenseApplicationController extends GetxController {
   final selectedLocation = Rxn<LatLng>();
   final locationStatus = 'not_set'.obs; // 'not_set' | 'set' | 'denied'
 
+  // Settlement relocation uses a second, independent location for the old site.
+  final settlementRelocation = false.obs;
+  final oldSelectedGovernorate = Rxn<GovernorateModel>();
+  final oldSelectedDistrict = Rxn<GovernorateModel>();
+  final oldSelectedSubdistrict = Rxn<GovernorateModel>();
+  final oldSelectedTown = Rxn<GovernorateModel>();
+  final oldGovernorates = <GovernorateModel>[].obs;
+  final oldDistricts = <GovernorateModel>[].obs;
+  final oldSubdistricts = <GovernorateModel>[].obs;
+  final oldTowns = <GovernorateModel>[].obs;
+  final oldLatitudeController = TextEditingController();
+  final oldLongitudeController = TextEditingController();
+
   // Planning
   final planningLocation = 'inside'.obs; // 'inside' | 'outside'
 
@@ -773,7 +786,16 @@ class LicenseApplicationController extends GetxController {
         location['longitude'] = longitude;
       }
       if (location.isNotEmpty) {
-        payload['location'] = location;
+        if (requestType.value == 'settlement' && settlementRelocation.value) {
+          payload['settlement'] = {
+            'is_relocation': 1,
+            'license_number': previousLicenseNumber.text.trim(),
+            'old_location': _buildOldLocationPayload(),
+            'new_location': location,
+          };
+        } else {
+          payload['location'] = location;
+        }
       }
     }
 
@@ -808,18 +830,22 @@ class LicenseApplicationController extends GetxController {
       }
 
       if (requestType.value == 'settlement') {
-        payload['settlement'] = {
-          'is_relocation': 0,
-          'license_number': previousLicenseNumber.text.trim(),
-        };
+        final settlement = payload['settlement'] is Map
+            ? Map<String, dynamic>.from(payload['settlement'] as Map)
+            : <String, dynamic>{};
+        settlement['is_relocation'] = settlementRelocation.value ? 1 : 0;
+        settlement['license_number'] = previousLicenseNumber.text.trim();
+        payload['settlement'] = settlement;
       }
     }
 
     if (correctionTargets.contains('settlementDetails')) {
-      payload['settlement'] = {
-        'is_relocation': 0,
-        'license_number': previousLicenseNumber.text.trim(),
-      };
+      final settlement = payload['settlement'] is Map
+          ? Map<String, dynamic>.from(payload['settlement'] as Map)
+          : <String, dynamic>{};
+      settlement['is_relocation'] = settlementRelocation.value ? 1 : 0;
+      settlement['license_number'] = previousLicenseNumber.text.trim();
+      payload['settlement'] = settlement;
     }
 
     return payload;
@@ -960,7 +986,9 @@ class LicenseApplicationController extends GetxController {
 
       if (!hasPreviousLicenseNumber) {
         settlementPreviousLicenseError.value = 'يرجى إدخال رقم الترخيص السابق';
-      } else if (!RegExp(r'^[A-Za-z0-9-]+$').hasMatch(previousLicenseNumber.text.trim())) {
+      } else if (!RegExp(
+        r'^[A-Za-z0-9-]+$',
+      ).hasMatch(previousLicenseNumber.text.trim())) {
         settlementPreviousLicenseError.value =
             'رقم الترخيص يجب أن يحتوي على أحرف إنكليزية وأرقام وواصلة (-) فقط، بدون مسافات أو رموز أخرى';
       } else {
@@ -977,7 +1005,6 @@ class LicenseApplicationController extends GetxController {
       if (!hasPreviousLicenseNumber || !hasSettlementAgreement) {
         errorMessage.value = 'يرجى إكمال بيانات التسوية المطلوبة';
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          
           scrollToFirstError();
         });
         return false;
@@ -1516,15 +1543,15 @@ class LicenseApplicationController extends GetxController {
         }
         break;
       case 'previousLicenseNumber':
-          if (value.trim().isEmpty) {
-            settlementPreviousLicenseError.value =
-                'يرجى إدخال رقم الترخيص السابق';
-          } else if (!RegExp(r'^[A-Za-z0-9-]+$').hasMatch(value.trim())) {
-            settlementPreviousLicenseError.value =
-                'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام وواصلة (-) فقط.';
-          } else {
-            settlementPreviousLicenseError.value = '';
-          }
+        if (value.trim().isEmpty) {
+          settlementPreviousLicenseError.value =
+              'يرجى إدخال رقم الترخيص السابق';
+        } else if (!RegExp(r'^[A-Za-z0-9-]+$').hasMatch(value.trim())) {
+          settlementPreviousLicenseError.value =
+              'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام وواصلة (-) فقط.';
+        } else {
+          settlementPreviousLicenseError.value = '';
+        }
         if (settlementPreviousLicenseError.value.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             scrollToFirstError();
@@ -1564,6 +1591,19 @@ class LicenseApplicationController extends GetxController {
 
   bool validateStep3() {
     errorMessage.value = '';
+    final oldLocationValid =
+        oldSelectedGovernorate.value != null &&
+        oldSelectedDistrict.value != null &&
+        oldSelectedSubdistrict.value != null &&
+        oldSelectedTown.value != null &&
+        oldLatitudeController.text.isNotEmpty &&
+        oldLongitudeController.text.isNotEmpty;
+    if (requestType.value == 'settlement' &&
+        settlementRelocation.value &&
+        !oldLocationValid) {
+      errorMessage.value = 'يرجى إدخال بيانات الموقع القديم كاملة';
+      return false;
+    }
     if (selectedGovernorate.value == null) {
       errorMessage.value = 'يرجى اختيار المحافظة';
       return false;
@@ -1983,15 +2023,39 @@ class LicenseApplicationController extends GetxController {
               'applicant[partners][$i]': partners[i].trim(),
         },
         if (requestType.value == 'settlement') ...{
-          'settlement[is_relocation]': 0,
+          'settlement[is_relocation]': settlementRelocation.value ? 1 : 0,
           'settlement[license_number]': previousLicenseNumber.text.trim(),
         },
-        'location[governorate_id]': selectedGovernorate.value?.id,
-        'location[district_id]': selectedDistrict.value?.id,
-        'location[sub_district_id]': selectedSubdistrict.value?.id,
-        'location[town_id]': selectedTown.value?.id,
-        'location[latitude]': latitudeController.text.trim(),
-        'location[longitude]': longitudeController.text.trim(),
+        if (requestType.value != 'settlement' ||
+            !settlementRelocation.value) ...{
+          'location[governorate_id]': selectedGovernorate.value?.id,
+          'location[district_id]': selectedDistrict.value?.id,
+          'location[sub_district_id]': selectedSubdistrict.value?.id,
+          'location[town_id]': selectedTown.value?.id,
+          'location[latitude]': latitudeController.text.trim(),
+          'location[longitude]': longitudeController.text.trim(),
+        } else ...{
+          'settlement[old_location][governorate_id]':
+              oldSelectedGovernorate.value?.id,
+          'settlement[old_location][district_id]':
+              oldSelectedDistrict.value?.id,
+          'settlement[old_location][sub_district_id]':
+              oldSelectedSubdistrict.value?.id,
+          'settlement[old_location][town_id]': oldSelectedTown.value?.id,
+          'settlement[old_location][latitude]': oldLatitudeController.text
+              .trim(),
+          'settlement[old_location][longitude]': oldLongitudeController.text
+              .trim(),
+          'settlement[new_location][governorate_id]':
+              selectedGovernorate.value?.id,
+          'settlement[new_location][district_id]': selectedDistrict.value?.id,
+          'settlement[new_location][sub_district_id]':
+              selectedSubdistrict.value?.id,
+          'settlement[new_location][town_id]': selectedTown.value?.id,
+          'settlement[new_location][latitude]': latitudeController.text.trim(),
+          'settlement[new_location][longitude]': longitudeController.text
+              .trim(),
+        },
         ...buildUserInfoPayload(),
       });
       final uploadAttachments = requiredAttachments
@@ -2042,14 +2106,27 @@ class LicenseApplicationController extends GetxController {
   }
 
   // ─── Lookups ─────────────────────────────────────────────────────
+  Map<String, dynamic> _buildOldLocationPayload() {
+    return {
+      'governorate_id': oldSelectedGovernorate.value?.id,
+      'district_id': oldSelectedDistrict.value?.id,
+      'sub_district_id': oldSelectedSubdistrict.value?.id,
+      'town_id': oldSelectedTown.value?.id,
+      'latitude': oldLatitudeController.text.trim(),
+      'longitude': oldLongitudeController.text.trim(),
+    };
+  }
+
   Future<void> _loadGovernorates() async {
     isGovernoratesLoading.value = true;
     try {
       final res = await CoreApiService.get('/v1/governorates');
       final data = res.data is Map ? res.data['data'] : res.data;
-      governorates.value = (data as List)
+      final values = (data as List)
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
+      governorates.value = values;
+      oldGovernorates.value = values;
     } catch (_) {
       governorates.value = [];
     } finally {
@@ -2149,6 +2226,58 @@ class LicenseApplicationController extends GetxController {
 
   Future<void> refreshTowns() async {
     await onSubdistrictChanged(selectedSubdistrict.value);
+  }
+
+  Future<void> onOldGovernorateChanged(GovernorateModel? gov) async {
+    oldSelectedGovernorate.value = gov;
+    oldSelectedDistrict.value = null;
+    oldSelectedSubdistrict.value = null;
+    oldSelectedTown.value = null;
+    oldDistricts.clear();
+    oldSubdistricts.clear();
+    oldTowns.clear();
+    if (gov == null) return;
+    try {
+      final res = await CoreApiService.get(
+        '/v1/governorates/${gov.id}/districts',
+      );
+      final data = res.data is Map ? res.data['data'] : res.data;
+      oldDistricts.value = (data as List)
+          .map((e) => GovernorateModel.fromJson(e))
+          .toList();
+    } catch (_) {}
+  }
+
+  Future<void> onOldDistrictChanged(GovernorateModel? dist) async {
+    oldSelectedDistrict.value = dist;
+    oldSelectedSubdistrict.value = null;
+    oldSelectedTown.value = null;
+    oldSubdistricts.clear();
+    oldTowns.clear();
+    if (dist == null) return;
+    try {
+      final res = await CoreApiService.get(
+        '/v1/districts/${dist.id}/sub-districts',
+      );
+      final data = res.data is Map ? res.data['data'] : res.data;
+      oldSubdistricts.value = (data as List)
+          .map((e) => GovernorateModel.fromJson(e))
+          .toList();
+    } catch (_) {}
+  }
+
+  Future<void> onOldSubdistrictChanged(GovernorateModel? sub) async {
+    oldSelectedSubdistrict.value = sub;
+    oldSelectedTown.value = null;
+    oldTowns.clear();
+    if (sub == null) return;
+    try {
+      final res = await CoreApiService.get('/v1/sub-districts/${sub.id}/towns');
+      final data = res.data is Map ? res.data['data'] : res.data;
+      oldTowns.value = (data as List)
+          .map((e) => GovernorateModel.fromJson(e))
+          .toList();
+    } catch (_) {}
   }
 
   void addPartner() {

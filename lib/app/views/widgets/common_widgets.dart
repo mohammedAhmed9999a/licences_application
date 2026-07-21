@@ -12,6 +12,8 @@ class SectionCard extends StatelessWidget {
   final int? stepNumber;
   final Widget child;
   final String? badgeText;
+  final EdgeInsetsGeometry? contentPadding;
+  final bool showBorder;
 
   const SectionCard({
     super.key,
@@ -20,6 +22,8 @@ class SectionCard extends StatelessWidget {
     this.stepNumber,
     required this.child,
     this.badgeText,
+    this.contentPadding,
+    this.showBorder = true,
   });
 
   @override
@@ -38,7 +42,7 @@ class SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: surface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: borderColor),
+        border: showBorder ? Border.all(color: borderColor) : null,
       ),
       child: Column(
         // crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,7 +50,7 @@ class SectionCard extends StatelessWidget {
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: contentPadding ?? EdgeInsets.all(16.w),
             child: Row(
               // mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -140,7 +144,10 @@ class SectionCard extends StatelessWidget {
               ),
             ),
           Divider(height: 1.h, color: theme.dividerColor),
-          Padding(padding: EdgeInsets.all(16.w), child: child),
+          Padding(
+            padding: contentPadding ?? EdgeInsets.all(16.w),
+            child: child,
+          ),
         ],
       ),
     );
