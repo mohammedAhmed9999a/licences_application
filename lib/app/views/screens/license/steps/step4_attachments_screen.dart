@@ -12,6 +12,8 @@ import '../../terms_pdf_viewer_screen.dart';
 
 class Step4AttachmentsScreen extends StatelessWidget {
   const Step4AttachmentsScreen({super.key});
+  //
+  //
 
   @override
   Widget build(BuildContext context) {
