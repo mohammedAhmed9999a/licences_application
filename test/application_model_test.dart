@@ -73,6 +73,24 @@ void main() {
     },
   );
 
+  test('parses subdistrict name from location payload', () {
+    final app = ApplicationModel.fromJson({
+      'id': 2,
+      'license_request_number': 'LR-1002',
+      'status': 'Pending',
+      'created_at': '2026-01-01T00:00:00Z',
+      'location': {
+        'sub_district_name': 'المرج',
+        'sub_district': {'name': 'المرج'},
+      },
+      'allowed_category': {},
+      'applicantable': {},
+      'user': {},
+    });
+
+    expect(app.subDistrict, 'المرج');
+  });
+
   test('parses company partners from applicantable payload', () {
     final app = ApplicationModel.fromJson({
       'id': 2,

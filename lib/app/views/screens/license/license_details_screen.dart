@@ -183,123 +183,165 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     final logoData = await rootBundle.load('assets/images/h-logo.webp');
     final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
 
-    pw.TableRow buildFourColumnRow(
+    pw.Widget buildFourColumnRow(
       String label1,
       String value1,
       String label2,
       String value2, {
       bool alternate = false,
     }) {
-      return pw.TableRow(
+      final rowColor = alternate
+          ? PdfColor.fromHex('#f8f7f0')
+          : PdfColors.white;
+
+      return pw.Table(
+        border: pw.TableBorder.symmetric(
+          inside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
+          outside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
+        ),
+        columnWidths: {
+          0: const pw.FlexColumnWidth(4),
+          1: const pw.FlexColumnWidth(2),
+          2: const pw.FlexColumnWidth(4),
+          3: const pw.FlexColumnWidth(2),
+        },
         children: [
-          pw.Container(
-            height: 20.h,
-            padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-            alignment: pw.Alignment.centerRight,
-            decoration: pw.BoxDecoration(color: PdfColors.white),
-            child: pw.Text(
-              value2.isEmpty ? '-' : value2,
-              textAlign: pw.TextAlign.right,
-              style: const pw.TextStyle(fontSize: 10),
-            ),
-          ),
-          pw.Container(
-            height: 20.h,
-            padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-            alignment: pw.Alignment.centerRight,
-            decoration: pw.BoxDecoration(color: PdfColor.fromHex('#edebe0')),
-            child: pw.Text(
-              label2,
-              textAlign: pw.TextAlign.right,
-              style: pw.TextStyle(
-                fontSize: 10,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.green800,
+          pw.TableRow(
+            decoration: pw.BoxDecoration(color: rowColor),
+            children: [
+              pw.Container(
+                height: 20.h,
+                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                alignment: pw.Alignment.centerRight,
+                color: PdfColor.fromHex('#ffffff'),
+
+                child: pw.Text(
+                  value2.isEmpty ? '-' : value2,
+                  textAlign: pw.TextAlign.right,
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
               ),
-            ),
-          ),
-          pw.Container(
-            height: 20.h,
-            padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-            alignment: pw.Alignment.centerRight,
-            decoration: pw.BoxDecoration(color: PdfColors.white),
-            child: pw.Text(
-              value1.isEmpty ? '-' : value1,
-              textAlign: pw.TextAlign.right,
-              style: const pw.TextStyle(fontSize: 10),
-            ),
-          ),
-          pw.Container(
-            height: 20.h,
-            padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-            alignment: pw.Alignment.centerRight,
-            decoration: pw.BoxDecoration(color: PdfColor.fromHex('#edebe0')),
-            child: pw.Text(
-              label1,
-              textAlign: pw.TextAlign.right,
-              style: pw.TextStyle(
-                fontSize: 10,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.green800,
+              pw.Container(
+                height: 20.h,
+                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                alignment: pw.Alignment.centerRight,
+                color: PdfColor.fromHex('#edebe0'),
+                child: pw.Text(
+                  label2,
+                  textAlign: pw.TextAlign.right,
+                  style: pw.TextStyle(
+                    fontSize: 10,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.green800,
+                  ),
+                ),
               ),
-            ),
+              pw.Container(
+                height: 20.h,
+                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                alignment: pw.Alignment.centerRight,
+                color: PdfColor.fromHex('#ffffff'),
+
+                child: pw.Text(
+                  value1.isEmpty ? '-' : value1,
+                  textAlign: pw.TextAlign.right,
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+              ),
+              pw.Container(
+                height: 20.h,
+                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                alignment: pw.Alignment.centerRight,
+                color: PdfColor.fromHex('#edebe0'),
+                child: pw.Text(
+                  label1,
+                  textAlign: pw.TextAlign.right,
+                  style: pw.TextStyle(
+                    fontSize: 10,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.green800,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       );
     }
 
-    pw.Widget buildSection(String title, List<pw.TableRow> rows) {
+    pw.Widget buildTwoColumnRow(
+      String label,
+      String value, {
+      bool alternate = false,
+    }) {
+      final rowColor = alternate
+          ? PdfColor.fromHex('#f8f7f0')
+          : PdfColors.white;
+
+      return pw.Table(
+        border: pw.TableBorder.symmetric(
+          inside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
+          outside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
+        ),
+        columnWidths: {
+          0: const pw.FlexColumnWidth(5),
+          1: const pw.FlexColumnWidth(1),
+        },
+        children: [
+          pw.TableRow(
+            decoration: pw.BoxDecoration(color: rowColor),
+            children: [
+              pw.Container(
+                height: 20.h,
+                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                alignment: pw.Alignment.centerRight,
+                color: PdfColor.fromHex('#ffffff'),
+                child: pw.Text(
+                  value.isEmpty ? '-' : value,
+                  textAlign: pw.TextAlign.right,
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+              ),
+              pw.Container(
+                height: 20.h,
+                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                alignment: pw.Alignment.centerRight,
+                color: PdfColor.fromHex('#edebe0'),
+                child: pw.Text(
+                  label,
+                  textAlign: pw.TextAlign.right,
+                  style: pw.TextStyle(
+                    fontSize: 10,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.green800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    pw.Widget buildSection(String title, List<pw.Widget> rows) {
       return pw.Container(
-        margin:  pw.EdgeInsets.only(bottom: 6.h,top: 6.h),
-        // decoration: pw.BoxDecoration(
-        //   border: pw.Border.all(color: PdfColors.grey300),
-        //   borderRadius: pw.BorderRadius.circular(8),
-        // ),
+        margin: pw.EdgeInsets.only(bottom: 6.h, top: 6.h),
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-                title,
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(
-                  fontSize: 12,
-                  fontWeight: pw.FontWeight.bold,
-                ),
+              title,
+              textAlign: pw.TextAlign.right,
+              style: pw.TextStyle(
+                fontSize: 12,
+                fontWeight: pw.FontWeight.bold,
               ),
-              pw.SizedBox(height: 4.h),
-            // pw.Container(
-            //   padding: const pw.EdgeInsets.symmetric(
-            //     vertical: 6,
-            //     horizontal: 8,
-            //   ),
-            //   decoration: pw.BoxDecoration(
-            //     color: PdfColors.grey200,
-            //     borderRadius: const pw.BorderRadius.only(
-            //       topLeft: pw.Radius.circular(8),
-            //       topRight: pw.Radius.circular(8),
-            //     ),
-            //   ),
-            //   child: pw.Text(
-            //     title,
-            //     textAlign: pw.TextAlign.right,
-            //     style: pw.TextStyle(
-            //       fontSize: 12,
-            //       fontWeight: pw.FontWeight.bold,
-            //     ),
-            //   ),
-            // ),
-            pw.Divider(color: PdfColors.grey300, height: 1),
-            pw.Table(
-              border: pw.TableBorder.symmetric(
-                inside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
-                outside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
-              ),
-              columnWidths: {
-                0: const pw.FlexColumnWidth(4),
-                1: const pw.FlexColumnWidth(2),
-                2: const pw.FlexColumnWidth(4),
-                3: const pw.FlexColumnWidth(2),
-              },
+            ),
+            // pw.SizedBox(height: 4.h),
+            // pw.Divider(color: PdfColors.grey300, height: 1),
+            pw.SizedBox(height: 4.h),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
               children: rows,
             ),
           ],
@@ -493,13 +535,13 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                       // 'نوع الطلب',
                       // requestTypeLabel,
                     ),
-                    if (detail!.application.licensenumberOld.trim().isNotEmpty)
-                      buildFourColumnRow(
-                        'رقم الترخيص السابق',
-                        previousLicenseNumber,
-                        '',
-                        '',
-                      ),
+                    // if (detail!.application.licensenumberOld.trim().isNotEmpty)
+                    //   buildFourColumnRow(
+                    //     'رقم الترخيص السابق',
+                    //     previousLicenseNumber,
+                    //     '',
+                    //     '',
+                    //   ),
                     buildFourColumnRow(
                        'نوع العملية',
                       requestTypeLabel,
@@ -528,35 +570,38 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                       //     : DateTime.now().toString().split(' ').first,
                       alternate: true,
                     ),
-                    buildFourColumnRow(
-                      'اسم مقدم الطلب',
-                      applicantFullName,
-                      'الفئة',
-                      stationCategoryLabel,
-                    ),
-                    if (detail!.application.companyName?.trim().isNotEmpty ==
-                        true)
-                      buildFourColumnRow(
-                        'اسم الشركة',
-                        companyName,
-                        'رقم رخصة الشركة',
-                        companyLicenseNumber,
-                      ),
-                    if (detail!.application.companyLicenseDate
-                            ?.trim()
-                            .isNotEmpty ==
-                        true)
+                    // buildFourColumnRow(
+                    //   'اسم مقدم الطلب',
+                    //   applicantFullName,
+                    //   'الفئة',
+                    //   stationCategoryLabel,
+                    // ),
+                    // if (detail!.application.companyName?.trim().isNotEmpty ==
+                    //     true)
+                    //   buildFourColumnRow(
+                    //     'اسم الشركة',
+                    //     companyName,
+                    //     'رقم رخصة الشركة',
+                    //     companyLicenseNumber,
+                    //   ),
+                    // if (detail!.application.companyLicenseDate
+                    //         ?.trim()
+                    //         .isNotEmpty ==
+                    //     true)
                       
-                      buildFourColumnRow(
-                        'تاريخ رخصة الشركة',
-                        _formatDisplayDate(detail!.application.companyLicenseDate),
-                       detail!.application.partners.isEmpty? ''
-                       : 'شركاء الشركة',
-                        detail!.application.partners.isNotEmpty
-                            ? detail!.application.partners.join(', ')
-                            : 'لا يوجد شركاء',
-                        alternate: true,
-                      ),
+                    //   buildFourColumnRow(
+                    //     'تاريخ رخصة الشركة',
+                    //     _formatDisplayDate(detail!.application.companyLicenseDate),
+                    //     '',
+                    //     '',
+                    //     alternate: true,
+                    //   ),
+                    //   buildTwoColumnRow(
+                    //     'شركاء الشركة',
+                    //     detail!.application.partners.isNotEmpty
+                    //         ? detail!.application.partners.join(', ')
+                    //         : 'لا يوجد شركاء',
+                    //   ),
                   ]),
                   buildSection('بيانات مقدم الطلب', [
                     buildFourColumnRow(
@@ -570,17 +615,20 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                       detail!.application.motherName?.trim().isNotEmpty == true
                           ? detail!.application.motherName!
                           : 'غير محدد',
-                      'تاريخ الميلاد',
-                      birthDate,
-                      alternate: true,
-                    ),
-                    buildFourColumnRow(
                       'مكان الولادة',
                       detail!.application.placeOfBirth?.trim().isNotEmpty == true
                           ? detail!.application.placeOfBirth!
                           : 'غير محدد',
-                      'تاريخ الميلاد',
+                                                alternate: true,
+
+                    ),
+                    buildFourColumnRow(
+                        'تاريخ الولدة',
                       birthDate,
+                     
+                     'بريد حساب المستخدم',
+                     '',
+                      // birthDate,
                       alternate: true,
                     ),
                     // buildFourColumnRow(
@@ -608,8 +656,35 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                     //   ),
                     
                   ]),
-                   buildSection('بيانات  التواصل', [
-                    // buildFourColumnRow(
+                detail!.application.companyName?.trim().isNotEmpty == true
+                    ?   buildSection('بيانات الشركة  والشركاء', [
+                        
+                        if (detail!.application.companyName?.trim().isNotEmpty ==
+                            true)
+                          buildFourColumnRow(
+                            'اسم الشركة',
+                        companyName,
+                        'رقم ترخيص الشركة',
+                        companyLicenseNumber,
+                      ),
+                    if (detail!.application.companyLicenseDate
+                            ?.trim()
+                            .isNotEmpty ==
+                        true)
+                      buildFourColumnRow(
+                        'تاريخ ترخيص الشركة',
+                        _formatDisplayDate(detail!.application.companyLicenseDate),
+                        '',
+                        '',
+                        alternate: true,
+                      ),
+                    buildTwoColumnRow(
+                      'شركاء الشركة',
+                      detail!.application.partners.isNotEmpty
+                          ? detail!.application.partners.join(', ')
+                          : '',
+                      alternate: true,
+                    ),
                     //   'الاسم الكامل',
                     //   applicantFullName,
                     //   'الرقم الوطني',
@@ -624,20 +699,6 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                     //   birthDate,
                     //   alternate: true,
                     // ),
-                    buildFourColumnRow(
-                      'البريد الإلكتروني',
-                      detail!.email,
-                      'رقم التواصل',
-                      detail!.phone,
-                    ),
-                    if (detail!.application.secondaryPhone?.trim().isNotEmpty ==
-                        true)
-                      buildFourColumnRow(
-                        'الهاتف الثانوي',
-                        detail!.application.secondaryPhone!,
-                        '',
-                        '',
-                      ),
                     // if (detail!.application.companyName?.trim().isNotEmpty ==
                     //     true)
                     //   buildFourColumnRow(
@@ -648,6 +709,32 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                     //     alternate: true,
                     //   ),
                     
+                  ]):pw.SizedBox(height: 0),
+                  buildSection('بيانات التواصل', [    buildFourColumnRow(
+                      'البريد الإلكتروني',
+                      detail!.email,
+                      'رقم التواصل',
+                      detail!.phone,
+                    ),
+                    if (detail!.application.secondaryPhone?.trim().isNotEmpty ==
+                        true)
+                      buildFourColumnRow(
+                        'رقم التواصل الثانوي',
+                        detail!.application.secondaryPhone!,
+                        '',
+                        '',
+                      ),
+                ]),
+                buildSection('بيانات التسوية', [
+                  
+                         if (detail!.application.licensenumberOld.trim().isNotEmpty)
+                      buildFourColumnRow(
+                        'رقم الترخيص السابق',
+                        previousLicenseNumber,
+                        'نقل المحطة',
+                        'نعم',
+                      ),
+                       
                   ]),
                   buildSection('بيانات الموقع والتصنيف', [
                     buildFourColumnRow(
@@ -656,26 +743,51 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                       'المنطقة',
                       district,
                     ),
-                    buildFourColumnRow(
-                      'اسم البلدة',
-                      detail!.stationName,
-                      'فئة المحطة',
-                      stationCategoryLabel,
+                     buildFourColumnRow(
+                      'الناحية',
+                      detail!.subDistrict.trim().isNotEmpty == true
+                          ? detail!.subDistrict
+                          : 'غير محدد',
+                      'البلدة',
+                      detail!.stationName.trim().isNotEmpty == true
+                          ? detail!.stationName
+                          : 'غير محدد',
                       alternate: true,
                     ),
+                      buildFourColumnRow(
+                      'خط العرض',
+                      detail!.coordinates.trim().isNotEmpty == true
+                          ? detail!.coordinates.split(',').first
+                          : 'غير محدد',
+                      'خط الطول',
+                      detail!.coordinates.trim().isNotEmpty == true
+                          ? detail!.coordinates.split(',').last
+                          : 'غير محدد',
+                      alternate: true,
+                     ),
+                    buildFourColumnRow(
+                       'التصنيف',
+                      stationCategoryLabel,
+                      'النطاق التنظيمي',
+                      district.isNotEmpty && planningLocationLabel.isNotEmpty
+                          ? planningLocationLabel
+                          : 'غير محدد',
+                     
+                      alternate: true,
+                     ),
                     buildFourColumnRow(
                       'نوع الطريق',
                       roadTypeLabel,
-                      'الحالة التنظيمية',
-                      planningLocationLabel,
-                    ),
-                    buildFourColumnRow(
-                      'الإحداثيات',
-                      coordinates,
+                      ' ',
                       '',
-                      '',
-                      alternate: true,
                     ),
+                    // buildFourColumnRow(
+                    //   'الإحداثيات',
+                    //   coordinates,
+                    //   '',
+                    //   '',
+                    //   alternate: true,
+                    // ),
                   ]),
                   // pw.SizedBox(height: 12),
                   // pw.Divider(color: PdfColors.grey300),
@@ -854,7 +966,8 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                         child: _buildUniformInfoList(context, [
                           _InfoEntry('المحافظة', detail!.governorate),
                           _InfoEntry('المنطقة / الحي', detail!.district),
-                          _InfoEntry('اسم المحطة', detail!.stationName),
+                          _InfoEntry('الناحية', detail!.subDistrict),
+                          _InfoEntry('البلدة', detail!.stationName),
                           _InfoEntry('فئة المحطة', detail!.stationCategory),
                           _InfoEntry('نوع الطريق', detail!.roadType),
                           _InfoEntry(

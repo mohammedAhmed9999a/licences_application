@@ -169,6 +169,7 @@ class ApplicationModel {
   final String phone;
   final String nationalId;
   final String district;
+  final String? subDistrict;
   final String roadType;
   final String planningLocation;
   final String coordinates;
@@ -215,6 +216,7 @@ class ApplicationModel {
     this.phone = '',
     this.nationalId = '',
     this.district = '',
+    this.subDistrict,
     this.roadType = '',
     this.planningLocation = '',
     this.coordinates = '',
@@ -250,6 +252,7 @@ class ApplicationModel {
     final location = _asStringKeyedMap(json['location']) ?? <String, dynamic>{};
     final governorateMap = _asStringKeyedMap(location['governorate']);
     final districtMap = _asStringKeyedMap(location['district']);
+    final subDistrictMap = _asStringKeyedMap(location['sub_district']);
     final townMap = _asStringKeyedMap(location['town']);
     final allowedCategory = _asStringKeyedMap(json['allowed_category']);
     final licenseCategory = _asStringKeyedMap(
@@ -350,6 +353,10 @@ class ApplicationModel {
     final companyName = applicantable['company_name']?.toString() ?? '';
     final companyLicenseNumber =
         applicantable['company_license_number']?.toString() ?? '';
+    final subDistrictName =
+        (location['sub_district_name']?.toString() ?? '').trim().isNotEmpty
+            ? location['sub_district_name']!.toString()
+            : subDistrictMap?['name']?.toString() ?? '';
     final companyLicenseDate =
         applicantable['company_license_date']?.toString() ?? '';
     final partners =
@@ -459,6 +466,7 @@ class ApplicationModel {
       phone: json['phone']?.toString() ?? '',
       nationalId: user['national_id']?.toString() ?? '',
       district: districtMap?['name']?.toString() ?? '',
+      subDistrict: subDistrictName.isNotEmpty ? subDistrictName : null,
       roadType:
           roadTypeMap?['name']?.toString() ??
           zoningMap?['scope']?.toString() ??

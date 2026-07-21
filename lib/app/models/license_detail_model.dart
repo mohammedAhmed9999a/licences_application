@@ -8,6 +8,7 @@ class LicenseDetailModel {
   final String nationalId;
   final String governorate;
   final String district;
+  final String subDistrict;
   final String stationName;
   final String stationCategory;
   final String roadType;
@@ -25,6 +26,7 @@ class LicenseDetailModel {
     required this.nationalId,
     required this.governorate,
     required this.district,
+    required this.subDistrict,
     required this.stationName,
     required this.stationCategory,
     required this.roadType,
@@ -54,6 +56,7 @@ class LicenseDetailModel {
         nationalId: '1001234567',
         governorate: 'دمشق',
         district: 'القنوات',
+        subDistrict: 'المرج',
         stationName: 'محطة أحمد للوقود',
         stationCategory: 'A',
         roadType: 'دولي',
@@ -80,6 +83,7 @@ class LicenseDetailModel {
         nationalId: '1009876543',
         governorate: 'حلب',
         district: 'الحديثة',
+        subDistrict: 'الحديثة',
         stationName: 'محطة سارة للطاقة',
         stationCategory: 'B',
         roadType: 'محلي',
@@ -112,6 +116,9 @@ class LicenseDetailModel {
       nationalId: app.nationalId.isNotEmpty ? app.nationalId : 'غير متوفر',
       governorate: app.governorate ?? 'غير محدد',
       district: app.district.isNotEmpty ? app.district : 'غير محدد',
+      subDistrict: app.subDistrict?.isNotEmpty == true
+          ? app.subDistrict!
+          : 'غير محدد',
       stationName: app.stationName ?? app.stationCategory ?? 'غير محدد',
       stationCategory: app.stationCategory ?? 'غير محدد',
       roadType: app.roadType.isNotEmpty ? app.roadType : 'غير محدد',
