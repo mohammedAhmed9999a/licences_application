@@ -121,6 +121,92 @@ class AttachmentItem {
   }
 }
 
+class SettlementLocation {
+  final String? id;
+  final String? governorateId;
+  final String? districtId;
+  final String? subDistrictId;
+  final String? townId;
+  final String? latitude;
+  final String? longitude;
+  final String? governorateName;
+  final String? districtName;
+  final String? subDistrictName;
+  final String? townName;
+
+  SettlementLocation({
+    this.id,
+    this.governorateId,
+    this.districtId,
+    this.subDistrictId,
+    this.townId,
+    this.latitude,
+    this.longitude,
+    this.governorateName,
+    this.districtName,
+    this.subDistrictName,
+    this.townName,
+  });
+
+  factory SettlementLocation.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return SettlementLocation();
+    Map<String, dynamic>? asMap(dynamic v) {
+      if (v is Map) return v.map((k, v2) => MapEntry(k.toString(), v2));
+      return null;
+    }
+    final governorate = asMap(json['governorate']);
+    final district = asMap(json['district']);
+    final subDistrict = asMap(json['sub_district']);
+    final town = asMap(json['town']);
+
+    return SettlementLocation(
+      id: json['id']?.toString(),
+      governorateId: json['governorate_id']?.toString(),
+      districtId: json['district_id']?.toString(),
+      subDistrictId: json['sub_district_id']?.toString(),
+      townId: json['town_id']?.toString(),
+      latitude: json['latitude']?.toString(),
+      longitude: json['longitude']?.toString(),
+      governorateName: governorate?['name']?.toString(),
+      districtName: district?['name']?.toString(),
+      subDistrictName: subDistrict?['name']?.toString(),
+      townName: town?['name']?.toString(),
+    );
+  }
+
+  String get displayName {
+    return townName ?? subDistrictName ?? districtName ?? governorateName ?? '';
+  }
+}
+
+class SettlementDetails {
+  final String? id;
+  final bool isRelocation;
+  final SettlementLocation? oldLocation;
+  final SettlementLocation? newLocation;
+
+  SettlementDetails({
+    this.id,
+    this.isRelocation = false,
+    this.oldLocation,
+    this.newLocation,
+  });
+
+  factory SettlementDetails.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return SettlementDetails();
+    Map<String, dynamic>? asMap(dynamic v) {
+      if (v is Map) return v.map((k, v2) => MapEntry(k.toString(), v2));
+      return null;
+    }
+    return SettlementDetails(
+      id: json['id']?.toString(),
+      isRelocation: json['is_relocation'] == true || json['is_relocation']?.toString() == '1',
+      oldLocation: SettlementLocation.fromJson(asMap(json['old_location'])),
+      newLocation: SettlementLocation.fromJson(asMap(json['new_location'])),
+    );
+  }
+}
+
 class ApplicationModel {
   final String id;
   final String applicationNumber;
@@ -200,6 +286,8 @@ class ApplicationModel {
   final String? applicantType;
   final bool termsAccepted;
 
+  final SettlementDetails? settlementDetails;
+
   ApplicationModel({
     required this.id,
     required this.applicationNumber,
@@ -245,7 +333,9 @@ class ApplicationModel {
     this.latitude,
     this.longitude,
     this.applicantType,
-    this.termsAccepted = false, required this.licensenumberOld,
+    this.termsAccepted = false,
+    this.settlementDetails,
+    required this.licensenumberOld,
   });
 
   factory ApplicationModel.fromJson(Map<String, dynamic> json) {
@@ -452,6 +542,7 @@ class ApplicationModel {
       townId: location['town_id']?.toString() ?? townMap?['id']?.toString(),
       latitude: latitude,
       longitude: longitude,
+      settlementDetails: SettlementDetails.fromJson(_asStringKeyedMap(json['settlement_details'])),
       applicantType: applicantTypeNormalized,
       termsAccepted:
           json['terms_accepted'] == true || json['terms_accepted'] == 1,

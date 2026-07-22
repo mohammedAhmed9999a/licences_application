@@ -11,11 +11,11 @@ class CoreApiService {
   // static const String baseUrl =
   //     'https://api-petro-stations.moenergy.gov.sy/api';
   // https://web-admin.moenergy.gov.sy/api/v1
-  static const String baseUrl = 'http://192.168.109.237:8000/api';
+  static const String baseUrl = 'http://192.168.88.125:8000/api';
   // static const String baseUrl = 'https://web-admin.moenergy.gov.sy/api';
 
   static const String baseUrlPublicImages =
-      "http://192.168.109.237:8000/storage/";
+      "http://192.168.88.125:8000/storage/";
 
   static Future<void> updateAuthHeader() async {
     await DioFactory.updateHeaderWithToken(StorageService.to.token);

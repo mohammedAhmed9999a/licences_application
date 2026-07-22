@@ -16,6 +16,7 @@ class LicenseDetailModel {
   final String coordinates;
   final String statusNote;
   final List<AttachmentItem> attachments;
+  final SettlementDetails? settlementDetails;
   final List<String> stepSummary;
 
   LicenseDetailModel({
@@ -34,6 +35,7 @@ class LicenseDetailModel {
     required this.coordinates,
     required this.statusNote,
     required this.attachments,
+    this.settlementDetails,
     required this.stepSummary,
   });
 
@@ -138,6 +140,7 @@ class LicenseDetailModel {
       stepSummary: app.stepSummary.isNotEmpty
           ? app.stepSummary
           : ['تم تقديم الطلب', 'في انتظار المراجعة'],
+      settlementDetails: app.settlementDetails,
     );
   }
 }

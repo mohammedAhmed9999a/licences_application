@@ -983,6 +983,32 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                         ]),
                       ),
                       SizedBox(height: 18.h),
+                       _buildSectionCard(
+                        context,
+                        title: 'التسوية الموقع والمحطة',
+                        icon: Icons.location_on_outlined,
+                        isExpanded: _expandedSections['location'] ?? true,
+                        onToggle: () => _toggleSection('location'),
+                        child: _buildUniformInfoList(context, [
+                          _InfoEntry('المحافظة', detail!.settlementDetails?.oldLocation?.governorateName.toString() ?? 'غير محدد'),
+                          _InfoEntry('المنطقة / الحي', detail!.settlementDetails?.oldLocation?.districtName.toString() ?? 'غير محدد'),
+                          _InfoEntry('الناحية', detail!.settlementDetails?.oldLocation?.subDistrictName.toString() ?? 'غير محدد'),
+                          _InfoEntry('البلدة', detail!.settlementDetails?.oldLocation?.subDistrictName.toString() ?? 'غير محدد'),
+                          // _InfoEntry('فئة المحطة', detail!.settlementDetails?.oldLocation?.stationCategory.toString() ?? 'غير محدد'),
+                          // _InfoEntry('نوع الطريق', detail!.settlementDetails?.roadType ?? 'غير محدد'),
+                          _InfoEntry(
+                            'الموقع التخطيطي',
+                            detail!.planningLocation,
+                          ),
+                          _InfoEntry(
+                            'الإحداثيات',
+                            detail!.coordinates,
+                            onTap: () =>
+                                _openCoordinatesOnMap(detail!.coordinates),
+                          ),
+                        ]),
+                      ),
+                      SizedBox(height: 18.h),
                       _buildAttachmentsSection(
                         context,
                         detail!,
