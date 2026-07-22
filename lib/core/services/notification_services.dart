@@ -2,9 +2,14 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:licences_application/app/controllers/dashboard_controller.dart';
+import 'package:licences_application/app/models/application_model.dart';
+import 'package:licences_application/app/models/license_detail_model.dart';
+import 'package:licences_application/app/routes/app_routes.dart';
 import 'package:licences_application/app/services/storage_service.dart';
 import 'package:licences_application/core/services/core_api_service.dart';
 import 'package:licences_application/core/services/my_services.dart';
@@ -35,11 +40,11 @@ class NotificationServices {
     await _localNotifications.initialize(
       const InitializationSettings(android: androidInit, iOS: iosInit),
       onDidReceiveNotificationResponse: (details) {
+        debugPrint('Local notification tapped: payload=${details.payload}');
         if (details.payload != null) {
           final id = int.tryParse(details.payload!);
           if (id != null) {
-            // Handle notification tap - update with your screen navigation
-            // Get.to(() => LicenseDetailsScreen(licenseId: id));
+            _handleNotificationPayload(id);
           }
         }
       },
@@ -122,39 +127,136 @@ class NotificationServices {
   }
 
   static Future<void> showNotification(RemoteMessage message) async {
+    debugPrint('Showing notification. data=${message.data}');
+    debugPrint(
+      'Notification title=${message.notification?.title} body=${message.notification?.body}',
+    );
+    // Prefer admin_message from data if provided
+    final adminMessage = message.data['admin_message']?.toString();
+    final bodyText = adminMessage ?? message.notification?.body ?? '';
     final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
         _channelName,
         importance: Importance.high,
         priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
+        icon: 'ic_notification',
         channelShowBadge: true,
       ),
-      iOS: const DarwinNotificationDetails(
+      iOS: DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
       ),
     );
 
-    final complaintId = message.data['complaint_id'];
-
+    final applicationId = _extractNotificationId(message);
     await _localNotifications.show(
       message.hashCode,
       message.notification?.title ?? '',
-      message.notification?.body ?? '',
+      bodyText,
       details,
-      payload: complaintId?.toString(),
+      payload: applicationId,
     );
+  }
+
+  static String? _extractNotificationId(RemoteMessage message) {
+    return message.data['application_id']?.toString().trim() ??
+        message.data['complaint_id']?.toString().trim() ??
+        message.data['reference_id']?.toString().trim() ??
+        message.data['id']?.toString().trim();
+  }
+
+  static Future<ApplicationModel?> _findApplicationById(
+    String applicationId,
+  ) async {
+    if (Get.isRegistered<DashboardController>()) {
+      final dashboard = Get.find<DashboardController>();
+      try {
+        return dashboard.applications.firstWhere(
+          (app) => app.id == applicationId,
+        );
+      } catch (_) {
+        // ignore: no-op
+      }
+    }
+
+    try {
+      final response = await CoreApiService.get(
+        '/v1/license-applications/$applicationId',
+      );
+      final data = response.data is Map<String, dynamic>
+          ? (response.data['data'] ?? response.data)
+          : response.data;
+      if (data is Map<String, dynamic>) {
+        return ApplicationModel.fromJson(data);
+      }
+    } catch (e) {
+      debugPrint('Failed to load application $applicationId: $e');
+    }
+    return null;
+  }
+
+  static Future<void> _navigateToComplaintId(int id) async {
+    final box = GetStorage();
+    final applicationId = id.toString();
+    final application = await _findApplicationById(applicationId);
+    if (application != null) {
+      final detail = LicenseDetailModel.fromApplication(application);
+      debugPrint(
+        'Navigating to license details for application_id=$applicationId',
+      );
+      Get.toNamed(AppRoutes.licenseDetails, arguments: detail);
+      await box.remove('pending_notification_id');
+      return;
+    }
+    debugPrint(
+      'Application not found for notification id=$applicationId, storing pending id',
+    );
+    await box.write('pending_notification_id', id);
+  }
+
+  static Future<void> _handleNotificationPayload(int id) async {
+    debugPrint('Handling notification payload for id=$id');
+    await _navigateToComplaintId(id);
+  }
+
+  static Future<void> processPendingNotification() async {
+    final box = GetStorage();
+    final storedId = box.read('pending_notification_id');
+    if (storedId == null) return;
+    final id = int.tryParse(storedId.toString());
+    if (id == null) return;
+    await _navigateToComplaintId(id);
   }
 
   static void firebaseInit() {
     FirebaseMessaging.onMessage.listen((message) {
-      if (Platform.isAndroid) {
-        showNotification(message);
+      debugPrint('FCM onMessage received: data=${message.data}');
+      debugPrint(
+        'FCM onMessage notification: title=${message.notification?.title} body=${message.notification?.body}',
+      );
+      // Refresh applications when an app-related notification arrives.
+      final notificationId = _extractNotificationId(message);
+      if (notificationId != null && notificationId.isNotEmpty) {
+        _refreshDashboardApplications();
       }
+      // Show a local notification on all platforms (foreground)
+      showNotification(message);
     });
+  }
+
+  static Future<void> _refreshDashboardApplications() async {
+    try {
+      if (Get.isRegistered<DashboardController>()) {
+        final dashboard = Get.find<DashboardController>();
+        await dashboard.loadApplications();
+      } else {
+        debugPrint('DashboardController not registered; skipping refresh.');
+      }
+    } catch (e) {
+      debugPrint('Failed to refresh dashboard applications: $e');
+    }
   }
 
   static Future<void> setupInteractWhenAppNotOpen() async {
@@ -175,17 +277,18 @@ class NotificationServices {
   }
 
   static void handleMessage(RemoteMessage message) async {
-    int idNotification = 0;
+    debugPrint('FCM handleMessage: data=${message.data}');
     final box = GetStorage();
-    idNotification = int.tryParse(message.data['complaint_id']) ?? 0;
-    await box.write('pending_notification_id', idNotification);
-    final complaintIdStr = message.data['complaint_id'];
-    if (complaintIdStr != null) {
-      final id = int.tryParse(complaintIdStr.toString());
-      if (id != null) {
-        // Handle notification - update with your screen navigation
-        // Get.to(() => LicenseDetailsScreen(licenseId: id));
-      }
+    final idString = _extractNotificationId(message);
+    final idNotification = int.tryParse(idString ?? '') ?? 0;
+    if (idNotification > 0) {
+      await box.write('pending_notification_id', idNotification);
+      debugPrint('Opening license details for notification id=$idNotification');
+      await _navigateToComplaintId(idNotification);
+    } else {
+      debugPrint(
+        'No valid notification id found in payload. keys: ${message.data.keys.toList()}',
+      );
     }
   }
 }

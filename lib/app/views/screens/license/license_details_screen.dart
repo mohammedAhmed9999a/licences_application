@@ -181,6 +181,11 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
         detail!.application.companyLicenseDate?.trim().isNotEmpty == true
         ? detail!.application.companyLicenseDate!
         : 'غير مطبق';
+    final partnersText = detail!.application.partners.isNotEmpty
+        ? (detail!.application.partners.length <= 50
+              ? detail!.application.partners.join(', ')
+              : 'عدد الشركاء ${detail!.application.partners.length}')
+        : '';
     final logoData = await rootBundle.load('assets/images/h-logo.webp');
     final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
 
@@ -702,11 +707,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                               '',
                               alternate: true,
                             ),
+                          // Container()
                           buildTwoColumnRow(
                             'شركاء الشركة',
-                            detail!.application.partners.isNotEmpty
-                                ? detail!.application.partners.join(', ')
-                                : '',
+                            partnersText,
                             alternate: true,
                           ),
 
@@ -1115,7 +1119,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
           appBar: _buildAppBar(context, detail!),
           body: Stack(
             children: [
-              // خلفية احترافية
+              //  احترافية
               // Positioned(
               //   top: 0,
               //   left: 0,

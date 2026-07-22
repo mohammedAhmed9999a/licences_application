@@ -581,8 +581,10 @@ class Step1ConditionsScreen extends StatelessWidget {
                                   key: ctrl.emailFieldKey,
                                   label: 'عنوان البريد الإلكتروني',
                                   required: true,
+
                                   errorText: _getEmailErrorText(ctrl),
                                   child: RtlTextField(
+                                    maxLength: 50,
                                     controller: ctrl.emailController,
                                     focusNode: ctrl.emailRequied,
                                     hintText: 'name@example.com',

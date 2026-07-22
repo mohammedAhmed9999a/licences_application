@@ -218,7 +218,7 @@ class LicenseApplicationController extends GetxController {
   final valuationStatementUploaded = false.obs;
   final valuationSataementUpdataStecte = false.obs;
   final valueMohammedAhmed = 'mohammed ahmed'.obs;
-  // ─── Success ──────────────────────────────────────────────────────
+  // Success
   final submittedApplicationNumber = ''.obs;
   final isCorrectionMode = false.obs;
   final editApplicationId = ''.obs;
@@ -246,6 +246,7 @@ class LicenseApplicationController extends GetxController {
     'birthPlace': 'licenseDetails',
     'birthDate': 'licenseDetails',
     'companyName': 'licenseDetails',
+    'partners': 'licenseDetails',
     'companyLicenseNumber': 'licenseDetails',
     'companyLicenseDate': 'licenseDetails',
     'governorate': 'locationClassification',
@@ -285,6 +286,7 @@ class LicenseApplicationController extends GetxController {
     'birthPlace',
     'birthDate',
     'companyName',
+    'partners',
     'companyLicenseNumber',
     'companyLicenseDate',
   };
@@ -732,12 +734,21 @@ class LicenseApplicationController extends GetxController {
         final companyLicenseDateValue = companyLicenseDate.value != null
             ? '${companyLicenseDate.value!.year.toString().padLeft(4, '0')}-${companyLicenseDate.value!.month.toString().padLeft(2, '0')}-${companyLicenseDate.value!.day.toString().padLeft(2, '0')}'
             : '';
+        final partnerNames = partners
+            .map((name) => name.trim())
+            .where((name) => name.isNotEmpty)
+            .toList();
 
         final applicant = <String, dynamic>{
           'company_name': companyName,
           'company_license_number': companyLicenseNumber,
           'company_license_date': companyLicenseDateValue,
         };
+
+        if (partnerNames.isNotEmpty ||
+            _originalApplication?.partners.isNotEmpty == true) {
+          applicant['partners'] = partnerNames;
+        }
 
         payload['applicant'] = applicant;
       }
@@ -838,9 +849,9 @@ class LicenseApplicationController extends GetxController {
         payload['settlement'] = settlement;
       }
     }
-    // 
-    // 
-    // 
+    //
+    //
+    //
 
     if (correctionTargets.contains('settlementDetails')) {
       final settlement = payload['settlement'] is Map
@@ -2283,7 +2294,13 @@ class LicenseApplicationController extends GetxController {
     } catch (_) {}
   }
 
+  static const int maxPartners = 50;
+
   void addPartner() {
+    if (partners.length >= maxPartners) {
+      errorMessage.value = 'لا يمكن إضافة أكثر من $maxPartners شركاء';
+      return;
+    }
     partners.add('');
     partnersKeys.add(ValueKey(DateTime.now().microsecondsSinceEpoch));
   }

@@ -147,8 +147,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                   FocusScope.of(context).unfocus();
                                 },
                                 maxLength: 30,
-                              enabled: ctrl.isFieldEditable('license_number'),
-
+                                enabled: ctrl.isFieldEditable('license_number'),
                               ),
                             ),
                           ),
@@ -439,7 +438,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                 ),
               ),
 
-              // Applicant Data 
+              // Applicant Data
               Obx(
                 () => SectionCard(
                   title: 'بيانات مقدم الطلب',
@@ -575,7 +574,7 @@ class _SettlementPhase extends StatelessWidget {
   }
 }
 
-// Individual Form 
+// Individual Form
 class _IndividualForm extends StatelessWidget {
   final LicenseApplicationController ctrl;
   const _IndividualForm({required this.ctrl});
@@ -980,82 +979,80 @@ class _IndividualForm extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         // Birth date
-        Obx(
-          () {
-            final birthDateEditable = ctrl.isFieldEditable('birthDate');
-            return LabeledField(
-              key: ctrl.birthDateFieldKey,
-              label: 'تاريخ الولادة',
-              required: true,
-              errorText: ctrl.birthDateError.value,
-              child: GestureDetector(
-                onTap: birthDateEditable
-                    ? () async {
-                        final lastDate = DateTime.now().subtract(
-                          const Duration(days: 365 * 18),
-                        );
-                        final initialDate = ctrl.birthDate.value != null
-                            ? (ctrl.birthDate.value!.isBefore(lastDate)
-                                  ? ctrl.birthDate.value!
-                                  : lastDate)
-                            : DateTime(1990);
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: initialDate,
-                          firstDate: DateTime(1920),
-                          lastDate: lastDate,
-                          builder: (ctx, child) => Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: child!,
-                          ),
-                        );
-                        if (picked != null) {
-                          ctrl.birthDate.value = picked;
-                          ctrl.validateStep2Field('birthDate', '');
-                        }
+        Obx(() {
+          final birthDateEditable = ctrl.isFieldEditable('birthDate');
+          return LabeledField(
+            key: ctrl.birthDateFieldKey,
+            label: 'تاريخ الولادة',
+            required: true,
+            errorText: ctrl.birthDateError.value,
+            child: GestureDetector(
+              onTap: birthDateEditable
+                  ? () async {
+                      final lastDate = DateTime.now().subtract(
+                        const Duration(days: 365 * 18),
+                      );
+                      final initialDate = ctrl.birthDate.value != null
+                          ? (ctrl.birthDate.value!.isBefore(lastDate)
+                                ? ctrl.birthDate.value!
+                                : lastDate)
+                          : DateTime(1990);
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: initialDate,
+                        firstDate: DateTime(1920),
+                        lastDate: lastDate,
+                        builder: (ctx, child) => Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: child!,
+                        ),
+                      );
+                      if (picked != null) {
+                        ctrl.birthDate.value = picked;
+                        ctrl.validateStep2Field('birthDate', '');
                       }
-                    : null,
-                child: AbsorbPointer(
-                  absorbing: !birthDateEditable,
-                  child: Container(
-                    height: 48.h,
-                    padding: EdgeInsets.symmetric(horizontal: 12.w),
-                    decoration: BoxDecoration(
-                      color: surface,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: borderColor),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Obx(
-                          () => Text(
-                            ctrl.birthDate.value != null
-                                ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
-                                : 'انقر لتحديد تاريخ ميلادك',
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 13.sp,
-                              color: ctrl.birthDate.value != null
-                                  ? textPrimary
-                                  : textHint,
-                            ),
+                    }
+                  : null,
+              child: AbsorbPointer(
+                absorbing: !birthDateEditable,
+                child: Container(
+                  height: 48.h,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: surface,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: borderColor),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Obx(
+                        () => Text(
+                          ctrl.birthDate.value != null
+                              ? '${ctrl.birthDate.value!.day}/${ctrl.birthDate.value!.month}/${ctrl.birthDate.value!.year}'
+                              : 'انقر لتحديد تاريخ ميلادك',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 13.sp,
+                            color: ctrl.birthDate.value != null
+                                ? textPrimary
+                                : textHint,
                           ),
                         ),
-                        const Spacer(),
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          size: 18.r,
-                          color: textHint,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 18.r,
+                        color: textHint,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        }),
         SizedBox(height: 6.h),
         Text(
           'يجب أن لا يقل عمر مقدم الطلب عن 18 سنة.',
@@ -1313,7 +1310,11 @@ class _CompanyForm extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      Icon(Icons.calendar_today_outlined, size: 18.r, color: textHint),
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 18.r,
+                        color: textHint,
+                      ),
                     ],
                   ),
                 ),
@@ -1381,80 +1382,81 @@ class _CompanyForm extends StatelessWidget {
             SizedBox(height: 16),
 
             // تاريخ ترخيص الشركة
-            Obx(
-              () {
-                final editable = ctrl.isFieldEditable('companyLicenseDate');
-                return LabeledField(
-                  key: ctrl.companyLicenseDateFieldKey,
-                  label: 'تاريخ ترخيص الشركة',
-                  required: true,
-                  errorText: ctrl.companyLicenseDateError.value,
-                  child: GestureDetector(
-                    onTap: editable
-                        ? () async {
-                            final yesterday = DateTime.now().subtract(
-                              const Duration(days: 1),
-                            );
-                            final initialDate = ctrl.companyLicenseDate.value != null &&
-                                    ctrl.companyLicenseDate.value!.isBefore(yesterday)
-                                ? ctrl.companyLicenseDate.value!
-                                : yesterday;
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: initialDate,
-                              firstDate: DateTime(1950),
-                              lastDate: yesterday,
-                            );
-                            if (picked != null) {
-                              ctrl.companyLicenseDate.value = picked;
-                              ctrl.validateStep2Field('companyLicenseDate', '');
-                            }
+            Obx(() {
+              final editable = ctrl.isFieldEditable('companyLicenseDate');
+              return LabeledField(
+                key: ctrl.companyLicenseDateFieldKey,
+                label: 'تاريخ ترخيص الشركة',
+                required: true,
+                errorText: ctrl.companyLicenseDateError.value,
+                child: GestureDetector(
+                  onTap: editable
+                      ? () async {
+                          final yesterday = DateTime.now().subtract(
+                            const Duration(days: 1),
+                          );
+                          final initialDate =
+                              ctrl.companyLicenseDate.value != null &&
+                                  ctrl.companyLicenseDate.value!.isBefore(
+                                    yesterday,
+                                  )
+                              ? ctrl.companyLicenseDate.value!
+                              : yesterday;
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: initialDate,
+                            firstDate: DateTime(1950),
+                            lastDate: yesterday,
+                          );
+                          if (picked != null) {
+                            ctrl.companyLicenseDate.value = picked;
+                            ctrl.validateStep2Field('companyLicenseDate', '');
                           }
-                        : null,
-                    child: AbsorbPointer(
-                      absorbing: !editable,
-                      child: Container(
-                        height: 48.h,
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                        decoration: BoxDecoration(
-                          color: surface,
-                          borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: borderColor),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                ctrl.companyLicenseDate.value != null
-                                    ? '${ctrl.companyLicenseDate.value!.day}/${ctrl.companyLicenseDate.value!.month}/${ctrl.companyLicenseDate.value!.year}'
-                                    : 'اختر تاريخ الترخيص',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                textAlign: TextAlign.end,
-                                style: TextStyle(
-                                  fontFamily: 'Cairo',
-                                  fontSize: 13.sp,
-                                  color: ctrl.companyLicenseDate.value != null
-                                      ? textPrimary
-                                      : textHint,
-                                ),
+                        }
+                      : null,
+                  child: AbsorbPointer(
+                    absorbing: !editable,
+                    child: Container(
+                      height: 48.h,
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              ctrl.companyLicenseDate.value != null
+                                  ? '${ctrl.companyLicenseDate.value!.day}/${ctrl.companyLicenseDate.value!.month}/${ctrl.companyLicenseDate.value!.year}'
+                                  : 'اختر تاريخ الترخيص',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 13.sp,
+                                color: ctrl.companyLicenseDate.value != null
+                                    ? textPrimary
+                                    : textHint,
                               ),
                             ),
-                            SizedBox(width: 170.w),
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 18.r,
-                              color: textHint,
-                            ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(width: 170.w),
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 18.r,
+                            color: textHint,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ],
         ),
 
@@ -1464,18 +1466,21 @@ class _CompanyForm extends StatelessWidget {
           textDirection: TextDirection.rtl,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            OutlinedButton.icon(
-              onPressed: ctrl.addPartner,
-              icon: const Icon(Icons.add, size: 16),
-              label: Text(
-                'إضافة شريك',
-                style: TextStyle(fontSize: 12.sp, fontFamily: 'Cairo'),
-              ),
-              style: OutlinedButton.styleFrom(
-                minimumSize: Size(0, 36.h),
-                padding: EdgeInsets.symmetric(horizontal: 12.w),
-              ),
-            ),
+            Obx(() {
+              final partnersEditable = ctrl.isFieldEditable('partners');
+              return OutlinedButton.icon(
+                onPressed: partnersEditable ? ctrl.addPartner : null,
+                icon: const Icon(Icons.add, size: 16),
+                label: Text(
+                  'إضافة شريك',
+                  style: TextStyle(fontSize: 12.sp, fontFamily: 'Cairo'),
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(0, 36.h),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                ),
+              );
+            }),
             Text(
               'أسماء الشركاء (اختياري)',
               style: TextStyle(
@@ -1497,8 +1502,9 @@ class _CompanyForm extends StatelessWidget {
           textDirection: TextDirection.rtl,
         ),
         SizedBox(height: 10.h),
-        Obx(
-          () => Column(
+        Obx(() {
+          final partnersEditable = ctrl.isFieldEditable('partners');
+          return Column(
             children: List.generate(
               ctrl.partners.length,
               (i) => Padding(
@@ -1525,20 +1531,22 @@ class _CompanyForm extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          ctrl.partners.length > 1
-                              ? IconButton(
-                                  onPressed: () => ctrl.removePartner(i),
-                                  icon: Icon(Icons.delete_outline, size: 18.r),
-                                  tooltip: 'حذف الشريك',
-                                )
-                              : Container(),
+                          if (partnersEditable && ctrl.partners.length > 1)
+                            IconButton(
+                              onPressed: () => ctrl.removePartner(i),
+                              icon: Icon(Icons.delete_outline, size: 18.r),
+                              tooltip: 'حذف الشريك',
+                            ),
                         ],
                       ),
                       SizedBox(height: 6.h),
                       TextField(
+                        enabled: partnersEditable,
                         textDirection: TextDirection.rtl,
                         textAlign: TextAlign.right,
-                        onChanged: (v) => ctrl.updatePartner(i, v),
+                        onChanged: partnersEditable
+                            ? (v) => ctrl.updatePartner(i, v)
+                            : null,
                         style: TextStyle(fontFamily: 'Cairo', fontSize: 13.sp),
                         decoration: InputDecoration(
                           hintText: 'الاسم الثلاثي للشريك',
@@ -1554,8 +1562,8 @@ class _CompanyForm extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        }),
         Obx(
           () => ctrl.partners.isEmpty
               ? Container(

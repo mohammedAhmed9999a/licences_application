@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:licences_application/core/constant/app_colors.dart';
+import 'package:licences_application/core/services/notification_services.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../theme/app_theme.dart';
 import '../widgets/ministry_logo_widget.dart';
@@ -62,6 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       Get.offAllNamed(AppRoutes.home);
     }
+    NotificationServices.processPendingNotification();
   }
 
   @override

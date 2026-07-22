@@ -46,6 +46,11 @@ void main() async {
   _updateSystemUIOverlay(settingsCtrl.themeMode.value);
 
   runApp(const FuelStationApp());
+
+  // Process any pending notification payload once the app is ready.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    NotificationServices.processPendingNotification();
+  });
 }
 
 void _updateSystemUIOverlay(ThemeMode themeMode) {
@@ -62,8 +67,33 @@ void _updateSystemUIOverlay(ThemeMode themeMode) {
   );
 }
 
-class FuelStationApp extends StatelessWidget {
+class FuelStationApp extends StatefulWidget {
   const FuelStationApp({super.key});
+
+  @override
+  State<FuelStationApp> createState() => _FuelStationAppState();
+}
+
+class _FuelStationAppState extends State<FuelStationApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      NotificationServices.processPendingNotification();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
