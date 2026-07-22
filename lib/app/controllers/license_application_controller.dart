@@ -840,6 +840,7 @@ class LicenseApplicationController extends GetxController {
     }
     // 
     // 
+    // 
 
     if (correctionTargets.contains('settlementDetails')) {
       final settlement = payload['settlement'] is Map
