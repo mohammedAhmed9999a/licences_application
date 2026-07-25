@@ -125,6 +125,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     'summary': false,
     'applicant': false,
     'location': false,
+    'old_location': false,
+
     'latest_attachments': false,
     'timeline': false,
   };
@@ -141,9 +143,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
     final applicationNumber = detail!.application.applicationNumber.isNotEmpty
         ? detail!.application.applicationNumber
         : 'غير محدد';
-    final previousLicenseNumber = detail!.application.licensenumberOld
-            .trim()
-            .isNotEmpty
+    final previousLicenseNumber =
+        detail!.application.licensenumberOld.trim().isNotEmpty
         ? detail!.application.licensenumberOld
         : '';
     final fontData = await rootBundle.load('assets/fonts/arial.ttf');
@@ -197,7 +198,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       return pw.Table(
         border: pw.TableBorder.symmetric(
           inside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
-          outside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
+          outside: pw.BorderSide(
+            color: PdfColor.fromHex('#b9a779'),
+            width: 0.5,
+          ),
         ),
         columnWidths: {
           0: const pw.FlexColumnWidth(4),
@@ -211,7 +215,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             children: [
               pw.Container(
                 height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 4,
+                ),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#ffffff'),
 
@@ -223,7 +230,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
               ),
               pw.Container(
                 height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 4,
+                ),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#edebe0'),
                 child: pw.Text(
@@ -238,7 +248,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
               ),
               pw.Container(
                 height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 4,
+                ),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#ffffff'),
 
@@ -250,7 +263,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
               ),
               pw.Container(
                 height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 4,
+                ),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#edebe0'),
                 child: pw.Text(
@@ -281,7 +297,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       return pw.Table(
         border: pw.TableBorder.symmetric(
           inside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
-          outside: pw.BorderSide(color: PdfColor.fromHex('#b9a779'), width: 0.5),
+          outside: pw.BorderSide(
+            color: PdfColor.fromHex('#b9a779'),
+            width: 0.5,
+          ),
         ),
         columnWidths: {
           0: const pw.FlexColumnWidth(5),
@@ -293,7 +312,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             children: [
               pw.Container(
                 height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 4,
+                ),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#ffffff'),
                 child: pw.Text(
@@ -304,7 +326,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
               ),
               pw.Container(
                 height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding: const pw.EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 4,
+                ),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#edebe0'),
                 child: pw.Text(
@@ -332,10 +357,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             pw.Text(
               title,
               textAlign: pw.TextAlign.right,
-              style: pw.TextStyle(
-                fontSize: 12,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
             ),
             // pw.SizedBox(height: 4.h),
             // pw.Divider(color: PdfColors.grey300, height: 1),
@@ -363,32 +385,30 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             italic: font,
             boldItalic: font,
           ),
-          margin:  pw.EdgeInsets.all(24.sp),
+          margin: pw.EdgeInsets.all(24.sp),
           buildBackground: (context) {
-          return pw.Container(
-  width: PdfPageFormat.a4.width,
-  height: PdfPageFormat.a4.height,
-  child: pw.Opacity(
-    opacity: 0.18,
-    child: pw.Column(
-mainAxisAlignment: pw.MainAxisAlignment.start,
-crossAxisAlignment: pw.CrossAxisAlignment.start,      children: List.generate(
-        158, // عدد الصفوف
-        (_) => pw.Row(
-mainAxisAlignment: pw.MainAxisAlignment.start,
-crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generate(
-            40, // عدد الأعمدة
-            (_) => pw.Image(
-              bgImage,
-              width: 400.w,
-              height: 600.h,
-            ),
-          ),
-        ),
-      ),
-    ),
-  ),
-);
+            return pw.Container(
+              width: PdfPageFormat.a4.width,
+              height: PdfPageFormat.a4.height,
+              child: pw.Opacity(
+                opacity: 0.18,
+                child: pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: List.generate(
+                    158, // عدد الصفوف
+                    (_) => pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.start,
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: List.generate(
+                        40, // عدد الأعمدة
+                        (_) => pw.Image(bgImage, width: 400.w, height: 600.h),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
             // return pw.Container(
             //   width: PdfPageFormat.a4.width,
             //   height: PdfPageFormat.a4.height,
@@ -447,12 +467,11 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
         build: (context) => [
           pw.Directionality(
             textDirection: pw.TextDirection.rtl,
-            child:pw. Padding(
-              padding: pw. EdgeInsets.all(10.sp),
-              child:pw. Column(
+            child: pw.Padding(
+              padding: pw.EdgeInsets.all(10.sp),
+              child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
-                
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -480,7 +499,7 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                         ],
                       ),
                       pw.Container(
-                        padding:  pw.EdgeInsets.all(6.sp),
+                        padding: pw.EdgeInsets.all(6.sp),
                         decoration: pw.BoxDecoration(
                           border: pw.Border.all(color: PdfColors.grey300),
                           borderRadius: pw.BorderRadius.circular(8.r),
@@ -543,7 +562,7 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                     //     '',
                     //   ),
                     buildFourColumnRow(
-                       'نوع العملية',
+                      'نوع العملية',
                       requestTypeLabel,
                       // 'حالة الطلب',
                       // detail!.application.statusLabel,
@@ -555,15 +574,17 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                       alternate: true,
                     ),
                     buildFourColumnRow(
-                       'نوع مقدم الطلب',
-                       ApplicationModel.getInvestorTypeLabel(detail!.application.investorType),
+                      'نوع مقدم الطلب',
+                      ApplicationModel.getInvestorTypeLabel(
+                        detail!.application.investorType,
+                      ),
                       // detail!.application.investorType.isNotEmpty
                       //     ? detail!.application.investorType
                       //     : 'غير محدد',
                       // 'حالة الطلب',
                       // detail!.application.statusLabel,
-                     'نسخة الشروط المعتمدة',
-                     '1.0',
+                      'نسخة الشروط المعتمدة',
+                      '1.0',
 
                       // detail!.application.createdAt.isNotEmpty
                       //     ? detail!.application.createdAt
@@ -588,7 +609,7 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                     //         ?.trim()
                     //         .isNotEmpty ==
                     //     true)
-                      
+
                     //   buildFourColumnRow(
                     //     'تاريخ رخصة الشركة',
                     //     _formatDisplayDate(detail!.application.companyLicenseDate),
@@ -610,27 +631,28 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                       'الرقم الوطني',
                       detail!.nationalId,
                     ),
-                      buildFourColumnRow(
+                    buildFourColumnRow(
                       'اسم الام',
                       detail!.application.motherName?.trim().isNotEmpty == true
                           ? detail!.application.motherName!
                           : 'غير محدد',
                       'مكان الولادة',
-                      detail!.application.placeOfBirth?.trim().isNotEmpty == true
+                      detail!.application.placeOfBirth?.trim().isNotEmpty ==
+                              true
                           ? detail!.application.placeOfBirth!
                           : 'غير محدد',
-                                                alternate: true,
-
+                      alternate: true,
                     ),
                     buildFourColumnRow(
-                        'تاريخ الولدة',
+                      'تاريخ الولدة',
                       birthDate,
-                     
-                     'بريد حساب المستخدم',
-                     '',
+
+                      'بريد حساب المستخدم',
+                      '',
                       // birthDate,
                       alternate: true,
                     ),
+
                     // buildFourColumnRow(
                     //   'البريد الإلكتروني',
                     //   detail!.email,
@@ -654,63 +676,67 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                     //     companyLicenseNumber,
                     //     alternate: true,
                     //   ),
-                    
                   ]),
-                detail!.application.companyName?.trim().isNotEmpty == true
-                    ?   buildSection('بيانات الشركة  والشركاء', [
-                        
-                        if (detail!.application.companyName?.trim().isNotEmpty ==
-                            true)
-                          buildFourColumnRow(
-                            'اسم الشركة',
-                        companyName,
-                        'رقم ترخيص الشركة',
-                        companyLicenseNumber,
-                      ),
-                    if (detail!.application.companyLicenseDate
-                            ?.trim()
-                            .isNotEmpty ==
-                        true)
-                      buildFourColumnRow(
-                        'تاريخ ترخيص الشركة',
-                        _formatDisplayDate(detail!.application.companyLicenseDate),
-                        '',
-                        '',
-                        alternate: true,
-                      ),
-                    buildTwoColumnRow(
-                      'شركاء الشركة',
-                      detail!.application.partners.isNotEmpty
-                          ? detail!.application.partners.join(', ')
-                          : '',
-                      alternate: true,
-                    ),
-                    //   'الاسم الكامل',
-                    //   applicantFullName,
-                    //   'الرقم الوطني',
-                    //   detail!.nationalId,
-                    // ),
-                    // buildFourColumnRow(
-                    //   'مكان الولادة',
-                    //   detail!.application.placeOfBirth?.trim().isNotEmpty == true
-                    //       ? detail!.application.placeOfBirth!
-                    //       : 'غير محدد',
-                    //   'تاريخ الميلاد',
-                    //   birthDate,
-                    //   alternate: true,
-                    // ),
-                    // if (detail!.application.companyName?.trim().isNotEmpty ==
-                    //     true)
-                    //   buildFourColumnRow(
-                    //    'اسم الشركة',
-                    //     companyName,
-                    //     'رقم الرخصة',
-                    //     companyLicenseNumber,
-                    //     alternate: true,
-                    //   ),
-                    
-                  ]):pw.SizedBox(height: 0),
-                  buildSection('بيانات التواصل', [    buildFourColumnRow(
+                  detail!.application.companyName?.trim().isNotEmpty == true
+                      ? buildSection('بيانات الشركة  والشركاء', [
+                          if (detail!.application.companyName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true)
+                            buildFourColumnRow(
+                              'اسم الشركة',
+                              companyName,
+                              'رقم ترخيص الشركة',
+                              companyLicenseNumber,
+                            ),
+                          if (detail!.application.companyLicenseDate
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true)
+                            buildFourColumnRow(
+                              'تاريخ ترخيص الشركة',
+                              _formatDisplayDate(
+                                detail!.application.companyLicenseDate,
+                              ),
+                              '',
+                              '',
+                              alternate: true,
+                            ),
+                          buildTwoColumnRow(
+                            'شركاء الشركة',
+                            detail!.application.partners.isNotEmpty
+                                ? detail!.application.partners.join(', ')
+                                : '',
+                            alternate: true,
+                          ),
+
+                          //   'الاسم الكامل',
+                          //   applicantFullName,
+                          //   'الرقم الوطني',
+                          //   detail!.nationalId,
+                          // ),
+                          // buildFourColumnRow(
+                          //   'مكان الولادة',
+                          //   detail!.application.placeOfBirth?.trim().isNotEmpty == true
+                          //       ? detail!.application.placeOfBirth!
+                          //       : 'غير محدد',
+                          //   'تاريخ الميلاد',
+                          //   birthDate,
+                          //   alternate: true,
+                          // ),
+                          // if (detail!.application.companyName?.trim().isNotEmpty ==
+                          //     true)
+                          //   buildFourColumnRow(
+                          //    'اسم الشركة',
+                          //     companyName,
+                          //     'رقم الرخصة',
+                          //     companyLicenseNumber,
+                          //     alternate: true,
+                          //   ),
+                        ])
+                      : pw.SizedBox(height: 0),
+                  buildSection('بيانات التواصل', [
+                    buildFourColumnRow(
                       'البريد الإلكتروني',
                       detail!.email,
                       'رقم التواصل',
@@ -724,18 +750,231 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                         '',
                         '',
                       ),
-                ]),
-                buildSection('بيانات التسوية', [
-                  
-                         if (detail!.application.licensenumberOld.trim().isNotEmpty)
+                  ]),
+                  if (detail!.application.settlementDetails?.isRelocation ==
+                          false &&
+                      detail!.application.licensenumberOld.trim().isNotEmpty)
+                    buildSection('بيانات التسوية', [
                       buildFourColumnRow(
                         'رقم الترخيص السابق',
                         previousLicenseNumber,
                         'نقل المحطة',
-                        'نعم',
+                        detail!.application.settlementDetails?.isRelocation ==
+                                true
+                            ? 'نعم'
+                            : 'لا',
                       ),
-                       
-                  ]),
+                    ]),
+
+                  if (detail!.application.settlementDetails?.isRelocation ==
+                          true &&
+                      (detail!.application.licensenumberOld.trim().isNotEmpty ||
+                          detail!.application.settlementDetails?.oldLocation !=
+                              null ||
+                          detail!.application.settlementDetails?.newLocation !=
+                              null ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.oldLocation
+                                  ?.governorateName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.oldLocation
+                                  ?.districtName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.oldLocation
+                                  ?.subDistrictName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.oldLocation
+                                  ?.townName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.newLocation
+                                  ?.governorateName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.newLocation
+                                  ?.districtName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.newLocation
+                                  ?.subDistrictName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.newLocation
+                                  ?.townName
+                                  ?.trim()
+                                  .isNotEmpty ==
+                              true ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.oldLocation
+                                  ?.latitude !=
+                              null ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.oldLocation
+                                  ?.longitude !=
+                              null ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.newLocation
+                                  ?.latitude !=
+                              null ||
+                          detail!
+                                  .application
+                                  .settlementDetails
+                                  ?.newLocation
+                                  ?.longitude !=
+                              null))
+                    buildSection('بيانات التسوية', [
+                      if (detail!.application.licensenumberOld
+                          .trim()
+                          .isNotEmpty)
+                        buildFourColumnRow(
+                          'رقم الترخيص السابق',
+                          previousLicenseNumber,
+                          'نقل المحطة',
+                          detail!.application.settlementDetails?.isRelocation ==
+                                  true
+                              ? 'نعم'
+                              : 'لا',
+                        ),
+                      buildFourColumnRow(
+                        'الموقع الفديم',
+                        (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.oldLocation
+                                    ?.governorateName
+                                    ?.toString() ??
+                                '/') +
+                            (' / ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.oldLocation
+                                    ?.districtName
+                                    ?.toString() ??
+                                '/') +
+                            (' / ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.oldLocation
+                                    ?.subDistrictName
+                                    ?.toString() ??
+                                '/') +
+                            (' / ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.oldLocation
+                                    ?.townName
+                                    ?.toString() ??
+                                'غير محدد'),
+                        'إحداثيات الموقع  القديم',
+                        (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.oldLocation
+                                    ?.latitude
+                                    ?.toString() ??
+                                '-') +
+                            (' , ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.oldLocation
+                                    ?.longitude
+                                    ?.toString() ??
+                                '-'),
+                      ),
+                      buildFourColumnRow(
+                        'لموقع الجديد',
+                        (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.newLocation
+                                    ?.governorateName
+                                    ?.toString() ??
+                                '/') +
+                            (' / ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.newLocation
+                                    ?.districtName
+                                    ?.toString() ??
+                                '/') +
+                            (' / ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.newLocation
+                                    ?.subDistrictName
+                                    ?.toString() ??
+                                '/') +
+                            (' / ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.newLocation
+                                    ?.townName
+                                    ?.toString() ??
+                                'غير محدد'),
+                        'إحداثيات الموقع الجديد',
+                        (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.newLocation
+                                    ?.latitude
+                                    ?.toString() ??
+                                '-') +
+                            (' , ') +
+                            (detail!
+                                    .application
+                                    .settlementDetails
+                                    ?.newLocation
+                                    ?.longitude
+                                    ?.toString() ??
+                                '-'),
+                      ),
+                    ]),
                   buildSection('بيانات الموقع والتصنيف', [
                     buildFourColumnRow(
                       'المحافظة',
@@ -743,7 +982,7 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                       'المنطقة',
                       district,
                     ),
-                     buildFourColumnRow(
+                    buildFourColumnRow(
                       'الناحية',
                       detail!.subDistrict.trim().isNotEmpty == true
                           ? detail!.subDistrict
@@ -754,7 +993,7 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                           : 'غير محدد',
                       alternate: true,
                     ),
-                      buildFourColumnRow(
+                    buildFourColumnRow(
                       'خط العرض',
                       detail!.coordinates.trim().isNotEmpty == true
                           ? detail!.coordinates.split(',').first
@@ -764,23 +1003,18 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                           ? detail!.coordinates.split(',').last
                           : 'غير محدد',
                       alternate: true,
-                     ),
+                    ),
                     buildFourColumnRow(
-                       'التصنيف',
+                      'التصنيف',
                       stationCategoryLabel,
                       'النطاق التنظيمي',
                       district.isNotEmpty && planningLocationLabel.isNotEmpty
                           ? planningLocationLabel
                           : 'غير محدد',
-                     
+
                       alternate: true,
-                     ),
-                    buildFourColumnRow(
-                      'نوع الطريق',
-                      roadTypeLabel,
-                      ' ',
-                      '',
                     ),
+                    buildFourColumnRow('نوع الطريق', roadTypeLabel, ' ', ''),
                     // buildFourColumnRow(
                     //   'الإحداثيات',
                     //   coordinates,
@@ -983,32 +1217,92 @@ crossAxisAlignment: pw.CrossAxisAlignment.start,          children: List.generat
                         ]),
                       ),
                       SizedBox(height: 18.h),
-                       _buildSectionCard(
-                        context,
-                        title: 'التسوية الموقع والمحطة',
-                        icon: Icons.location_on_outlined,
-                        isExpanded: _expandedSections['location'] ?? true,
-                        onToggle: () => _toggleSection('location'),
-                        child: _buildUniformInfoList(context, [
-                          _InfoEntry('المحافظة', detail!.settlementDetails?.oldLocation?.governorateName.toString() ?? 'غير محدد'),
-                          _InfoEntry('المنطقة / الحي', detail!.settlementDetails?.oldLocation?.districtName.toString() ?? 'غير محدد'),
-                          _InfoEntry('الناحية', detail!.settlementDetails?.oldLocation?.subDistrictName.toString() ?? 'غير محدد'),
-                          _InfoEntry('البلدة', detail!.settlementDetails?.oldLocation?.subDistrictName.toString() ?? 'غير محدد'),
-                          // _InfoEntry('فئة المحطة', detail!.settlementDetails?.oldLocation?.stationCategory.toString() ?? 'غير محدد'),
-                          // _InfoEntry('نوع الطريق', detail!.settlementDetails?.roadType ?? 'غير محدد'),
-                          _InfoEntry(
-                            'الموقع التخطيطي',
-                            detail!.planningLocation,
-                          ),
-                          _InfoEntry(
-                            'الإحداثيات',
-                            detail!.coordinates,
-                            onTap: () =>
-                                _openCoordinatesOnMap(detail!.coordinates),
-                          ),
-                        ]),
-                      ),
-                      SizedBox(height: 18.h),
+                      detail!.settlementDetails?.isRelocation == true
+                          ? _buildSectionCard(
+                              context,
+                              title: 'الموقع القديم',
+                              icon: Icons.location_on_outlined,
+                              isExpanded:
+                                  _expandedSections['old_location'] ?? true,
+                              onToggle: () => _toggleSection('old_location'),
+                              child: _buildUniformInfoList(context, [
+                                _InfoEntry(
+                                  'المحافظة',
+                                  detail!
+                                          .settlementDetails
+                                          ?.oldLocation
+                                          ?.governorateName
+                                          .toString() ??
+                                      'غير محدد',
+                                ),
+                                _InfoEntry(
+                                  'المنطقة / الحي',
+                                  detail!
+                                          .settlementDetails
+                                          ?.oldLocation
+                                          ?.districtName
+                                          .toString() ??
+                                      'غير محدد',
+                                ),
+                                _InfoEntry(
+                                  'الناحية',
+                                  detail!
+                                          .settlementDetails
+                                          ?.oldLocation
+                                          ?.subDistrictName
+                                          .toString() ??
+                                      'غير محدد',
+                                ),
+                                _InfoEntry(
+                                  'البلدة',
+                                  detail!
+                                          .settlementDetails
+                                          ?.oldLocation
+                                          ?.subDistrictName
+                                          .toString() ??
+                                      'غير محدد',
+                                ),
+                                // _InfoEntry('فئة المحطة', detail!.settlementDetails?.oldLocation?.stationCategory.toString() ?? 'غير محدد'),
+                                // _InfoEntry('نوع الطريق', detail!.settlementDetails?.roadType ?? 'غير محدد'),
+                                _InfoEntry(
+                                  'الموقع التخطيطي',
+                                  detail!.planningLocation,
+                                ),
+                                _InfoEntry(
+                                  'الإحداثيات',
+                                  detail!
+                                                  .settlementDetails
+                                                  ?.oldLocation
+                                                  ?.latitude !=
+                                              null &&
+                                          detail!
+                                                  .settlementDetails
+                                                  ?.oldLocation
+                                                  ?.longitude !=
+                                              null
+                                      ? '${detail!.settlementDetails?.oldLocation?.latitude}, ${detail!.settlementDetails?.oldLocation?.longitude}'
+                                      : 'غير محدد',
+                                  onTap: () => _openCoordinatesOnMap(
+                                    detail!
+                                                    .settlementDetails
+                                                    ?.oldLocation
+                                                    ?.latitude !=
+                                                null &&
+                                            detail!
+                                                    .settlementDetails
+                                                    ?.oldLocation
+                                                    ?.longitude !=
+                                                null
+                                        ? '${detail!.settlementDetails?.oldLocation?.latitude}, ${detail!.settlementDetails?.oldLocation?.longitude}'
+                                        : '',
+                                  ),
+                                ),
+                              ]),
+                            )
+                          : SizedBox(height: 0),
+                      detail!.settlementDetails?.isRelocation == true
+                          ? SizedBox(height: 18.h)
+                          : SizedBox(height: 0),
                       _buildAttachmentsSection(
                         context,
                         detail!,

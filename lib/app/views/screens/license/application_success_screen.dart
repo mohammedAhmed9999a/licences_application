@@ -91,81 +91,169 @@ class ApplicationSuccessScreen extends StatelessWidget {
       final logoData = await rootBundle.load('assets/images/h-logo.webp');
 
       final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
-      pw.TableRow buildFourColumnRow(
+      pw.Widget buildFourColumnRow(
         String label1,
         String value1,
         String label2,
         String value2, {
         bool alternate = false,
       }) {
-        return pw.TableRow(
+        final rowColor = alternate
+            ? PdfColor.fromHex('#f8f7f0')
+            : PdfColors.white;
+
+        return pw.Table(
+          border: pw.TableBorder.symmetric(
+            inside: pw.BorderSide(
+              color: PdfColor.fromHex('#b9a779'),
+              width: 0.5,
+            ),
+            outside: pw.BorderSide(
+              color: PdfColor.fromHex('#b9a779'),
+              width: 0.5,
+            ),
+          ),
+          columnWidths: {
+            0: const pw.FlexColumnWidth(4),
+            1: const pw.FlexColumnWidth(2),
+            2: const pw.FlexColumnWidth(4),
+            3: const pw.FlexColumnWidth(2),
+          },
           children: [
-            pw.Container(
-              height: 20.h,
-              padding: const pw.EdgeInsets.symmetric(
-                vertical: 1,
-                horizontal: 4,
-              ),
-              alignment: pw.Alignment.centerRight,
-              decoration: pw.BoxDecoration(color: PdfColors.white),
-              child: pw.Text(
-                value2.isEmpty ? '-' : value2,
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(fontSize: 10),
-              ),
-            ),
-            pw.Container(
-              height: 20.h,
-
-              padding: const pw.EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 4,
-              ),
-              alignment: pw.Alignment.centerRight,
-              decoration: pw.BoxDecoration(color: PdfColors.grey100),
-              child: pw.Text(
-                label2,
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(
-                  fontSize: 10,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.green800,
+            pw.TableRow(
+              decoration: pw.BoxDecoration(color: rowColor),
+              children: [
+                pw.Container(
+                  height: 20.h,
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  alignment: pw.Alignment.centerRight,
+                  color: PdfColor.fromHex('#ffffff'),
+                  child: pw.Text(
+                    value2.isEmpty ? '-' : value2,
+                    textAlign: pw.TextAlign.right,
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
                 ),
-              ),
-            ),
-            pw.Container(
-              height: 20.h,
-
-              padding: const pw.EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 4,
-              ),
-              alignment: pw.Alignment.centerRight,
-              decoration: pw.BoxDecoration(color: PdfColors.white),
-              child: pw.Text(
-                value1.isEmpty ? '-' : value1,
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(fontSize: 10),
-              ),
-            ),
-            pw.Container(
-              height: 20.h,
-
-              padding: const pw.EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 4,
-              ),
-              alignment: pw.Alignment.centerRight,
-              decoration: pw.BoxDecoration(color: PdfColors.grey100),
-              child: pw.Text(
-                label1,
-                textAlign: pw.TextAlign.right,
-                style: pw.TextStyle(
-                  fontSize: 10,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.green800,
+                pw.Container(
+                  height: 20.h,
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  alignment: pw.Alignment.centerRight,
+                  color: PdfColor.fromHex('#edebe0'),
+                  child: pw.Text(
+                    label2,
+                    textAlign: pw.TextAlign.right,
+                    style: pw.TextStyle(
+                      fontSize: 10,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.green800,
+                    ),
+                  ),
                 ),
-              ),
+                pw.Container(
+                  height: 20.h,
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  alignment: pw.Alignment.centerRight,
+                  color: PdfColor.fromHex('#ffffff'),
+                  child: pw.Text(
+                    value1.isEmpty ? '-' : value1,
+                    textAlign: pw.TextAlign.right,
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
+                ),
+                pw.Container(
+                  height: 20.h,
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  alignment: pw.Alignment.centerRight,
+                  color: PdfColor.fromHex('#edebe0'),
+                  child: pw.Text(
+                    label1,
+                    textAlign: pw.TextAlign.right,
+                    style: pw.TextStyle(
+                      fontSize: 10,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.green800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      }
+
+      pw.Widget buildTwoColumnRow(
+        String label,
+        String value, {
+        bool alternate = false,
+      }) {
+        final rowColor = alternate
+            ? PdfColor.fromHex('#f8f7f0')
+            : PdfColors.white;
+
+        return pw.Table(
+          border: pw.TableBorder.symmetric(
+            inside: pw.BorderSide(
+              color: PdfColor.fromHex('#b9a779'),
+              width: 0.5,
+            ),
+            outside: pw.BorderSide(
+              color: PdfColor.fromHex('#b9a779'),
+              width: 0.5,
+            ),
+          ),
+          columnWidths: {
+            0: const pw.FlexColumnWidth(5),
+            1: const pw.FlexColumnWidth(1),
+          },
+          children: [
+            pw.TableRow(
+              decoration: pw.BoxDecoration(color: rowColor),
+              children: [
+                pw.Container(
+                  height: 20.h,
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  alignment: pw.Alignment.centerRight,
+                  color: PdfColor.fromHex('#ffffff'),
+                  child: pw.Text(
+                    value.isEmpty ? '-' : value,
+                    textAlign: pw.TextAlign.right,
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
+                ),
+                pw.Container(
+                  height: 20.h,
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  alignment: pw.Alignment.centerRight,
+                  color: PdfColor.fromHex('#edebe0'),
+                  child: pw.Text(
+                    label,
+                    textAlign: pw.TextAlign.right,
+                    style: pw.TextStyle(
+                      fontSize: 10,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.green800,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -244,49 +332,23 @@ class ApplicationSuccessScreen extends StatelessWidget {
       //   );
       // }
 
-      pw.Widget buildSection(String title, List<pw.TableRow> rows) {
+      pw.Widget buildSection(String title, List<pw.Widget> rows) {
         return pw.Container(
-          margin: const pw.EdgeInsets.only(bottom: 4),
-          decoration: pw.BoxDecoration(
-            border: pw.Border.all(color: PdfColors.grey300),
-            borderRadius: pw.BorderRadius.circular(8),
-          ),
+          margin: pw.EdgeInsets.only(bottom: 6.h, top: 6.h),
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Container(
-                padding: const pw.EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 2,
-                ),
-                decoration: pw.BoxDecoration(
-                  color: PdfColors.grey200,
-                  borderRadius: const pw.BorderRadius.only(
-                    topLeft: pw.Radius.circular(8),
-                    topRight: pw.Radius.circular(8),
-                  ),
-                ),
-                child: pw.Text(
-                  title,
-                  textAlign: pw.TextAlign.right,
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+              pw.Text(
+                title,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  fontWeight: pw.FontWeight.bold,
                 ),
               ),
-              pw.Divider(color: PdfColors.grey300, height: 1),
-              pw.Table(
-                border: pw.TableBorder.symmetric(
-                  inside: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
-                  outside: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
-                ),
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(4),
-                  1: const pw.FlexColumnWidth(2),
-                  2: const pw.FlexColumnWidth(4),
-                  3: const pw.FlexColumnWidth(2),
-                },
+              pw.SizedBox(height: 4.h),
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.stretch,
                 children: rows,
               ),
             ],
@@ -294,7 +356,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
         );
       }
 
-      final bgData = await rootBundle.load('assets/images/logo2.png');
+      final bgData = await rootBundle.load('assets/images/pattern-light.png');
       debugPrint('حجم البيانات: ${bgData.lengthInBytes}');
       final bgImage = pw.MemoryImage(bgData.buffer.asUint8List());
       debugPrint('عرض الصورة: ${bgImage.width}, ارتفاعها: ${bgImage.height}');
@@ -308,18 +370,27 @@ class ApplicationSuccessScreen extends StatelessWidget {
               italic: font,
               boldItalic: font,
             ),
-            margin: const pw.EdgeInsets.all(24),
+            margin: pw.EdgeInsets.all(24.sp),
             buildBackground: (context) {
               return pw.Container(
                 width: PdfPageFormat.a4.width,
                 height: PdfPageFormat.a4.height,
                 child: pw.Opacity(
-                  opacity: 0.12,
-                  child: pw.Image(
-                    bgImage,
-                    fit: pw.BoxFit.cover,
-                    width: PdfPageFormat.a4.width,
-                    height: PdfPageFormat.a4.height,
+                  opacity: 0.18,
+                  child: pw.Column(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: List.generate(
+                      158,
+                      (_) => pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: List.generate(
+                          40,
+                          (_) => pw.Image(bgImage, width: 400.w, height: 600.h),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               );
@@ -368,7 +439,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
-                      pw.Image(logoImage, width: 150.w, height: 100.h),
+                      pw.Image(logoImage, width: 140.w, height: 70.h),
 
                       pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -376,7 +447,8 @@ class ApplicationSuccessScreen extends StatelessWidget {
                           pw.Text(
                             'إدارة خدمات الطاقة',
                             style: pw.TextStyle(
-                              fontSize: 16,
+                              fontSize: 20,
+                              color: PdfColors.green800,
                               fontWeight: pw.FontWeight.bold,
                             ),
                           ),
@@ -384,22 +456,14 @@ class ApplicationSuccessScreen extends StatelessWidget {
                           pw.Text(
                             'طلب ترخيص محطة وقود',
                             style: pw.TextStyle(
-                              fontSize: 14,
+                              fontSize: 13,
                               color: PdfColors.grey700,
                             ),
                           ),
-                          // pw.SizedBox(height: 2),
-                          // pw.Text(
-                          //   'طلب ترخيص محطة وقود',
-                          //   style: pw.TextStyle(
-                          //     fontSize: 12,
-                          //     color: PdfColors.grey700,
-                          //   ),
-                          // ),
                         ],
                       ),
                       pw.Container(
-                        padding: const pw.EdgeInsets.all(8),
+                        padding: pw.EdgeInsets.all(6.sp),
                         decoration: pw.BoxDecoration(
                           border: pw.Border.all(color: PdfColors.grey300),
                           borderRadius: pw.BorderRadius.circular(8),
@@ -408,86 +472,34 @@ class ApplicationSuccessScreen extends StatelessWidget {
                         child: pw.BarcodeWidget(
                           data: applicationNumber,
                           barcode: pw.Barcode.qrCode(),
-                          width: 50.w,
-                          height: 50.h,
+                          width: 40.w,
+                          height: 40.h,
                         ),
                       ),
                     ],
                   ),
                   pw.SizedBox(height: 18),
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: pw.BoxDecoration(
-                      color: PdfColors.grey200,
-                      borderRadius: pw.BorderRadius.circular(8),
-                    ),
-                    child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Text(
-                          'رقم الطلب: $applicationNumber',
-                          style: pw.TextStyle(
-                            fontSize: 10,
-                            fontWeight: pw.FontWeight.bold,
-                          ),
-                        ),
-                        pw.Text(
-                          'تاريخ التقديم: $submissionDateLabel',
-                          // 'تاريخ التقديم: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                          style: pw.TextStyle(fontSize: 10),
-                        ),
-                      ],
-                    ),
-                  ),
-                  pw.SizedBox(height: 10),
 
                   buildSection('بيانات الطلب', [
                     buildFourColumnRow(
                       'رقم الطلب',
                       applicationNumber,
-                      'نوع الطلب',
-                      requestTypeLabel,
-                    ),
-                    buildFourColumnRow(
                       'حالة الطلب',
                       'قيد الدراسة',
+                    ),
+                    buildFourColumnRow(
+                      'نوع العملية',
+                      requestTypeLabel,
                       'تاريخ التقديم',
-
                       submissionDateLabel,
-                      // '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
                       alternate: true,
                     ),
                     buildFourColumnRow(
-                      'مدة الدراسة',
+                      'نوع مقدم الطلب',
+                      ctrl.investorType.value == 'company' ? 'شركة' : 'فرد',
+                      'نسخة الشروط المعتمدة',
                       '1.0',
-                      'فئة المحطة',
-                      stationCategoryLabel,
                     ),
-                    buildFourColumnRow(
-                      'رقم الترخيص السابق',
-                      settlementLicenseNumber,
-                      'اسم مقدم الطلب',
-                      applicantFullName,
-                      alternate: true,
-                    ),
-                    if (ctrl.investorType.value == 'company')
-                      buildFourColumnRow(
-                        'اسم الشركة',
-                        ctrl.companyNameController.text.trim(),
-                        'رقم ترخيص الشركة',
-                        companyLicenseNumber,
-                      ),
-                    if (ctrl.investorType.value == 'company')
-                      buildFourColumnRow(
-                        'تاريخ ترخيص الشركة',
-                        companyLicenseDateLabel,
-                        '',
-                        '',
-                      ),
                   ]),
                   buildSection('بيانات مقدم الطلب', [
                     buildFourColumnRow(
@@ -497,12 +509,43 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       ctrl.nationalIdController.text.trim(),
                     ),
                     buildFourColumnRow(
+                      'اسم الام',
+                      ctrl.motherNameController.text.trim(),
                       'مكان الولادة',
-                      ctrl.birthPlaceController.text.trim(),
-                      'تاريخ الولادة',
-                      birthDate,
+                      ctrl.birthPlaceController.text.trim().isNotEmpty
+                          ? ctrl.birthPlaceController.text.trim()
+                          : 'غير محدد',
                       alternate: true,
                     ),
+                    buildFourColumnRow(
+                      'تاريخ الولدة',
+                      birthDate,
+                      'بريد حساب المستخدم',
+                      '',
+                    ),
+                  ]),
+                  if (ctrl.investorType.value == 'company')
+                    buildSection('بيانات الشركة  والشركاء', [
+                      buildFourColumnRow(
+                        'اسم الشركة',
+                        ctrl.companyNameController.text.trim(),
+                        'رقم ترخيص الشركة',
+                        companyLicenseNumber,
+                      ),
+                      buildFourColumnRow(
+                        'تاريخ ترخيص الشركة',
+                        companyLicenseDateLabel,
+                        '',
+                        '',
+                        alternate: true,
+                      ),
+                      buildTwoColumnRow(
+                        'شركاء الشركة',
+                        partners.isNotEmpty ? partners.join('، ') : 'غير محدد',
+                        alternate: true,
+                      ),
+                    ]),
+                  buildSection('بيانات التواصل', [
                     buildFourColumnRow(
                       'البريد الإلكتروني',
                       ctrl.emailController.text.trim(),
@@ -511,20 +554,77 @@ class ApplicationSuccessScreen extends StatelessWidget {
                     ),
                     if (ctrl.phone2Controller.text.trim().isNotEmpty)
                       buildFourColumnRow(
-                        'الهاتف الثانوي',
+                        'رقم التواصل الثانوي',
                         ctrl.phone2Controller.text.trim(),
                         '',
                         '',
-                      ),
-                    if (ctrl.investorType.value == 'company')
-                      buildFourColumnRow(
-                        'اسم الشركة',
-                        ctrl.companyNameController.text.trim(),
-                        'الشركاء',
-                        partners.isNotEmpty ? partners.join('، ') : 'غير محدد',
                         alternate: true,
                       ),
                   ]),
+                  if (ctrl.requestType.value == 'settlement' &&
+                      (ctrl.previousLicenseNumber.text.trim().isNotEmpty ||
+                          ctrl.settlementRelocation.value))
+                    buildSection('بيانات التسوية', [
+                      if (ctrl.previousLicenseNumber.text.trim().isNotEmpty)
+                        buildFourColumnRow(
+                          'رقم الترخيص السابق',
+                          settlementLicenseNumber,
+                          'نقل المحطة',
+                          ctrl.settlementRelocation.value ? 'نعم' : 'لا',
+                        ),
+                      if (ctrl.settlementRelocation.value)
+                        buildFourColumnRow(
+                          'الموقع الفديم',
+                          (ctrl.oldSelectedGovernorate.value?.name
+                                      ?.toString() ??
+                                  '/') +
+                              ' / ' +
+                              (ctrl.oldSelectedDistrict.value?.name
+                                      ?.toString() ??
+                                  '/') +
+                              ' / ' +
+                              (ctrl.oldSelectedSubdistrict.value?.name
+                                      ?.toString() ??
+                                  '/') +
+                              ' / ' +
+                              (ctrl.oldSelectedTown.value?.name?.toString() ??
+                                  'غير محدد'),
+                          'إحداثيات الموقع  القديم',
+                          (ctrl.oldLatitudeController.text.trim().isNotEmpty
+                                  ? ctrl.oldLatitudeController.text.trim()
+                                  : '-') +
+                              ' , ' +
+                              (ctrl.oldLongitudeController.text
+                                      .trim()
+                                      .isNotEmpty
+                                  ? ctrl.oldLongitudeController.text.trim()
+                                  : '-'),
+                        ),
+                      if (ctrl.settlementRelocation.value)
+                        buildFourColumnRow(
+                          'لموقع الجديد',
+                          (ctrl.selectedGovernorate.value?.name?.toString() ??
+                                  '/') +
+                              ' / ' +
+                              (ctrl.selectedDistrict.value?.name?.toString() ??
+                                  '/') +
+                              ' / ' +
+                              (ctrl.selectedSubdistrict.value?.name
+                                      ?.toString() ??
+                                  '/') +
+                              ' / ' +
+                              (ctrl.selectedTown.value?.name?.toString() ??
+                                  'غير محدد'),
+                          'إحداثيات الموقع الجديد',
+                          (ctrl.latitudeController.text.trim().isNotEmpty
+                                  ? ctrl.latitudeController.text.trim()
+                                  : '-') +
+                              ' , ' +
+                              (ctrl.longitudeController.text.trim().isNotEmpty
+                                  ? ctrl.longitudeController.text.trim()
+                                  : '-'),
+                        ),
+                    ]),
                   buildSection('بيانات الموقع والتصنيف', [
                     buildFourColumnRow(
                       'المحافظة',
@@ -540,24 +640,19 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       alternate: true,
                     ),
                     buildFourColumnRow(
-                      'نوع الطريق',
-                      roadTypeLabel,
-                      'فئة المحطـة',
-                      stationCategoryLabel,
-                    ),
-                    buildFourColumnRow(
+                      'خط العرض',
+                      latitude,
                       'خط الطول',
                       longitude,
-                      'دائرة العرض',
-                      latitude,
-                      alternate: true,
                     ),
                     buildFourColumnRow(
-                      'حالة التنظيم',
+                      'التصنيف',
+                      stationCategoryLabel,
+                      'النطاق التنظيمي',
                       planningLocationLabel,
-                      '',
-                      '',
+                      alternate: true,
                     ),
+                    buildFourColumnRow('نوع الطريق', roadTypeLabel, ' ', ''),
                   ]),
                   // pw.SizedBox(height: 12),
                   // pw.Divider(color: PdfColors.grey300),

@@ -154,6 +154,7 @@ class SettlementLocation {
       if (v is Map) return v.map((k, v2) => MapEntry(k.toString(), v2));
       return null;
     }
+
     final governorate = asMap(json['governorate']);
     final district = asMap(json['district']);
     final subDistrict = asMap(json['sub_district']);
@@ -198,9 +199,12 @@ class SettlementDetails {
       if (v is Map) return v.map((k, v2) => MapEntry(k.toString(), v2));
       return null;
     }
+
     return SettlementDetails(
       id: json['id']?.toString(),
-      isRelocation: json['is_relocation'] == true || json['is_relocation']?.toString() == '1',
+      isRelocation:
+          json['is_relocation'] == true ||
+          json['is_relocation']?.toString() == '1',
       oldLocation: SettlementLocation.fromJson(asMap(json['old_location'])),
       newLocation: SettlementLocation.fromJson(asMap(json['new_location'])),
     );
@@ -248,6 +252,7 @@ class ApplicationModel {
         return value;
     }
   }
+
   final String? stationCategory;
   final String? stationName;
   final String? applicantName;
@@ -445,17 +450,16 @@ class ApplicationModel {
         applicantable['company_license_number']?.toString() ?? '';
     final subDistrictName =
         (location['sub_district_name']?.toString() ?? '').trim().isNotEmpty
-            ? location['sub_district_name']!.toString()
-            : subDistrictMap?['name']?.toString() ?? '';
+        ? location['sub_district_name']!.toString()
+        : subDistrictMap?['name']?.toString() ?? '';
     final companyLicenseDate =
         applicantable['company_license_date']?.toString() ?? '';
-    final partners =
-        (applicantable['partners'] is List)
-            ? (applicantable['partners'] as List)
-                .map((partner) => partner?.toString() ?? '')
-                .where((partner) => partner.trim().isNotEmpty)
-                .toList()
-            : <String>[];
+    final partners = (applicantable['partners'] is List)
+        ? (applicantable['partners'] as List)
+              .map((partner) => partner?.toString() ?? '')
+              .where((partner) => partner.trim().isNotEmpty)
+              .toList()
+        : <String>[];
 
     final latestAttachmentItems =
         (json['latest_attachments'] as List?)
@@ -507,7 +511,7 @@ class ApplicationModel {
     return ApplicationModel(
       id: json['id']?.toString() ?? '',
       applicationNumber: json['license_request_number']?.toString() ?? '',
-      licensenumberOld: json['license_number']?.toString()??'',
+      licensenumberOld: json['license_number']?.toString() ?? '',
       status: statusValue,
       statusLabel: _statusLabel(statusValue),
       requestType: _normalizeRequestType(rawRequestType),
@@ -542,7 +546,9 @@ class ApplicationModel {
       townId: location['town_id']?.toString() ?? townMap?['id']?.toString(),
       latitude: latitude,
       longitude: longitude,
-      settlementDetails: SettlementDetails.fromJson(_asStringKeyedMap(json['settlement_details'])),
+      settlementDetails: SettlementDetails.fromJson(
+        _asStringKeyedMap(json['settlement_details']),
+      ),
       applicantType: applicantTypeNormalized,
       termsAccepted:
           json['terms_accepted'] == true || json['terms_accepted'] == 1,
