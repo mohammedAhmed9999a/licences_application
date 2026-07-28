@@ -114,6 +114,7 @@ class LicenseApplicationController extends GetxController {
   final companyLicenseNumberController = TextEditingController();
   final companyLicenseDate = Rxn<DateTime>();
   final partners = <String>[].obs; // list of partner names
+  final partnerTextControllers = <TextEditingController>[];
   final partnersKeys = <Key>[].obs;
 
   final companyNameError = ''.obs;
@@ -339,6 +340,7 @@ class LicenseApplicationController extends GetxController {
     ever<String>(investorType, (val) {
       if (val == 'company' && partners.isEmpty) {
         partners.add('');
+        partnerTextControllers.add(TextEditingController(text: ''));
         partnersKeys.add(ValueKey(DateTime.now().microsecondsSinceEpoch));
       }
     });
@@ -359,6 +361,9 @@ class LicenseApplicationController extends GetxController {
     birthPlaceController.dispose();
     companyNameController.dispose();
     companyLicenseNumberController.dispose();
+    for (final ctrl in partnerTextControllers) {
+      ctrl.dispose();
+    }
     firstNameFocus.dispose();
     fatherNameFocus.dispose();
     motherNameFocus.dispose();
@@ -448,6 +453,11 @@ class LicenseApplicationController extends GetxController {
     companyLicenseNumberController.clear();
     companyLicenseDate.value = null;
     partners.clear();
+    for (final controller in partnerTextControllers) {
+      controller.dispose();
+    }
+    partnerTextControllers.clear();
+    partnersKeys.clear();
     selectedGovernorate.value = null;
     selectedDistrict.value = null;
     selectedSubdistrict.value = null;
@@ -591,7 +601,26 @@ class LicenseApplicationController extends GetxController {
         companyLicenseDate.value = parsed;
       }
     }
-    // Normalize planning location (handle Arabic and English responses)
+
+    partners.clear();
+    for (final controller in partnerTextControllers) {
+      controller.dispose();
+    }
+    partnerTextControllers.clear();
+    partnersKeys.clear();
+    if (application.partners.isNotEmpty) {
+      for (final partner in application.partners) {
+        final trimmed = partner.trim();
+        partners.add(trimmed);
+        partnerTextControllers.add(TextEditingController(text: trimmed));
+        partnersKeys.add(ValueKey(DateTime.now().microsecondsSinceEpoch));
+      }
+    } else if (investorType.value == 'company' && partners.isEmpty) {
+      partners.add('');
+      partnerTextControllers.add(TextEditingController(text: ''));
+      partnersKeys.add(ValueKey(DateTime.now().microsecondsSinceEpoch));
+    }
+
     final planningRaw = application.planningLocation?.toLowerCase() ?? '';
     if (planningRaw.contains('outside') || planningRaw.contains('خارج')) {
       planningLocation.value = 'outside';
@@ -2294,7 +2323,7 @@ class LicenseApplicationController extends GetxController {
     } catch (_) {}
   }
 
-  static const int maxPartners = 50;
+  static const int maxPartners = 30;
 
   void addPartner() {
     if (partners.length >= maxPartners) {
@@ -2302,6 +2331,7 @@ class LicenseApplicationController extends GetxController {
       return;
     }
     partners.add('');
+    partnerTextControllers.add(TextEditingController(text: ''));
     partnersKeys.add(ValueKey(DateTime.now().microsecondsSinceEpoch));
   }
 
@@ -2309,6 +2339,10 @@ class LicenseApplicationController extends GetxController {
     if (index < 0 || index >= partners.length) return;
     partners.removeAt(index);
     if (index >= 0 && index < partnersKeys.length) partnersKeys.removeAt(index);
+    if (index >= 0 && index < partnerTextControllers.length) {
+      partnerTextControllers[index].dispose();
+      partnerTextControllers.removeAt(index);
+    }
   }
 
   void updatePartner(int index, String name) => partners[index] = name;

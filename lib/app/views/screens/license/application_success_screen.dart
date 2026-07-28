@@ -75,6 +75,9 @@ class ApplicationSuccessScreen extends StatelessWidget {
       final partners = ctrl.investorType.value == 'company'
           ? ctrl.partners.where((p) => p.trim().isNotEmpty).toList()
           : <String>[];
+      final partnersText = partners.isNotEmpty
+          ? partners.map((p) => p.trim()).where((p) => p.isNotEmpty).join('، ')
+          : 'غير محدد';
       final stationCategoryLabel = 'الفئة ${ctrl.stationCategory.value}';
       final companyLicenseNumber =
           ctrl.companyLicenseNumberController.text.trim().isNotEmpty
@@ -222,16 +225,16 @@ class ApplicationSuccessScreen extends StatelessWidget {
               decoration: pw.BoxDecoration(color: rowColor),
               children: [
                 pw.Container(
-                  height: 20.h,
                   padding: const pw.EdgeInsets.symmetric(
                     vertical: 10,
                     horizontal: 4,
                   ),
-                  alignment: pw.Alignment.centerRight,
+                  alignment: pw.Alignment.topRight,
                   color: PdfColor.fromHex('#ffffff'),
                   child: pw.Text(
                     value.isEmpty ? '-' : value,
                     textAlign: pw.TextAlign.right,
+                    softWrap: true,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
                 ),
@@ -541,7 +544,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       ),
                       buildTwoColumnRow(
                         'شركاء الشركة',
-                        partners.isNotEmpty ? partners.join('، ') : 'غير محدد',
+                        partnersText,
                         alternate: true,
                       ),
                     ]),

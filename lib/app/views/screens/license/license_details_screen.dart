@@ -18,6 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../theme/app_theme.dart';
 import '../../../models/application_model.dart';
 import '../../../models/license_detail_model.dart';
+import '../../../controllers/auth_controller.dart';
 import '../../../controllers/license_application_controller.dart';
 import '../../../routes/app_routes.dart';
 
@@ -181,6 +182,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
         detail!.application.companyLicenseDate?.trim().isNotEmpty == true
         ? detail!.application.companyLicenseDate!
         : 'غير مطبق';
+    final authCtrl = Get.find<AuthController>();
     final partnersText = detail!.application.partners.isNotEmpty
         ? (detail!.application.partners.length <= 50
               ? detail!.application.partners.join(', ')
@@ -247,7 +249,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   style: pw.TextStyle(
                     fontSize: 10,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.green800,
+                    color: PdfColors.black,
                   ),
                 ),
               ),
@@ -280,7 +282,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   style: pw.TextStyle(
                     fontSize: 10,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.green800,
+                    color: PdfColors.black,
                   ),
                 ),
               ),
@@ -294,6 +296,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       String label,
       String value, {
       bool alternate = false,
+      int maxLines = 1,
     }) {
       final rowColor = alternate
           ? PdfColor.fromHex('#f8f7f0')
@@ -316,7 +319,6 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             decoration: pw.BoxDecoration(color: rowColor),
             children: [
               pw.Container(
-                height: 20.h,
                 padding: const pw.EdgeInsets.symmetric(
                   vertical: 10,
                   horizontal: 4,
@@ -327,6 +329,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   value.isEmpty ? '-' : value,
                   textAlign: pw.TextAlign.right,
                   style: const pw.TextStyle(fontSize: 10),
+                  maxLines: maxLines,
+                  overflow: pw.TextOverflow.clip,
                 ),
               ),
               pw.Container(
@@ -343,7 +347,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   style: pw.TextStyle(
                     fontSize: 10,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.green800,
+                    color: PdfColors.black,
                   ),
                 ),
               ),
@@ -401,7 +405,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   mainAxisAlignment: pw.MainAxisAlignment.start,
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: List.generate(
-                    158, // عدد الصفوف
+                    188, // عدد الصفوف
                     (_) => pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.start,
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -430,43 +434,57 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
           },
         ),
 
-        // pageTheme: pw.PageTheme(
-        //   pageFormat: PdfPageFormat.a4,
-        //   buildBackground: (context) {
-        //     debugPrint(
-        //       '🔵 buildBackground استُدعيت - رقم الصفحة: ${context.pageNumber}',
-        //     );
-        //     return pw.FullPage(
-        //       ignoreMargins: true,
-        //       child: pw.Image(
-        //         bgImage,
-        //         fit: pw.BoxFit.cover,
-        //       ), // بدون Opacity مؤقتًا
-        //     );
-        //   },
-        // ),
-        // footer: ,
         footer: (context) => pw.Directionality(
           textDirection: pw.TextDirection.rtl,
-          child: pw.Column(
-            mainAxisSize: pw.MainAxisSize.min,
-            children: [
-              pw.Divider(color: PdfColors.grey300),
-              pw.SizedBox(height: 6),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
-                    style: pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-                  ),
-                  pw.Text(
-                    'وزارة الطاقة © ${DateTime.now().year}',
-                    style: pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-                  ),
-                ],
-              ),
-            ],
+          child: pw.Container(
+            margin: pw.EdgeInsets.only(top: 4.h),
+            padding: pw.EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
+            child: pw.Column(
+              mainAxisSize: pw.MainAxisSize.min,
+              children: [
+                pw.Container(height: 0.5, color: PdfColors.grey300),
+                pw.SizedBox(height: 6),
+                pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Expanded(
+                      child: pw.Text(
+                        'تم إنشاء هذا المستند إلكترونياً لغرض متابعة طلب الترخيص.',
+                        style: pw.TextStyle(
+                          fontSize: 8,
+                          color: PdfColors.grey600,
+                        ),
+                        textAlign: pw.TextAlign.right,
+                      ),
+                    ),
+                    pw.SizedBox(width: 8),
+                    pw.Container(
+                      width: 130.w,
+                      child: pw.Text(
+                        'تاريخ الإنشاء: ${DateFormat('yyyy/MM/dd - hh:mm', 'ar').format(DateTime.now())}',
+                        style: pw.TextStyle(
+                          fontSize: 8,
+                          color: PdfColors.grey600,
+                        ),
+                        textAlign: pw.TextAlign.left,
+                      ),
+                    ),
+                    pw.SizedBox(width: 8),
+                    pw.Container(
+                      width: 60.w,
+                      child: pw.Text(
+                        '${context.pageNumber}/${context.pagesCount}',
+                        style: pw.TextStyle(
+                          fontSize: 8,
+                          color: PdfColors.grey600,
+                        ),
+                        textAlign: pw.TextAlign.left,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         build: (context) => [
@@ -477,50 +495,72 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  pw.Table(
+                    columnWidths: {
+                      0: pw.FixedColumnWidth(130.w),
+                      1: pw.FixedColumnWidth(10.w),
+                      2: const pw.FlexColumnWidth(1),
+                      3: pw.FixedColumnWidth(10.w),
+                      4: pw.FixedColumnWidth(130.w),
+                    },
+                    defaultVerticalAlignment:
+                        pw.TableCellVerticalAlignment.middle,
                     children: [
-                      pw.Image(logoImage, width: 140.w, height: 70.h),
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      pw.TableRow(
                         children: [
-                          pw.Text(
-                            'إدارة خدمات الطاقة',
-                            style: pw.TextStyle(
-                              fontSize: 20,
-                              color: PdfColors.green800,
-                              fontWeight: pw.FontWeight.bold,
+                          pw.Container(
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.BarcodeWidget(
+                              data: applicationNumber,
+                              barcode: pw.Barcode.qrCode(),
+                              width: 64.w,
+                              height: 64.h,
                             ),
                           ),
-                          pw.SizedBox(height: 4),
-                          pw.Text(
-                            'طلب ترخيص محطة وقود',
-                            style: pw.TextStyle(
-                              fontSize: 13,
-                              color: PdfColors.grey700,
+                          pw.Container(),
+                          pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.center,
+                            mainAxisAlignment: pw.MainAxisAlignment.center,
+                            children: [
+                              pw.Text(
+                                'إدارة خدمات الطاقة',
+                                style: pw.TextStyle(
+                                  fontSize: 18,
+                                  color: PdfColors.green800,
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                                textAlign: pw.TextAlign.center,
+                              ),
+                              pw.SizedBox(height: 4),
+                              pw.Text(
+                                'طلب ترخيص محطة وقود',
+                                style: pw.TextStyle(
+                                  fontSize: 12,
+                                  color: PdfColors.grey700,
+                                ),
+                                textAlign: pw.TextAlign.center,
+                              ),
+                            ],
+                          ),
+                          pw.Container(),
+                          pw.Container(
+                            alignment: pw.Alignment.centerRight,
+                            child: pw.Image(
+                              logoImage,
+                              width: 145.w,
+                              height: 64.h,
                             ),
                           ),
                         ],
                       ),
-                      pw.Container(
-                        padding: pw.EdgeInsets.all(6.sp),
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(color: PdfColors.grey300),
-                          borderRadius: pw.BorderRadius.circular(8.r),
-                          color: PdfColors.white,
-                        ),
-                        child: pw.BarcodeWidget(
-                          data: applicationNumber,
-                          barcode: pw.Barcode.qrCode(),
-                          width: 40.w,
-                          height: 40.h,
-                        ),
-                      ),
                     ],
                   ),
-                  // pw.SizedBox(height: 18),
-                  pw.Divider(),
+                  pw.SizedBox(height: 8),
+                  pw.Container(
+                    height: 1,
+                    color: PdfColors.green800,
+                  ),
+                  pw.SizedBox(height: 10),
                   // pw.Container(
                   //   width: double.infinity,
                   //   padding: const pw.EdgeInsets.symmetric(
@@ -653,8 +693,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       birthDate,
 
                       'بريد حساب المستخدم',
-                      '',
-                      // birthDate,
+
+                      authCtrl.userEmail.isNotEmpty
+                          ? authCtrl.userEmail
+                          : '', // birthDate,
                       alternate: true,
                     ),
 
@@ -712,6 +754,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                             'شركاء الشركة',
                             partnersText,
                             alternate: true,
+                            maxLines: 4,
                           ),
 
                           //   'الاسم الكامل',
@@ -1027,29 +1070,6 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                     //   alternate: true,
                     // ),
                   ]),
-                  // pw.SizedBox(height: 12),
-                  // pw.Divider(color: PdfColors.grey300),
-                  // pw.SizedBox(height: 10),
-                  // // Spacer(),
-                  // pw.Row(
-                  //   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     pw.Text(
-                  //       'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
-                  //       style: pw.TextStyle(
-                  //         fontSize: 9,
-                  //         color: PdfColors.grey600,
-                  //       ),
-                  //     ),
-                  //     pw.Text(
-                  //       'وزارة الطاقة © ${DateTime.now().year}',
-                  //       style: pw.TextStyle(
-                  //         fontSize: 9,
-                  //         color: PdfColors.grey600,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                 ],
               ),
             ),

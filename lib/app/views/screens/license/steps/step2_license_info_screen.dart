@@ -1503,6 +1503,36 @@ class _CompanyForm extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
         Obx(() {
+          final partnersText = ctrl.partners
+              .map((p) => p.trim())
+              .where((p) => p.isNotEmpty)
+              .join('، ');
+          if (partnersText.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          return Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(bottom: 10.h),
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: surfaceAlt,
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: borderColor),
+            ),
+            child: Text(
+              partnersText,
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 13.sp,
+                color: textPrimary,
+                height: 1.4,
+              ),
+              textDirection: TextDirection.rtl,
+              softWrap: true,
+            ),
+          );
+        }),
+        Obx(() {
           final partnersEditable = ctrl.isFieldEditable('partners');
           return Column(
             children: List.generate(
@@ -1541,12 +1571,14 @@ class _CompanyForm extends StatelessWidget {
                       ),
                       SizedBox(height: 6.h),
                       TextField(
+                        controller: ctrl.partnerTextControllers[i],
                         enabled: partnersEditable,
                         textDirection: TextDirection.rtl,
                         textAlign: TextAlign.right,
                         onChanged: partnersEditable
                             ? (v) => ctrl.updatePartner(i, v)
                             : null,
+                        maxLength: 50,
                         style: TextStyle(fontFamily: 'Cairo', fontSize: 13.sp),
                         decoration: InputDecoration(
                           hintText: 'الاسم الثلاثي للشريك',
