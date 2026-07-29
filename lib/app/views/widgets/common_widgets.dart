@@ -213,8 +213,8 @@ class LabeledField extends StatelessWidget {
             ],
           ),
           SizedBox(height: 6.h),
-          child,
 
+          child,
           if (errorText != null && errorText!.isNotEmpty) ...[
             SizedBox(height: 6.h),
             Row(

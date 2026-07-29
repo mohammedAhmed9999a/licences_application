@@ -148,6 +148,7 @@ class Step3LocationScreen extends StatelessWidget {
                                   subtitle: 'استخدم موقع المحطة الحالي.',
                                   icon: Icons.location_on_outlined,
                                   selected: !ctrl.settlementRelocation.value,
+                                  enabled: !ctrl.isCorrectionMode.value,
                                   onTap: () =>
                                       ctrl.settlementRelocation.value = false,
                                 ),
@@ -160,6 +161,7 @@ class Step3LocationScreen extends StatelessWidget {
                                   subtitle: 'أدخل الموقع القديم والجديد.',
                                   icon: Icons.compare_arrows,
                                   selected: ctrl.settlementRelocation.value,
+                                  enabled: !ctrl.isCorrectionMode.value,
                                   onTap: () =>
                                       ctrl.settlementRelocation.value = true,
                                 ),
@@ -168,7 +170,10 @@ class Step3LocationScreen extends StatelessWidget {
                           ),
                           if (ctrl.settlementRelocation.value) ...[
                             SizedBox(height: 14.h),
-                            _OldSettlementLocationForm(ctrl: ctrl),
+                            _OldSettlementLocationForm(
+                              ctrl: ctrl,
+                              governorateEditable: governorateEditable,
+                            ),
                           ],
                         ],
                       ),
@@ -1207,9 +1212,13 @@ class Step3LocationScreen extends StatelessWidget {
 
 // ─── Helper Widgets ───────────────────────────────────────────────────────────
 class _OldSettlementLocationForm extends StatelessWidget {
-  const _OldSettlementLocationForm({required this.ctrl});
+  const _OldSettlementLocationForm({
+    required this.ctrl,
+    required this.governorateEditable,
+  });
 
   final LicenseApplicationController ctrl;
+  final bool governorateEditable;
 
   @override
   Widget build(BuildContext context) {
@@ -1267,6 +1276,11 @@ class _OldSettlementLocationForm extends StatelessWidget {
               label: 'المحافظة',
               value: ctrl.oldSelectedGovernorate.value?.name,
               items: ctrl.oldGovernorates.map((item) => item.name).toList(),
+              enabled: governorateEditable,
+              loadingLabel: 'جاري تحميل المحافظات...',
+              onRefresh: governorateEditable
+                  ? () => ctrl.refreshGovernorates()
+                  : null,
               onChanged: (value) {
                 ctrl.onOldGovernorateChanged(
                   ctrl.oldGovernorates.firstWhereOrNull(
@@ -1280,6 +1294,11 @@ class _OldSettlementLocationForm extends StatelessWidget {
               label: 'المنطقة',
               value: ctrl.oldSelectedDistrict.value?.name,
               items: ctrl.oldDistricts.map((item) => item.name).toList(),
+              enabled: governorateEditable,
+              loadingLabel: 'جاري تحميل المناطق...',
+              onRefresh: governorateEditable
+                  ? () => ctrl.refreshOldDistricts()
+                  : null,
               onChanged: (value) {
                 ctrl.onOldDistrictChanged(
                   ctrl.oldDistricts.firstWhereOrNull(
@@ -1293,6 +1312,11 @@ class _OldSettlementLocationForm extends StatelessWidget {
               label: 'الناحية',
               value: ctrl.oldSelectedSubdistrict.value?.name,
               items: ctrl.oldSubdistricts.map((item) => item.name).toList(),
+              enabled: governorateEditable,
+              loadingLabel: 'جاري تحميل النواحي...',
+              onRefresh: governorateEditable
+                  ? () => ctrl.refreshOldSubdistricts()
+                  : null,
               onChanged: (value) {
                 ctrl.onOldSubdistrictChanged(
                   ctrl.oldSubdistricts.firstWhereOrNull(
@@ -1306,6 +1330,11 @@ class _OldSettlementLocationForm extends StatelessWidget {
               label: 'البلدة',
               value: ctrl.oldSelectedTown.value?.name,
               items: ctrl.oldTowns.map((item) => item.name).toList(),
+              enabled: governorateEditable,
+              loadingLabel: 'جاري تحميل البلديات...',
+              onRefresh: governorateEditable
+                  ? () => ctrl.refreshOldTowns()
+                  : null,
               onChanged: (value) {
                 final town = ctrl.oldTowns.firstWhereOrNull(
                   (item) => item.name == value,
@@ -1362,7 +1391,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
                       child: _LocationPickerMap(
                         latitudeController: ctrl.oldLatitudeController,
                         longitudeController: ctrl.oldLongitudeController,
-                        enabled: true,
+                        enabled: governorateEditable,
                         onLocationSelected: (position) {
                           ctrl.oldLatitudeController.text = position.latitude
                               .toStringAsFixed(6);
@@ -1386,6 +1415,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
+                    enabled: governorateEditable,
                   ),
                 ),
                 SizedBox(width: 10.w),
@@ -1396,6 +1426,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
+                    enabled: governorateEditable,
                   ),
                 ),
               ],
@@ -1411,6 +1442,10 @@ class _OldSettlementLocationForm extends StatelessWidget {
     required String? value,
     required List<String> items,
     required ValueChanged<String?> onChanged,
+    bool enabled = true,
+    bool isLoading = false,
+    String? loadingLabel,
+    VoidCallback? onRefresh,
   }) {
     return LabeledField(
       label: label,
@@ -1419,6 +1454,10 @@ class _OldSettlementLocationForm extends StatelessWidget {
         hint: 'اختر $label',
         value: value,
         items: items,
+        enabled: enabled,
+        isLoading: isLoading,
+        loadingLabel: loadingLabel,
+        onRefresh: onRefresh,
         onChanged: onChanged,
       ),
     );
@@ -1560,7 +1599,7 @@ class _DropdownField extends StatelessWidget {
 
     return Container(
       height: 50.h,
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      // padding: EdgeInsets.symmetric(horizontal: 12.w),
       decoration: BoxDecoration(
         color: fillColor,
         borderRadius: BorderRadius.circular(8.r),

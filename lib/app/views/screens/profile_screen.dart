@@ -35,7 +35,13 @@ class ProfileScreen extends StatelessWidget {
             ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
             : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
 
-        appBar: AppBar(title: Text("الملف الشخصي ",)),
+        appBar: AppBar(
+          title: Text("الملف الشخصي "),
+
+          backgroundColor: isDark
+              ? AppColors.forest1.withOpacity(0.9)
+              : AppColors.forest1.withOpacity(0.9),
+        ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(10.w),
           child: Directionality(

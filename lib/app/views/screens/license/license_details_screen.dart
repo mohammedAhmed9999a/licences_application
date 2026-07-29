@@ -405,7 +405,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                   mainAxisAlignment: pw.MainAxisAlignment.start,
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: List.generate(
-                    188, // عدد الصفوف
+                    200,
+                    // 188, // عدد الصفوف
                     (_) => pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.start,
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -556,10 +557,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                     ],
                   ),
                   pw.SizedBox(height: 8),
-                  pw.Container(
-                    height: 1,
-                    color: PdfColors.green800,
-                  ),
+                  pw.Container(height: 1, color: PdfColors.green800),
                   pw.SizedBox(height: 10),
                   // pw.Container(
                   //   width: double.infinity,
@@ -751,7 +749,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                             ),
                           // Container()
                           buildTwoColumnRow(
-                            'شركاء الشركة',
+                            'أسماء الشركاء',
                             partnersText,
                             alternate: true,
                             maxLines: 4,
@@ -1710,6 +1708,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
 
   List<_InfoEntry> _buildApplicantEntries(LicenseDetailModel detail) {
     final app = detail.application;
+    // final userName1=app.firstName ?? '';
     final userName = [app.firstName, app.fatherName, app.lastName]
         .where((value) => (value ?? '').trim().isNotEmpty)
         .map((value) => value!.trim())
@@ -1763,6 +1762,17 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
           // _formatDisplayDate(app.companyLicenseDate),
         ),
       );
+    }
+
+    if (app.partners.isNotEmpty) {
+      final partnersText = app.partners
+          .map((partner) => partner.trim())
+          .where((partner) => partner.isNotEmpty)
+          .join('، ');
+
+      if (partnersText.isNotEmpty) {
+        fields.add(_InfoEntry('أسماء الشركاء', partnersText));
+      }
     }
 
     return fields;

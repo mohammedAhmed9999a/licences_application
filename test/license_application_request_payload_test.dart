@@ -28,5 +28,24 @@ void main() {
         },
       });
     });
+
+    test('flattens company partners for multipart correction payloads', () {
+      final controller = LicenseApplicationController();
+      controller.isCorrectionMode.value = true;
+      controller.editApplicationId.value = '123';
+      controller.investorType.value = 'company';
+      controller.correctionTargets.assignAll(['licenseDetails']);
+      controller.companyNameController.text = 'شركة الاختبار';
+      controller.companyLicenseNumberController.text = '123456';
+      controller.companyLicenseDate.value = DateTime(2026, 7, 28);
+      controller.partners.assignAll(['مروان', 'سامي']);
+
+      final fields = controller.buildCorrectionFormDataFields();
+
+      expect(fields['applicant[company_name]'], 'شركة الاختبار');
+      expect(fields['applicant[partners][0]'], 'مروان');
+      expect(fields['applicant[partners][1]'], 'سامي');
+      expect(fields.containsKey('applicant[partners]'), isFalse);
+    });
   });
 }

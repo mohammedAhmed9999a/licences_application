@@ -332,6 +332,12 @@ class LicenseApplicationController extends GetxController {
     return correctionTargets.contains(target);
   }
 
+  bool canEditOldSettlementLocation() {
+    if (!isCorrectionMode.value) return true;
+    return correctionTargets.contains('settlementDetails') ||
+        correctionTargets.contains('locationClassification');
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -569,9 +575,11 @@ class LicenseApplicationController extends GetxController {
         : 'new';
     previousLicenseNumber.text =
         application.requestType.toLowerCase().contains('settlement')
-        ? (application.applicationNumber.isNotEmpty
-              ? application.applicationNumber
-              : '')
+        ? (application.licensenumberOld.trim().isNotEmpty
+              ? application.licensenumberOld.trim()
+              : (application.applicationNumber.isNotEmpty
+                    ? application.applicationNumber
+                    : ''))
         : '';
     investorType.value =
         application.applicantType?.toLowerCase().contains('company') == true
@@ -673,6 +681,60 @@ class LicenseApplicationController extends GetxController {
       townId: application.townId,
     );
 
+    final settlementDetails = application.settlementDetails;
+    if (requestType.value == 'settlement') {
+      final isRelocation = settlementDetails?.isRelocation == true;
+      settlementRelocation.value = isRelocation;
+
+      if (isRelocation) {
+        final oldLocation = settlementDetails?.oldLocation;
+        if (oldLocation != null) {
+          final oldGovernorateId = oldLocation.governorateId;
+          if (oldGovernorateId?.isNotEmpty == true) {
+            final match = oldGovernorates.firstWhereOrNull(
+              (item) => item.id.toString() == oldGovernorateId,
+            );
+            if (match != null) {
+              oldSelectedGovernorate.value = match;
+              await onOldGovernorateChanged(match);
+            }
+          }
+          if (oldLocation.districtId?.isNotEmpty == true) {
+            final match = oldDistricts.firstWhereOrNull(
+              (item) => item.id.toString() == oldLocation.districtId,
+            );
+            if (match != null) {
+              oldSelectedDistrict.value = match;
+              await onOldDistrictChanged(match);
+            }
+          }
+          if (oldLocation.subDistrictId?.isNotEmpty == true) {
+            final match = oldSubdistricts.firstWhereOrNull(
+              (item) => item.id.toString() == oldLocation.subDistrictId,
+            );
+            if (match != null) {
+              oldSelectedSubdistrict.value = match;
+              await onOldSubdistrictChanged(match);
+            }
+          }
+          if (oldLocation.townId?.isNotEmpty == true) {
+            final match = oldTowns.firstWhereOrNull(
+              (item) => item.id.toString() == oldLocation.townId,
+            );
+            if (match != null) {
+              oldSelectedTown.value = match;
+            }
+          }
+          if (oldLocation.latitude?.isNotEmpty == true) {
+            oldLatitudeController.text = oldLocation.latitude!;
+          }
+          if (oldLocation.longitude?.isNotEmpty == true) {
+            oldLongitudeController.text = oldLocation.longitude!;
+          }
+        }
+      }
+    }
+
     _originalApplication = application;
     if (application.needsCorrection) {
       errorMessage.value = 'تم تهيئة الطلب للتعديل وفقًا للملاحظات';
@@ -685,6 +747,32 @@ class LicenseApplicationController extends GetxController {
 
   bool _hasChangedBool(bool? originalValue, bool currentValue) {
     return (originalValue ?? false) != currentValue;
+  }
+
+  Map<String, dynamic> buildCorrectionFormDataFields() {
+    final payload = buildCorrectionPayload();
+    final flattened = <String, dynamic>{};
+
+    void flatten(String prefix, dynamic value) {
+      if (value is Map) {
+        value.forEach((key, child) {
+          final nextPrefix = prefix.isEmpty ? key.toString() : '$prefix[$key]';
+          flatten(nextPrefix, child);
+        });
+      } else if (value is List) {
+        for (var i = 0; i < value.length; i++) {
+          flatten('$prefix[$i]', value[i]);
+        }
+      } else {
+        flattened[prefix] = value;
+      }
+    }
+
+    payload.forEach((key, value) {
+      flatten(key, value);
+    });
+
+    return flattened;
   }
 
   Map<String, dynamic> buildCorrectionPayload() {
@@ -791,51 +879,39 @@ class LicenseApplicationController extends GetxController {
 
     if (correctionTargets.contains('locationClassification')) {
       final location = <String, dynamic>{};
-      if (selectedGovernorate.value?.id != null &&
-          (original == null ||
-              original.governorateId !=
-                  selectedGovernorate.value?.id.toString())) {
-        location['governorate_id'] = selectedGovernorate.value?.id;
-      }
-      if (selectedDistrict.value?.id != null &&
-          (original == null ||
-              original.districtId != selectedDistrict.value?.id.toString())) {
-        location['district_id'] = selectedDistrict.value?.id;
-      }
-      if (selectedSubdistrict.value?.id != null &&
-          (original == null ||
-              original.subDistrictId !=
-                  selectedSubdistrict.value?.id.toString())) {
-        location['sub_district_id'] = selectedSubdistrict.value?.id;
-      }
-      if (selectedTown.value?.id != null &&
-          (original == null ||
-              original.townId != selectedTown.value?.id.toString())) {
-        location['town_id'] = selectedTown.value?.id;
-      }
+      final originalGovernorateId = original?.governorateId;
+      final originalDistrictId = original?.districtId;
+      final originalSubDistrictId = original?.subDistrictId;
+      final originalTownId = original?.townId;
+      final originalLatitude = original?.latitude ?? '';
+      final originalLongitude = original?.longitude ?? '';
+
+      final governorateId = selectedGovernorate.value?.id?.toString();
+      final districtId = selectedDistrict.value?.id?.toString();
+      final subDistrictId = selectedSubdistrict.value?.id?.toString();
+      final townId = selectedTown.value?.id?.toString();
       final latitude = latitudeController.text.trim();
-      if (latitude.isNotEmpty &&
-          (original == null ||
-              _hasChangedString(original.latitude, latitude))) {
-        location['latitude'] = latitude;
-      }
       final longitude = longitudeController.text.trim();
-      if (longitude.isNotEmpty &&
-          (original == null ||
-              _hasChangedString(original.longitude, longitude))) {
-        location['longitude'] = longitude;
-      }
-      if (location.isNotEmpty) {
-        if (requestType.value == 'settlement' && settlementRelocation.value) {
-          payload['settlement'] = {
-            'is_relocation': 1,
-            'license_number': previousLicenseNumber.text.trim(),
-            'old_location': _buildOldLocationPayload(),
-            'new_location': location,
-          };
-        } else {
-          payload['location'] = location;
-        }
+
+      location['governorate_id'] = governorateId ?? originalGovernorateId ?? '';
+      location['district_id'] = districtId ?? originalDistrictId ?? '';
+      location['sub_district_id'] =
+          subDistrictId ?? originalSubDistrictId ?? '';
+      location['town_id'] = townId ?? originalTownId ?? '';
+      location['latitude'] = latitude.isNotEmpty ? latitude : originalLatitude;
+      location['longitude'] = longitude.isNotEmpty
+          ? longitude
+          : originalLongitude;
+
+      if (requestType.value == 'settlement' && settlementRelocation.value) {
+        payload['settlement'] = {
+          'is_relocation': 1,
+          'license_number': previousLicenseNumber.text.trim(),
+          'old_location': _buildOldLocationPayload(),
+          'new_location': location,
+        };
+      } else {
+        payload['location'] = location;
       }
     }
 
@@ -1998,7 +2074,7 @@ class LicenseApplicationController extends GetxController {
           return;
         }
 
-        final formData = dio.FormData.fromMap(rawPayload);
+        final formData = dio.FormData.fromMap(buildCorrectionFormDataFields());
         final uploadAttachments = requiredAttachments
             .where((attachment) => getAttachmentFile(attachment.key) != null)
             .toList();
@@ -2269,6 +2345,18 @@ class LicenseApplicationController extends GetxController {
 
   Future<void> refreshTowns() async {
     await onSubdistrictChanged(selectedSubdistrict.value);
+  }
+
+  Future<void> refreshOldDistricts() async {
+    await onOldGovernorateChanged(oldSelectedGovernorate.value);
+  }
+
+  Future<void> refreshOldSubdistricts() async {
+    await onOldDistrictChanged(oldSelectedDistrict.value);
+  }
+
+  Future<void> refreshOldTowns() async {
+    await onOldSubdistrictChanged(oldSelectedSubdistrict.value);
   }
 
   Future<void> onOldGovernorateChanged(GovernorateModel? gov) async {

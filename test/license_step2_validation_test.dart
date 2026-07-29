@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:licences_application/app/controllers/license_application_controller.dart';
+import 'package:licences_application/app/models/application_model.dart';
 import 'package:licences_application/app/views/screens/license/steps/step2_license_info_screen.dart';
 
 void main() {
@@ -70,28 +71,30 @@ void main() {
     expect(controller.errorMessage.value, isEmpty);
   });
 
-  testWidgets('company mode shows all applicant fields while keeping only three required', (
-    tester,
-  ) async {
-    final controller = LicenseApplicationController();
-    controller.investorType.value = 'company';
-    Get.put(controller);
-    addTearDown(Get.reset);
+  testWidgets(
+    'company mode shows all applicant fields while keeping only three required',
+    (tester) async {
+      final controller = LicenseApplicationController();
+      controller.investorType.value = 'company';
+      Get.put(controller);
+      addTearDown(Get.reset);
 
-    await tester.pumpWidget(
-      ScreenUtilInit(
-        designSize: const Size(390, 844),
-        builder: (_, __) => GetMaterialApp(home: const Step2LicenseInfoScreen()),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        ScreenUtilInit(
+          designSize: const Size(390, 844),
+          builder: (_, __) =>
+              GetMaterialApp(home: const Step2LicenseInfoScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('الاسم الأول'), findsWidgets);
-    expect(find.text('اسم الأب'), findsOneWidget);
-    expect(find.text('اسم الأم'), findsOneWidget);
-    expect(find.text('مكان الولادة'), findsOneWidget);
-    expect(find.text('تاريخ الولادة'), findsOneWidget);
-  });
+      expect(find.text('الاسم الأول'), findsWidgets);
+      expect(find.text('اسم الأب'), findsOneWidget);
+      expect(find.text('اسم الأم'), findsOneWidget);
+      expect(find.text('مكان الولادة'), findsOneWidget);
+      expect(find.text('تاريخ الولادة'), findsOneWidget);
+    },
+  );
 
   test(
     'validateStep2 requires only the company representative fields for company requests',
@@ -192,6 +195,28 @@ void main() {
         controller.settlementPreviousLicenseError.value,
         contains('رقم الترخيص'),
       );
+    },
+  );
+
+  test(
+    'prepareForCorrection fills the previous license number for settlement requests',
+    () async {
+      final controller = LicenseApplicationController();
+      final application = ApplicationModel(
+        id: '1',
+        applicationNumber: 'طلب رقم 1001',
+        status: 'draft',
+        statusLabel: 'مسودة',
+        requestType: 'settlement',
+        investorType: 'individual',
+        createdAt: '2024-01-01',
+        licensenumberOld: 'ABC-123',
+      );
+
+      await controller.prepareForCorrection(application);
+
+      expect(controller.requestType.value, 'settlement');
+      expect(controller.previousLicenseNumber.text, 'ABC-123');
     },
   );
 }

@@ -154,7 +154,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                     style: pw.TextStyle(
                       fontSize: 10,
                       fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.green800,
+                      color: PdfColors.black,
                     ),
                   ),
                 ),
@@ -186,7 +186,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                     style: pw.TextStyle(
                       fontSize: 10,
                       fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.green800,
+                      color: PdfColors.black,
                     ),
                   ),
                 ),
@@ -252,7 +252,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                     style: pw.TextStyle(
                       fontSize: 10,
                       fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.green800,
+                      color: PdfColors.black,
                     ),
                   ),
                 ),
@@ -384,7 +384,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                     mainAxisAlignment: pw.MainAxisAlignment.start,
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: List.generate(
-                      158,
+                      188,
                       (_) => pw.Row(
                         mainAxisAlignment: pw.MainAxisAlignment.start,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -401,31 +401,55 @@ class ApplicationSuccessScreen extends StatelessWidget {
           ),
           footer: (context) => pw.Directionality(
             textDirection: pw.TextDirection.rtl,
-            child: pw.Column(
-              mainAxisSize: pw.MainAxisSize.min,
-              children: [
-                pw.Divider(color: PdfColors.grey300),
-                pw.SizedBox(height: 6),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      'تم إنشاء الملف آلياً بواسطة نظام إدارة خدمات الطاقة',
-                      style: pw.TextStyle(
-                        fontSize: 9,
-                        color: PdfColors.grey600,
+            child: pw.Container(
+              margin: pw.EdgeInsets.only(top: 4.h),
+              padding: pw.EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
+              child: pw.Column(
+                mainAxisSize: pw.MainAxisSize.min,
+                children: [
+                  pw.Container(height: 0.5, color: PdfColors.grey300),
+                  pw.SizedBox(height: 6),
+                  pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Expanded(
+                        child: pw.Text(
+                          'تم إنشاء هذا المستند إلكترونياً لغرض متابعة طلب الترخيص.',
+                          style: pw.TextStyle(
+                            fontSize: 8,
+                            color: PdfColors.grey600,
+                          ),
+                          textAlign: pw.TextAlign.right,
+                        ),
                       ),
-                    ),
-                    pw.Text(
-                      'وزارة الطاقة © ${DateTime.now().year}',
-                      style: pw.TextStyle(
-                        fontSize: 9,
-                        color: PdfColors.grey600,
+                      pw.SizedBox(width: 8),
+                      pw.Container(
+                        width: 130.w,
+                        child: pw.Text(
+                          'تاريخ الإنشاء: ${DateFormat('yyyy/MM/dd - hh:mm', 'ar').format(DateTime.now())}',
+                          style: pw.TextStyle(
+                            fontSize: 8,
+                            color: PdfColors.grey600,
+                          ),
+                          textAlign: pw.TextAlign.left,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      pw.SizedBox(width: 8),
+                      pw.Container(
+                        width: 60.w,
+                        child: pw.Text(
+                          '${context.pageNumber}/${context.pagesCount}',
+                          style: pw.TextStyle(
+                            fontSize: 8,
+                            color: PdfColors.grey600,
+                          ),
+                          textAlign: pw.TextAlign.left,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           build: (context) => [
@@ -438,49 +462,69 @@ class ApplicationSuccessScreen extends StatelessWidget {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  pw.Table(
+                    columnWidths: {
+                      0: pw.FixedColumnWidth(130.w),
+                      1: pw.FixedColumnWidth(10.w),
+                      2: const pw.FlexColumnWidth(1),
+                      3: pw.FixedColumnWidth(10.w),
+                      4: pw.FixedColumnWidth(130.w),
+                    },
+                    defaultVerticalAlignment:
+                        pw.TableCellVerticalAlignment.middle,
                     children: [
-                      pw.Image(logoImage, width: 140.w, height: 70.h),
-
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      pw.TableRow(
                         children: [
-                          pw.Text(
-                            'إدارة خدمات الطاقة',
-                            style: pw.TextStyle(
-                              fontSize: 20,
-                              color: PdfColors.green800,
-                              fontWeight: pw.FontWeight.bold,
+                          pw.Container(
+                            alignment: pw.Alignment.centerLeft,
+                            child: pw.BarcodeWidget(
+                              data: applicationNumber,
+                              barcode: pw.Barcode.qrCode(),
+                              width: 64.w,
+                              height: 64.h,
                             ),
                           ),
-                          pw.SizedBox(height: 4),
-                          pw.Text(
-                            'طلب ترخيص محطة وقود',
-                            style: pw.TextStyle(
-                              fontSize: 13,
-                              color: PdfColors.grey700,
+                          pw.Container(),
+                          pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.center,
+                            mainAxisAlignment: pw.MainAxisAlignment.center,
+                            children: [
+                              pw.Text(
+                                'إدارة خدمات الطاقة',
+                                style: pw.TextStyle(
+                                  fontSize: 18,
+                                  color: PdfColors.green800,
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                                textAlign: pw.TextAlign.center,
+                              ),
+                              pw.SizedBox(height: 4),
+                              pw.Text(
+                                'طلب ترخيص محطة وقود',
+                                style: pw.TextStyle(
+                                  fontSize: 12,
+                                  color: PdfColors.grey700,
+                                ),
+                                textAlign: pw.TextAlign.center,
+                              ),
+                            ],
+                          ),
+                          pw.Container(),
+                          pw.Container(
+                            alignment: pw.Alignment.centerRight,
+                            child: pw.Image(
+                              logoImage,
+                              width: 145.w,
+                              height: 64.h,
                             ),
                           ),
                         ],
                       ),
-                      pw.Container(
-                        padding: pw.EdgeInsets.all(6.sp),
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(color: PdfColors.grey300),
-                          borderRadius: pw.BorderRadius.circular(8),
-                          color: PdfColors.white,
-                        ),
-                        child: pw.BarcodeWidget(
-                          data: applicationNumber,
-                          barcode: pw.Barcode.qrCode(),
-                          width: 40.w,
-                          height: 40.h,
-                        ),
-                      ),
                     ],
                   ),
+                  pw.SizedBox(height: 8),
+                  pw.Container(height: 1, color: PdfColors.green800),
+                  pw.SizedBox(height: 10),
                   pw.SizedBox(height: 18),
 
                   buildSection('بيانات الطلب', [
@@ -524,7 +568,9 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       'تاريخ الولدة',
                       birthDate,
                       'بريد حساب المستخدم',
-                      '',
+                      ctrl.emailController.text.trim().isNotEmpty
+                          ? ctrl.emailController.text.trim()
+                          : 'غير متوفر',
                     ),
                   ]),
                   if (ctrl.investorType.value == 'company')
@@ -543,7 +589,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                         alternate: true,
                       ),
                       buildTwoColumnRow(
-                        'شركاء الشركة',
+                        'أسماء الشركاء',
                         partnersText,
                         alternate: true,
                       ),

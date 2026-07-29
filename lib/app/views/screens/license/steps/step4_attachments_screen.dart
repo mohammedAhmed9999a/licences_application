@@ -161,12 +161,12 @@ class Step4AttachmentsScreen extends StatelessWidget {
           }),
 
           // ─── Summary Section ──────────────────────────────────────────
-          SectionCard(
-            title: 'ملخص الطلب',
-            subtitle: 'مراجعة قبل الإرسال',
-            stepNumber: 2,
-            child: _buildSummary(ctrl),
-          ),
+          // SectionCard(
+          //   title: 'ملخص الطلب',
+          //   subtitle: 'مراجعة قبل الإرسال',
+          //   stepNumber: 2,
+          //   child: _buildSummary(ctrl),
+          // ),
 
           // Error
           Obx(() => ErrorBanner(message: ctrl.errorMessage.value)),
