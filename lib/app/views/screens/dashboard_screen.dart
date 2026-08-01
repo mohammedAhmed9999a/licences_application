@@ -614,6 +614,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         color: isSelected ? stat.color : Colors.transparent,
                         width: 1.2,
                       ),
+                      //
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
