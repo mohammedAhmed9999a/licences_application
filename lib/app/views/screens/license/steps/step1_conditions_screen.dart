@@ -581,7 +581,6 @@ class Step1ConditionsScreen extends StatelessWidget {
                                   key: ctrl.emailFieldKey,
                                   label: 'عنوان البريد الإلكتروني',
                                   required: true,
-
                                   errorText: _getEmailErrorText(ctrl),
                                   child: RtlTextField(
                                     maxLength: 50,
@@ -636,7 +635,9 @@ class Step1ConditionsScreen extends StatelessWidget {
                             builder: (context, _, __) {
                               return Obx(
                                 () => LabeledField(
-                                  key: ctrl.phoneFieldKey,
+                                  key: useColumnLayout
+                                      ? null
+                                      : ctrl.phoneFieldKey,
                                   label: 'رقم التواصل (رقم سوري حصراً)',
                                   required: true,
                                   errorText: _getPhoneErrorText(ctrl),
@@ -662,7 +663,9 @@ class Step1ConditionsScreen extends StatelessWidget {
                             builder: (context, _, __) {
                               return Obx(
                                 () => LabeledField(
-                                  key: ctrl.emailFieldKey,
+                                  key: useColumnLayout
+                                      ? null
+                                      : ctrl.emailFieldKey,
                                   label: 'عنوان البريد الإلكتروني',
                                   required: true,
                                   errorText: _getEmailErrorText(ctrl),

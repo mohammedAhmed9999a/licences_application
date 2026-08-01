@@ -183,13 +183,13 @@ class StepIndicatorWidget extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () {
-        if (isEnabled) {
-          onStepTapped?.call(stepIndex);
-        } else {
-          onBlockedStepTap?.call(stepIndex);
-        }
-      },
+      // onTap: () {
+      //   if (isEnabled) {
+      //     onStepTapped?.call(stepIndex);
+      //   } else {
+      //     onBlockedStepTap?.call(stepIndex);
+      //   }
+      // },
       child: Opacity(
         opacity: isEnabled ? 1 : 0.6,
         child: Container(

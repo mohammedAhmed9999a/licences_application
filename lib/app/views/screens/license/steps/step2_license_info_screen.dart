@@ -26,7 +26,7 @@ class Step2LicenseInfoScreen extends StatelessWidget {
       child: SingleChildScrollView(
         controller: ctrl.step2ScrollController,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 5.h),
           child: Column(
             children: [
               SectionCard(
@@ -261,20 +261,6 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
-                                              Flexible(
-                                                child: Text(
-                                                  'أقر بالاطلاع على متطلبات ومراحل تسوية أوضاع المحطات وأوافق على الالتزام بها.',
-                                                  style: TextStyle(
-                                                    fontFamily: 'Cairo',
-                                                    fontSize: 12.sp,
-                                                    color: textPrimary,
-                                                  ),
-                                                  textDirection:
-                                                      TextDirection.rtl,
-                                                  softWrap: true,
-                                                ),
-                                              ),
-                                              SizedBox(width: 8.w),
                                               Checkbox(
                                                 value: ctrl.settledAgreed.value,
                                                 onChanged: (v) {
@@ -289,6 +275,21 @@ class Step2LicenseInfoScreen extends StatelessWidget {
                                                         '';
                                                   }
                                                 },
+                                              ),
+                                              SizedBox(width: 8.w),
+
+                                              Flexible(
+                                                child: Text(
+                                                  'أقر بالاطلاع على متطلبات ومراحل تسوية أوضاع المحطات وأوافق على الالتزام بها.',
+                                                  style: TextStyle(
+                                                    fontFamily: 'Cairo',
+                                                    fontSize: 12.sp,
+                                                    color: textPrimary,
+                                                  ),
+                                                  textDirection:
+                                                      TextDirection.rtl,
+                                                  softWrap: true,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -542,7 +543,7 @@ class _SettlementPhase extends StatelessWidget {
         children: [
           Flexible(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
@@ -631,10 +632,10 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'الاسم الأول بالهوية الشخصية',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 15,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('firstName', v),
@@ -658,10 +659,10 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'اسم الأب',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 15,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('fatherName', v),
@@ -689,11 +690,12 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'اسم الأب',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
-                        onChanged: (_) => ctrl.fatherNameError.value = '',
+                        maxLength: 15,
+                        onChanged: (v) =>
+                            ctrl.validateStep2Field('fatherName', v),
                       ),
                     ),
                   ),
@@ -715,7 +717,7 @@ class _IndividualForm extends StatelessWidget {
                             RegExp(r'[\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 15,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('firstName', v),
@@ -752,10 +754,10 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'الكنية',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 15,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('nickname', v),
@@ -778,10 +780,10 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'اسم الأم',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 15,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('motherName', v),
@@ -811,10 +813,10 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'اسم الأم',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 15,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('motherName', v),
@@ -838,10 +840,10 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'الكنية',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 15,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('nickname', v),
@@ -904,10 +906,10 @@ class _IndividualForm extends StatelessWidget {
                         hintText: 'مكان الولادة',
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                            RegExp(r'[\u0600-\u06FF\s]'),
+                            RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 30,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('birthPlace', v),
@@ -940,7 +942,7 @@ class _IndividualForm extends StatelessWidget {
                             RegExp(r'[\u0600-\u06FF\s]'),
                           ),
                         ],
-                        maxLength: 50,
+                        maxLength: 30,
                         textInputAction: TextInputAction.next,
                         onChanged: (v) =>
                             ctrl.validateStep2Field('birthPlace', v),
@@ -989,19 +991,22 @@ class _IndividualForm extends StatelessWidget {
             child: GestureDetector(
               onTap: birthDateEditable
                   ? () async {
-                      final lastDate = DateTime.now().subtract(
-                        const Duration(days: 365 * 18),
+                      final today = DateTime.now();
+                      final minimumBirthDate = DateTime(
+                        today.year - 18,
+                        today.month,
+                        today.day,
                       );
                       final initialDate = ctrl.birthDate.value != null
-                          ? (ctrl.birthDate.value!.isBefore(lastDate)
-                                ? ctrl.birthDate.value!
-                                : lastDate)
-                          : DateTime(1990);
+                          ? (ctrl.birthDate.value!.isAfter(minimumBirthDate)
+                                ? minimumBirthDate
+                                : ctrl.birthDate.value!)
+                          : minimumBirthDate;
                       final picked = await showDatePicker(
                         context: context,
                         initialDate: initialDate,
                         firstDate: DateTime(1920),
-                        lastDate: lastDate,
+                        lastDate: minimumBirthDate,
                         builder: (ctx, child) => Directionality(
                           textDirection: TextDirection.rtl,
                           child: child!,
@@ -1128,9 +1133,11 @@ class _CompanyForm extends StatelessWidget {
               focusNode: ctrl.firstNameFocus,
               hintText: 'الاسم الأول',
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
+                ),
               ],
-              maxLength: 50,
+              maxLength: 15,
               textInputAction: TextInputAction.next,
               onChanged: (v) => ctrl.validateStep2Field('firstName', v),
               onSubmitted: (_) => ctrl.requestFocus(ctrl.nicknameFocus),
@@ -1150,9 +1157,11 @@ class _CompanyForm extends StatelessWidget {
               focusNode: ctrl.nicknameFocus,
               hintText: 'الكنية',
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
+                ),
               ],
-              maxLength: 50,
+              maxLength: 15,
               textInputAction: TextInputAction.next,
               onChanged: (v) => ctrl.validateStep2Field('nickname', v),
               onSubmitted: (_) => ctrl.requestFocus(ctrl.nationalIdFocus),
@@ -1193,9 +1202,11 @@ class _CompanyForm extends StatelessWidget {
               focusNode: ctrl.fatherNameFocus,
               hintText: 'اسم الأب',
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
+                ),
               ],
-              maxLength: 50,
+              maxLength: 15,
               textInputAction: TextInputAction.next,
               onChanged: (v) => ctrl.validateStep2Field('fatherName', v),
               onSubmitted: (_) => ctrl.requestFocus(ctrl.motherNameFocus),
@@ -1215,9 +1226,11 @@ class _CompanyForm extends StatelessWidget {
               focusNode: ctrl.motherNameFocus,
               hintText: 'اسم الأم',
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
+                ),
               ],
-              maxLength: 50,
+              maxLength: 15,
               textInputAction: TextInputAction.next,
               onChanged: (v) => ctrl.validateStep2Field('motherName', v),
               onSubmitted: (_) => ctrl.requestFocus(ctrl.birthPlaceFocus),
@@ -1237,9 +1250,11 @@ class _CompanyForm extends StatelessWidget {
               focusNode: ctrl.birthPlaceFocus,
               hintText: 'مكان الولادة',
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[A-Za-z\u0600-\u06FF\s]'),
+                ),
               ],
-              maxLength: 50,
+              maxLength: 30,
               textInputAction: TextInputAction.next,
               onChanged: (v) => ctrl.validateStep2Field('birthPlace', v),
               onSubmitted: (_) => ctrl.requestFocus(ctrl.birthDateFocus),
@@ -1258,19 +1273,22 @@ class _CompanyForm extends StatelessWidget {
             child: GestureDetector(
               onTap: birthDateEditable
                   ? () async {
-                      final lastDate = DateTime.now().subtract(
-                        const Duration(days: 365 * 18),
+                      final today = DateTime.now();
+                      final minimumBirthDate = DateTime(
+                        today.year - 18,
+                        today.month,
+                        today.day,
                       );
                       final initialDate = ctrl.birthDate.value != null
-                          ? (ctrl.birthDate.value!.isBefore(lastDate)
-                                ? ctrl.birthDate.value!
-                                : lastDate)
-                          : DateTime(1990);
+                          ? (ctrl.birthDate.value!.isAfter(minimumBirthDate)
+                                ? minimumBirthDate
+                                : ctrl.birthDate.value!)
+                          : minimumBirthDate;
                       final picked = await showDatePicker(
                         context: context,
                         initialDate: initialDate,
                         firstDate: DateTime(1920),
-                        lastDate: lastDate,
+                        lastDate: minimumBirthDate,
                         builder: (ctx, child) => Directionality(
                           textDirection: TextDirection.rtl,
                           child: child!,
@@ -1339,7 +1357,7 @@ class _CompanyForm extends StatelessWidget {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[\u0600-\u06FF\s]')),
               ],
-              maxLength: 100,
+              maxLength: 30,
               textInputAction: TextInputAction.next,
               onChanged: (v) => ctrl.validateStep2Field('companyName', v),
               onSubmitted: (_) =>
@@ -1462,35 +1480,6 @@ class _CompanyForm extends StatelessWidget {
 
         SizedBox(height: 16.h),
         // Partners
-        Row(
-          textDirection: TextDirection.rtl,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Obx(() {
-              final partnersEditable = ctrl.isFieldEditable('partners');
-              return OutlinedButton.icon(
-                onPressed: partnersEditable ? ctrl.addPartner : null,
-                icon: const Icon(Icons.add, size: 16),
-                label: Text(
-                  'إضافة شريك',
-                  style: TextStyle(fontSize: 12.sp, fontFamily: 'Cairo'),
-                ),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: Size(0, 36.h),
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                ),
-              );
-            }),
-            Text(
-              'أسماء الشركاء (اختياري)',
-              style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 14.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
         SizedBox(height: 4.h),
         Text(
           'أدخل أسماء الشركاء المسجلين في الشركة إن وجدت، وهي اختيارية.',
@@ -1619,6 +1608,35 @@ class _CompanyForm extends StatelessWidget {
                   ),
                 )
               : const SizedBox.shrink(),
+        ),
+        Row(
+          textDirection: TextDirection.rtl,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Obx(() {
+              final partnersEditable = ctrl.isFieldEditable('partners');
+              return OutlinedButton.icon(
+                onPressed: partnersEditable ? ctrl.addPartner : null,
+                icon: const Icon(Icons.add, size: 16),
+                label: Text(
+                  'إضافة شريك',
+                  style: TextStyle(fontSize: 12.sp, fontFamily: 'Cairo'),
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(0, 36.h),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                ),
+              );
+            }),
+            Text(
+              'أسماء الشركاء (اختياري)',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ],
     );

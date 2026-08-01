@@ -3,12 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../core/constant/app_colors.dart';
 import '../../controllers/auth_controller.dart';
-import '../../routes/app_routes.dart';
 import '../widgets/common_widgets.dart';
-import '../widgets/ministry_logo_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
@@ -17,230 +17,210 @@ class ProfileScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
     final onPrimary = theme.colorScheme.onPrimary;
-    final primaryGradientEnd = primaryColor.withOpacity(
-      theme.brightness == Brightness.dark ? 0.95 : 0.8,
-    );
     final surface = theme.colorScheme.surface;
     final borderColor = theme.dividerColor;
     final isDark = Get.isDarkMode;
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: isDark
-            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
-            : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
 
-        appBar: AppBar(
-          title: Text("الملف الشخصي "),
-
-          backgroundColor: isDark
-              ? AppColors.forest1.withOpacity(0.9)
-              : AppColors.forest1.withOpacity(0.9),
-        ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(10.w),
-          child: Directionality(
-            textDirection:
-                TextDirection.ltr, // Force LTR for layout consistency
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              textDirection: TextDirection.rtl,
-              children: [
-                SizedBox(height: 8.h),
-                Container(
-                  padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/background.png'),
-                      opacity: 0.1,
-                      fit: BoxFit.cover,
-                    ),
-                    // color: Theme.of(
-                    //   context,
-                    // ).scaffoldBackgroundColor.withAlpha(125),
-                    gradient: LinearGradient(
-                      colors: [AppColors.forest1, AppColors.forest1],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                    ),
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          textDirection: TextDirection.rtl,
-                          // crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'الملف الشخصي',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: onPrimary,
-                              ),
-                            ),
-                            SizedBox(height: 6.h),
-                            Text(
-                              authCtrl.userName.isNotEmpty
-                                  ? authCtrl.userName
-                                  : 'مستخدم',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                color: onPrimary,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              authCtrl.userEmail.isNotEmpty
-                                  ? authCtrl.userEmail
-                                  : 'user@example.com',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 12.sp,
-                                color: onPrimary.withOpacity(0.9),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      CircleAvatar(
-                        radius: 30.r,
-                        backgroundColor: Colors.white,
-                        child: Text(
-                          authCtrl.userName.isNotEmpty
-                              ? authCtrl.userName[0].toUpperCase()
-                              : 'م',
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Cairo',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+    final profileContent = SingleChildScrollView(
+      padding: EdgeInsets.all(10.w),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          textDirection: TextDirection.rtl,
+          children: [
+            SizedBox(height: 8.h),
+            Container(
+              padding: EdgeInsets.all(10.w),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/background.png'),
+                  opacity: 0.1,
+                  fit: BoxFit.cover,
                 ),
-                SizedBox(height: 20.h),
-                Obx(() {
-                  if (authCtrl.isProfileLoading.value) {
-                    return Column(
-                      children: const [ShimmerLoadingCard(height: 180)],
-                    );
-                  }
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'معلومات الحساب',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                      if (authCtrl.profileError.value.isNotEmpty)
-                        Padding(
-                          padding: EdgeInsets.only(top: 10.h),
-                          child: Text(
-                            authCtrl.profileError.value,
-                            style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontSize: 12.sp,
-                              color: AppColors.error,
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                }),
-                SizedBox(height: 12.h),
-                _InfoCard(
-                  icon: Icons.person_outline,
-                  title: 'الاسم الكامل',
-                  value: authCtrl.userName.isNotEmpty
-                      ? authCtrl.userName
-                      : 'غير متوفر',
+                gradient: LinearGradient(
+                  colors: [AppColors.forest1, AppColors.forest1],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
                 ),
-                SizedBox(height: 10.h),
-                _InfoCard(
-                  icon: Icons.email_outlined,
-                  title: 'البريد الإلكتروني',
-                  value: authCtrl.userEmail.isNotEmpty
-                      ? authCtrl.userEmail
-                      : 'غير متوفر',
-                ),
-                SizedBox(height: 10.h),
-                _InfoCard(
-                  icon: Icons.badge_outlined,
-                  title: 'نوع الحساب',
-                  value: 'مستخدم مسجل',
-                ),
-                SizedBox(height: 24.h),
-                Text(
-                  'الإجراءات',
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: surface,
-                      borderRadius: BorderRadius.circular(16.r),
-                      border: Border.all(color: borderColor),
-                    ),
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      textDirection: TextDirection.rtl,
                       children: [
-                        // _ActionTile(
-                        //   icon: Icons.settings_outlined,
-                        //   title: 'الإعدادات',
-                        //   subtitle: 'تغيير اللغة والمظهر',
-                        //   onTap: () => Get.toNamed(AppRoutes.settings),
-                        // ),
-                        // Divider(height: 1.h, color: borderColor),
-                        _ActionTile(
-                          icon: Icons.lock_outline,
-                          title: 'الأمان',
-                          subtitle: 'تحديث كلمة المرور',
-                          onTap: () {},
+                        Text(
+                          'الملف الشخصي',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: onPrimary,
+                          ),
                         ),
-                        Divider(height: 1.h, color: borderColor),
-                        _ActionTile(
-                          icon: Icons.logout_outlined,
-                          title: 'تسجيل الخروج',
-                          subtitle: 'الخروج من الحساب الحالي',
-                          onTap: () => _showLogoutDialog(context, authCtrl),
-                          danger: true,
+                        SizedBox(height: 6.h),
+                        Text(
+                          authCtrl.userName.isNotEmpty
+                              ? authCtrl.userName
+                              : 'مستخدم',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            color: onPrimary,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          authCtrl.userEmail.isNotEmpty
+                              ? authCtrl.userEmail
+                              : 'user@example.com',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 12.sp,
+                            color: onPrimary.withOpacity(0.9),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(width: 12.w),
+                  CircleAvatar(
+                    radius: 30.r,
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      authCtrl.userName.isNotEmpty
+                          ? authCtrl.userName[0].toUpperCase()
+                          : 'م',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            SizedBox(height: 20.h),
+            Obx(() {
+              if (authCtrl.isProfileLoading.value) {
+                return const ShimmerLoadingCard(height: 180);
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'معلومات الحساب',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  if (authCtrl.profileError.value.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: 10.h),
+                      child: Text(
+                        authCtrl.profileError.value,
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 12.sp,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }),
+            SizedBox(height: 12.h),
+            _InfoCard(
+              icon: Icons.person_outline,
+              title: 'الاسم الكامل',
+              value: authCtrl.userName.isNotEmpty
+                  ? authCtrl.userName
+                  : 'غير متوفر',
+            ),
+            SizedBox(height: 10.h),
+            _InfoCard(
+              icon: Icons.email_outlined,
+              title: 'البريد الإلكتروني',
+              value: authCtrl.userEmail.isNotEmpty
+                  ? authCtrl.userEmail
+                  : 'غير متوفر',
+            ),
+            SizedBox(height: 10.h),
+            _InfoCard(
+              icon: Icons.badge_outlined,
+              title: 'نوع الحساب',
+              value: 'مستخدم مسجل',
+            ),
+            SizedBox(height: 24.h),
+            Text(
+              'الإجراءات',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 15.sp,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(color: borderColor),
+                ),
+                child: Column(
+                  children: [
+                    _ActionTile(
+                      icon: Icons.lock_outline,
+                      title: 'الأمان',
+                      subtitle: 'تحديث كلمة المرور',
+                      onTap: () {},
+                    ),
+                    Divider(height: 1.h, color: borderColor),
+                    _ActionTile(
+                      icon: Icons.logout_outlined,
+                      title: 'تسجيل الخروج',
+                      subtitle: 'الخروج من الحساب الحالي',
+                      onTap: () => _showLogoutDialog(context, authCtrl),
+                      danger: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
+    );
+
+    if (embedded) {
+      return SafeArea(child: profileContent);
+    }
+
+    return Scaffold(
+      // backgroundColor: isDark
+      //     ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+      //     : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
+      // appBar: AppBar(
+      //   title: const Text('الملف الشخصي'),
+      //   backgroundColor: isDark
+      //       ? AppColors.forest1.withOpacity(0.9)
+      //       : AppColors.forest1.withOpacity(0.9),
+      // ),
+      body: profileContent,
     );
   }
 

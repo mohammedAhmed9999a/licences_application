@@ -66,10 +66,15 @@ class LicenseApplicationController extends GetxController {
   final applicationId = ''.obs;
   final isLoading = false.obs;
   final step3CardsUnlocked = true.obs;
+  final hasAttemptedStep1Submission = false.obs;
   final isGovernoratesLoading = false.obs;
   final isDistrictsLoading = false.obs;
   final isSubdistrictsLoading = false.obs;
   final isTownsLoading = false.obs;
+  final isOldGovernoratesLoading = false.obs;
+  final isOldDistrictsLoading = false.obs;
+  final isOldSubdistrictsLoading = false.obs;
+  final isOldTownsLoading = false.obs;
   final errorMessage = ''.obs;
   final step1ErrorField = ''.obs;
 
@@ -492,6 +497,8 @@ class LicenseApplicationController extends GetxController {
     investmentContractUploaded.value = false;
     valuationStatementUploaded.value = false;
     errorMessage.value = '';
+    step1ErrorField.value = '';
+    hasAttemptedStep1Submission.value = false;
     submittedApplicationNumber.value = '';
   }
 
@@ -568,13 +575,16 @@ class LicenseApplicationController extends GetxController {
     emailController.text = application.email;
     phoneController.text = application.phone;
     phone2Controller.text = application.secondaryPhone ?? '';
-    agreedToTerms.value = application.termsAccepted;
-    requestType.value =
-        application.requestType.toLowerCase().contains('settlement')
-        ? 'settlement'
-        : 'new';
-    previousLicenseNumber.text =
-        application.requestType.toLowerCase().contains('settlement')
+    agreedToTerms.value = true; // Activate terms checkbox in edit mode
+    final isSettlement = application.requestType.toLowerCase().contains(
+      'settlement',
+    );
+    requestType.value = isSettlement ? 'settlement' : 'new';
+    if (isSettlement) {
+      settledAgreed.value = true; // Activate settlement checkbox in edit mode
+      settlementAgreementError.value = '';
+    }
+    previousLicenseNumber.text = isSettlement
         ? (application.licensenumberOld.trim().isNotEmpty
               ? application.licensenumberOld.trim()
               : (application.applicationNumber.isNotEmpty
@@ -1039,6 +1049,7 @@ class LicenseApplicationController extends GetxController {
   }
 
   bool validateStep1() {
+    hasAttemptedStep1Submission.value = true;
     errorMessage.value = '';
     step1ErrorField.value = '';
 
@@ -2329,34 +2340,69 @@ class LicenseApplicationController extends GetxController {
   }
 
   Future<void> refreshGovernorates() async {
-    await _loadGovernorates();
-    if (selectedGovernorate.value != null) {
-      await onGovernorateChanged(selectedGovernorate.value);
+    isGovernoratesLoading.value = true;
+    try {
+      await _loadGovernorates();
+      if (selectedGovernorate.value != null) {
+        await onGovernorateChanged(selectedGovernorate.value);
+      }
+    } finally {
+      isGovernoratesLoading.value = false;
     }
   }
 
   Future<void> refreshDistricts() async {
-    await onGovernorateChanged(selectedGovernorate.value);
+    isDistrictsLoading.value = true;
+    try {
+      await onGovernorateChanged(selectedGovernorate.value);
+    } finally {
+      isDistrictsLoading.value = false;
+    }
   }
 
   Future<void> refreshSubdistricts() async {
-    await onDistrictChanged(selectedDistrict.value);
+    isSubdistrictsLoading.value = true;
+    try {
+      await onDistrictChanged(selectedDistrict.value);
+    } finally {
+      isSubdistrictsLoading.value = false;
+    }
   }
 
   Future<void> refreshTowns() async {
-    await onSubdistrictChanged(selectedSubdistrict.value);
+    isTownsLoading.value = true;
+    try {
+      await onSubdistrictChanged(selectedSubdistrict.value);
+    } finally {
+      isTownsLoading.value = false;
+    }
   }
 
   Future<void> refreshOldDistricts() async {
-    await onOldGovernorateChanged(oldSelectedGovernorate.value);
+    isOldDistrictsLoading.value = true;
+    try {
+      await onOldGovernorateChanged(oldSelectedGovernorate.value);
+    } finally {
+      isOldDistrictsLoading.value = false;
+    }
   }
 
   Future<void> refreshOldSubdistricts() async {
-    await onOldDistrictChanged(oldSelectedDistrict.value);
+    isOldSubdistrictsLoading.value = true;
+    try {
+      await onOldDistrictChanged(oldSelectedDistrict.value);
+    } finally {
+      isOldSubdistrictsLoading.value = false;
+    }
   }
 
   Future<void> refreshOldTowns() async {
-    await onOldSubdistrictChanged(oldSelectedSubdistrict.value);
+    isOldTownsLoading.value = true;
+    try {
+      await onOldSubdistrictChanged(oldSelectedSubdistrict.value);
+    } finally {
+      isOldTownsLoading.value = false;
+    }
   }
 
   Future<void> onOldGovernorateChanged(GovernorateModel? gov) async {
@@ -2368,6 +2414,7 @@ class LicenseApplicationController extends GetxController {
     oldSubdistricts.clear();
     oldTowns.clear();
     if (gov == null) return;
+    isOldDistrictsLoading.value = true;
     try {
       final res = await CoreApiService.get(
         '/v1/governorates/${gov.id}/districts',
@@ -2376,7 +2423,10 @@ class LicenseApplicationController extends GetxController {
       oldDistricts.value = (data as List)
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      isOldDistrictsLoading.value = false;
+    }
   }
 
   Future<void> onOldDistrictChanged(GovernorateModel? dist) async {
@@ -2386,6 +2436,7 @@ class LicenseApplicationController extends GetxController {
     oldSubdistricts.clear();
     oldTowns.clear();
     if (dist == null) return;
+    isOldSubdistrictsLoading.value = true;
     try {
       final res = await CoreApiService.get(
         '/v1/districts/${dist.id}/sub-districts',
@@ -2394,7 +2445,10 @@ class LicenseApplicationController extends GetxController {
       oldSubdistricts.value = (data as List)
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      isOldSubdistrictsLoading.value = false;
+    }
   }
 
   Future<void> onOldSubdistrictChanged(GovernorateModel? sub) async {
@@ -2402,13 +2456,17 @@ class LicenseApplicationController extends GetxController {
     oldSelectedTown.value = null;
     oldTowns.clear();
     if (sub == null) return;
+    isOldTownsLoading.value = true;
     try {
       final res = await CoreApiService.get('/v1/sub-districts/${sub.id}/towns');
       final data = res.data is Map ? res.data['data'] : res.data;
       oldTowns.value = (data as List)
           .map((e) => GovernorateModel.fromJson(e))
           .toList();
-    } catch (_) {}
+    } catch (_) {
+    } finally {
+      isOldTownsLoading.value = false;
+    }
   }
 
   static const int maxPartners = 30;

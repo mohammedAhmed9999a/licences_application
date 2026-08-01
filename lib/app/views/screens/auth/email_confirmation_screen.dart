@@ -30,7 +30,7 @@ class EmailConfirmationScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/splash_background.png'),
+          image: AssetImage('assets/images/background.png'),
           fit: BoxFit.cover,
         ),
       ),
@@ -92,7 +92,7 @@ class EmailConfirmationScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'لقد أرسلنا رابط التفعيل إلى بريدك الإلكتروني.',
@@ -129,7 +129,7 @@ class EmailConfirmationScreen extends StatelessWidget {
                               ),
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   email.isNotEmpty

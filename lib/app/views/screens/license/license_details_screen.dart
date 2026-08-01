@@ -12,6 +12,7 @@ import 'package:licences_application/app/views/screens/terms_pdf_viewer_screen.d
 import 'package:licences_application/core/services/core_api_service.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:url_launcher/url_launcher.dart';
@@ -122,6 +123,8 @@ class FullscreenImageViewer extends StatelessWidget {
 
 class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
   LicenseDetailModel? detail;
+  bool _isEditPreparing = false;
+  bool _isPdfExporting = false;
   final Map<String, bool> _expandedSections = {
     'summary': false,
     'applicant': false,
@@ -197,10 +200,14 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       String label2,
       String value2, {
       bool alternate = false,
+      bool allowWrap = false,
     }) {
       final rowColor = alternate
           ? PdfColor.fromHex('#f8f7f0')
           : PdfColors.white;
+      final shouldWrap =
+          allowWrap && (value1.length > 30 || value2.length > 30);
+      final rowHeight = shouldWrap ? 30.h : 20.h;
 
       return pw.Table(
         border: pw.TableBorder.symmetric(
@@ -221,26 +228,21 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             decoration: pw.BoxDecoration(color: rowColor),
             children: [
               pw.Container(
-                height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 4,
-                ),
+                height: rowHeight,
+                padding: pw.EdgeInsets.symmetric(vertical: 5.h, horizontal: 4),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#ffffff'),
 
                 child: pw.Text(
                   value2.isEmpty ? '-' : value2,
                   textAlign: pw.TextAlign.right,
+                  softWrap: shouldWrap,
                   style: const pw.TextStyle(fontSize: 10),
                 ),
               ),
               pw.Container(
-                height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 4,
-                ),
+                height: rowHeight,
+                padding: pw.EdgeInsets.symmetric(vertical: 5.h, horizontal: 4),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#edebe0'),
                 child: pw.Text(
@@ -254,26 +256,21 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                 ),
               ),
               pw.Container(
-                height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 4,
-                ),
+                height: rowHeight,
+                padding: pw.EdgeInsets.symmetric(vertical: 5.h, horizontal: 4),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#ffffff'),
 
                 child: pw.Text(
                   value1.isEmpty ? '-' : value1,
                   textAlign: pw.TextAlign.right,
+                  softWrap: shouldWrap,
                   style: const pw.TextStyle(fontSize: 10),
                 ),
               ),
               pw.Container(
-                height: 20.h,
-                padding: const pw.EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 4,
-                ),
+                height: rowHeight,
+                padding: pw.EdgeInsets.symmetric(vertical: 5.h, horizontal: 4),
                 alignment: pw.Alignment.centerRight,
                 color: PdfColor.fromHex('#edebe0'),
                 child: pw.Text(
@@ -380,7 +377,9 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       );
     }
 
-    final bgData = await rootBundle.load('assets/images/pattern-light.png');
+    final bgData = await rootBundle.load(
+      'assets/images/pattern-tiled-smooth.png',
+    );
     debugPrint('حجم البيانات: ${bgData.lengthInBytes}');
     final bgImage = pw.MemoryImage(bgData.buffer.asUint8List());
     debugPrint('عرض الصورة: ${bgImage.width}, ارتفاعها: ${bgImage.height}');
@@ -394,44 +393,26 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
             italic: font,
             boldItalic: font,
           ),
-          margin: pw.EdgeInsets.all(24.sp),
+          margin: pw.EdgeInsets.all(2.sp),
           buildBackground: (context) {
+            final tileWidth = PdfPageFormat.a4.width;
+            final tileHeight = PdfPageFormat.a4.height;
+            final horizontalTiles = 1;
+            final verticalTiles = 1;
+
             return pw.Container(
               width: PdfPageFormat.a4.width,
               height: PdfPageFormat.a4.height,
               child: pw.Opacity(
                 opacity: 0.18,
-                child: pw.Column(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: List.generate(
-                    200,
-                    // 188, // عدد الصفوف
-                    (_) => pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.start,
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: List.generate(
-                        40, // عدد الأعمدة
-                        (_) => pw.Image(bgImage, width: 400.w, height: 600.h),
-                      ),
-                    ),
-                  ),
+                child: pw.Image(
+                  bgImage,
+                  width: PdfPageFormat.a4.width,
+                  height: PdfPageFormat.a4.height,
+                  fit: pw.BoxFit.fill,
                 ),
               ),
             );
-            // return pw.Container(
-            //   width: PdfPageFormat.a4.width,
-            //   height: PdfPageFormat.a4.height,
-            //   child: pw.Opacity(
-            //     opacity: 0.2,
-            //     child: pw.Image(
-            //       bgImage,
-            //       fit: pw.BoxFit.cover,
-            //       width: PdfPageFormat.a4.width,
-            //       height: PdfPageFormat.a4.height,
-            //     ),
-            //   ),
-            // );
           },
         ),
 
@@ -492,9 +473,9 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
           pw.Directionality(
             textDirection: pw.TextDirection.rtl,
             child: pw.Padding(
-              padding: pw.EdgeInsets.all(10.sp),
+              padding: pw.EdgeInsets.symmetric(horizontal: 12.w),
               child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Table(
                     columnWidths: {
@@ -526,8 +507,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                               pw.Text(
                                 'إدارة خدمات الطاقة',
                                 style: pw.TextStyle(
-                                  fontSize: 18,
-                                  color: PdfColors.green800,
+                                  fontSize: 20.sp,
+                                  color: PdfColor.fromHex('#002623'),
                                   fontWeight: pw.FontWeight.bold,
                                 ),
                                 textAlign: pw.TextAlign.center,
@@ -786,6 +767,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                       detail!.email,
                       'رقم التواصل',
                       detail!.phone,
+                      allowWrap: true,
                     ),
                     if (detail!.application.secondaryPhone?.trim().isNotEmpty ==
                         true)
@@ -1650,9 +1632,10 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
                           ? Icons.keyboard_arrow_up_rounded
                           : Icons.keyboard_arrow_down_rounded,
                       color: primary,
-                      size: 20.sp,
+                      size: 26.sp,
                     ),
-                    SizedBox(width: 10.w),
+                    Spacer(),
+                    // SizedBox(width: 10.w),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -1708,6 +1691,8 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
 
   List<_InfoEntry> _buildApplicantEntries(LicenseDetailModel detail) {
     final app = detail.application;
+    final authCtrl = Get.find<AuthController>();
+
     // final userName1=app.firstName ?? '';
     final userName = [app.firstName, app.fatherName, app.lastName]
         .where((value) => (value ?? '').trim().isNotEmpty)
@@ -1720,7 +1705,12 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       fields.add(_InfoEntry('اسم مقدم الطلب', detail.applicantName));
     }
     if (_hasMeaningfulValue(userName)) {
-      fields.add(_InfoEntry('اسم المستخدم', userName));
+      fields.add(
+        _InfoEntry(
+          'اسم المستخدم',
+          authCtrl.userName.isNotEmpty ? authCtrl.userName : 'مستخدم',
+        ),
+      );
     }
     if (_hasMeaningfulValue(app.nickname)) {
       fields.add(_InfoEntry('الاسم المستعار', app.nickname!));
@@ -2510,12 +2500,37 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
               await ctrl.prepareForCorrection(detail!.application);
               Get.toNamed(AppRoutes.licenseApplication);
             },
-            icon: ThemedIcon(
-              Icons.edit_outlined,
-              type: IconType.button,
-              customSize: 16.sp,
+            // onPressed: _isEditPreparing
+            //     ? null
+            //     : () async {
+            //         setState(() {
+            //           _isEditPreparing = true;
+            //         });
+            //         try {
+            //           await ctrl.prepareForCorrection(detail!.application);
+            //           Get.toNamed(AppRoutes.licenseApplication);
+            //         } finally {
+            //           if (mounted) {
+            //             setState(() {
+            //               _isEditPreparing = false;
+            //             });
+            //           }
+            //         }
+            //       },
+            icon: _isEditPreparing
+                ? LoadingAnimationWidget.staggeredDotsWave(
+                    color: Colors.white,
+                    size: 25.w,
+                  )
+                : ThemedIcon(
+                    Icons.edit_outlined,
+                    type: IconType.button,
+                    customSize: 16.sp,
+                  ),
+            label: Text(
+              _isEditPreparing ? 'جاري التحضير...' : 'تعديل الطلب',
+              style: TextStyle(fontSize: 12.sp),
             ),
-            label: Text('تعديل الطلب', style: TextStyle(fontSize: 12.sp)),
             style: ElevatedButton.styleFrom(
               backgroundColor: primary,
               foregroundColor: Colors.white,
@@ -2543,37 +2558,56 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
         //   ),
         // ),
         ElevatedButton.icon(
-          onPressed: () async {
-            Get.snackbar(
-              'تحميل',
-              'جاري تحضير ملف PDF...',
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: primary,
-              colorText: Colors.white,
-              margin: const EdgeInsets.all(16),
-              borderRadius: 8,
-              duration: const Duration(seconds: 2),
-            );
-            try {
-              await _exportApplicationPdf();
-            } catch (error, stackTrace) {
-              debugPrint('❌ PDF ERROR: $error');
-              debugPrint('❌ STACK: $stackTrace');
-              Get.snackbar(
-                'خطأ',
-                'تعذر إنشاء ملف PDF. يرجى المحاولة لاحقاً.',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: AppColors.error,
-                colorText: Colors.white,
-              );
-            }
-          },
-          icon: ThemedIcon(
-            Icons.picture_as_pdf_outlined,
-            type: IconType.button,
-            customSize: 16.sp,
+          onPressed: _isPdfExporting
+              ? null
+              : () async {
+                  setState(() {
+                    _isPdfExporting = true;
+                  });
+                  Get.snackbar(
+                    'تحميل',
+                    'جاري تحضير ملف PDF...',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: primary,
+                    colorText: Colors.white,
+                    margin: const EdgeInsets.all(16),
+                    borderRadius: 8,
+                    duration: const Duration(seconds: 2),
+                  );
+                  try {
+                    await _exportApplicationPdf();
+                  } catch (error, stackTrace) {
+                    debugPrint('❌ PDF ERROR: $error');
+                    debugPrint('❌ STACK: $stackTrace');
+                    Get.snackbar(
+                      'خطأ',
+                      'تعذر إنشاء ملف PDF. يرجى المحاولة لاحقاً.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: AppColors.error,
+                      colorText: Colors.white,
+                    );
+                  } finally {
+                    if (mounted) {
+                      setState(() {
+                        _isPdfExporting = false;
+                      });
+                    }
+                  }
+                },
+          icon: _isPdfExporting
+              ? LoadingAnimationWidget.threeArchedCircle(
+                  color: Colors.white,
+                  size: 16.w,
+                )
+              : ThemedIcon(
+                  Icons.picture_as_pdf_outlined,
+                  type: IconType.button,
+                  customSize: 16.sp,
+                ),
+          label: Text(
+            _isPdfExporting ? 'جاري التحميل...' : 'تحميل PDF',
+            style: TextStyle(fontSize: 12.sp),
           ),
-          label: Text('تحميل PDF', style: TextStyle(fontSize: 12.sp)),
           style: ElevatedButton.styleFrom(
             backgroundColor: primary,
             foregroundColor: Colors.white,

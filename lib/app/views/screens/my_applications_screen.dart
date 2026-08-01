@@ -28,7 +28,7 @@ class MyApplicationsScreen extends StatelessWidget {
         backgroundColor: isDark
             ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
             : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
-        appBar: const MinistryAppBar(title: 'طلباتي'),
+        // appBar: const MinistryAppBar(title: 'طلباتي'),
         body: Obx(() {
           if (ctrl.isLoading.value) {
             return ListView.builder(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/constant/app_colors.dart';
 import '../../theme/app_theme.dart';
@@ -307,48 +308,99 @@ class RtlTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        TextField(
-          controller: controller,
-          focusNode: focusNode,
-          textAlign: TextAlign.start,
-          keyboardType: keyboardType,
-          obscureText: obscureText,
-          maxLines: maxLines,
-          enabled: enabled,
-          textInputAction: textInputAction,
-          onSubmitted: onSubmitted,
-          onChanged: onChanged,
-          inputFormatters: inputFormatters,
-          maxLength: maxLength,
-          style: TextStyle(fontFamily: 'Cairo', fontSize: 14.sp),
-          decoration: InputDecoration(
-            hintText: hintText,
-            // hint direction follows app Directionality
-            suffixIcon: suffixIcon,
-          ),
-        ),
-        if (helperText != null) ...[
-          SizedBox(height: 4.h),
-          Builder(
-            builder: (context) {
-              final theme = Theme.of(context);
-              final helperColor =
-                  theme.textTheme.bodySmall?.color ?? theme.hintColor;
-              return Text(
+    final theme = Theme.of(context);
+    final helperColor = theme.textTheme.bodySmall?.color ?? theme.hintColor;
+
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        final currentLength = value.text.length;
+        final showCounter = maxLength != null;
+        final isAtLimit = showCounter && currentLength >= maxLength!;
+
+        final suffixChildren = <Widget>[];
+        if (suffixIcon != null) {
+          suffixChildren.add(suffixIcon!);
+        }
+        if (showCounter) {
+          suffixChildren.add(
+            Padding(
+              padding: EdgeInsetsDirectional.only(
+                start: suffixIcon != null ? 4.w : 0,
+              ),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: isAtLimit
+                      ? theme.colorScheme.error.withOpacity(0.12)
+                      : theme.dividerColor.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  '$currentLength/$maxLength',
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Cairo',
+                    color: isAtLimit ? theme.colorScheme.error : helperColor,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        final trailingWidget = suffixChildren.isEmpty
+            ? null
+            : Padding(
+                padding: EdgeInsetsDirectional.only(end: 4.w),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: suffixChildren,
+                ),
+              );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            TextField(
+              controller: controller,
+              focusNode: focusNode,
+              textAlign: TextAlign.start,
+              keyboardType: keyboardType,
+              obscureText: obscureText,
+              maxLines: maxLines,
+              enabled: enabled,
+              textInputAction: textInputAction,
+              onSubmitted: onSubmitted,
+              onChanged: onChanged,
+              inputFormatters: inputFormatters,
+              maxLength: maxLength,
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 14.sp),
+              decoration: InputDecoration(
+                hintText: hintText,
+                counterText: '',
+                suffixIcon: trailingWidget,
+                suffixIconConstraints: const BoxConstraints(
+                  minWidth: 20,
+                  minHeight: 20,
+                ),
+              ),
+            ),
+            if (helperText != null) ...[
+              SizedBox(height: 4.h),
+              Text(
                 helperText!,
                 style: TextStyle(
                   fontSize: 11.sp,
                   color: helperColor,
                   fontFamily: 'Cairo',
                 ),
-              );
-            },
-          ),
-        ],
-      ],
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }
@@ -824,19 +876,26 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
     return SizedBox(
       width: width ?? double.infinity,
       height: 50.h,
+
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isDark ? AppColors.forest1 : primaryColor,
+          // foregroundColor: isDark ? Colors.black : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+        ),
         onPressed: isLoading ? null : onPressed,
         child: isLoading
-            ? SizedBox(
-                width: 22.w,
-                height: 22.h,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+            ? LoadingAnimationWidget.staggeredDotsWave(
+                color: AppColors.golden1,
+                size: 40.w,
               )
             : Text(label),
       ),
@@ -893,13 +952,9 @@ class NavigationButtons extends StatelessWidget {
                 padding: EdgeInsets.zero,
               ),
               child: isLoading
-                  ? SizedBox(
-                      width: 20.w,
-                      height: 20.h,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
+                  ? LoadingAnimationWidget.staggeredDotsWave(
+                      color: Colors.white,
+                      size: 20.w,
                     )
                   : Text(nextLabel),
             ),

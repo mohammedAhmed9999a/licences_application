@@ -14,9 +14,13 @@ import '../../models/application_model.dart';
 import '../../models/license_detail_model.dart';
 import '../../routes/app_routes.dart';
 import '../widgets/common_widgets.dart';
+import 'license/license_application_screen.dart';
+import 'my_applications_screen.dart';
 import 'notifications_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
+
+enum _DashboardPanel { home, profile, notifications }
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -28,6 +32,31 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   String? selectedStatus;
   int _currentIndex = 0;
+  _DashboardPanel _activePanel = _DashboardPanel.home;
+
+  void _openProfile() {
+    setState(() {
+      _activePanel = _DashboardPanel.profile;
+    });
+  }
+
+  void _openNotifications() {
+    setState(() {
+      _activePanel = _DashboardPanel.notifications;
+    });
+  }
+
+  void _openNewLicenseRequest() {
+    final licenseCtrl = Get.find<LicenseApplicationController>();
+    licenseCtrl.resetForm();
+    Get.toNamed(AppRoutes.licenseApplication);
+  }
+
+  void _closePanel() {
+    setState(() {
+      _activePanel = _DashboardPanel.home;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,124 +65,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final onPrimaryColor = theme.colorScheme.onPrimary;
     final surface = context.themeSurface;
     final borderColor = context.themeBorder;
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: surface,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1.h, color: borderColor),
+    final isDark = Get.find<SettingsController>().isDark;
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/background.png'),
+          fit: BoxFit.cover,
         ),
-        titleSpacing: 10.w,
-        // leading: Padding(
-        //   padding: EdgeInsets.only(left: 8.w, right: 4.w),
-        //   child: GestureDetector(
-        //     onTap: () => Get.to(() => const ProfileScreen()),
-        //     child: Container(
-        //       width: 36.w,
-        //       height: 36.h,
-        //       decoration: BoxDecoration(
-        //         color: primaryColor,
-        //         shape: BoxShape.circle,
-        //       ),
-        //       child: Center(
-        //         child: Text(
-        //           authCtrl.userName.isNotEmpty
-        //               ? authCtrl.userName[0].toUpperCase()
-        //               : 'م',
-        //           style: TextStyle(
-        //             color: onPrimaryColor,
-        //             fontFamily: 'Cairo',
-        //             fontWeight: FontWeight.bold,
-        //             fontSize: 16.sp,
-        //           ),
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
-        actions: [
-          // Obx(() {
-          //   final settingsCtrl = Get.find<SettingsController>();
-          //   final isDark = settingsCtrl.isDark;
-          //   return IconButton(
-          //     onPressed: () => settingsCtrl.toggleTheme(),
-          //     tooltip: isDark ? 'الوضع الفاتح' : 'الوضع الداكن',
-          //     icon: ThemedIcon(
-          //       isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-          //       type: IconType.appBar,
-
-          //       customSize: 26.sp,
+      ),
+      child: Scaffold(
+        backgroundColor: isDark
+            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
+        appBar: AppBar(
+          backgroundColor: surface,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          // leading: _activePanel != _DashboardPanel.home
+          //     ? IconButton(
+          //         onPressed: _closePanel,
+          //         tooltip: 'العودة',
+          //         icon: Icon(
+          //           Icons.arrow_back_ios_new,
+          //           color: AppColors.warning,
+          //           size: 22.sp,
+          //         ),
+          //       )
+          //     : null,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1.h, color: borderColor),
+          ),
+          titleSpacing: _activePanel == _DashboardPanel.home ? 10.w : 0,
+          // leading: Padding(
+          //   padding: EdgeInsets.only(left: 8.w, right: 4.w),
+          //   child: GestureDetector(
+          //     onTap: () => Get.to(() => const ProfileScreen()),
+          //     child: Container(
+          //       width: 36.w,
+          //       height: 36.h,
+          //       decoration: BoxDecoration(
+          //         color: primaryColor,
+          //         shape: BoxShape.circle,
+          //       ),
+          //       child: Center(
+          //         child: Text(
+          //           authCtrl.userName.isNotEmpty
+          //               ? authCtrl.userName[0].toUpperCase()
+          //               : 'م',
+          //           style: TextStyle(
+          //             color: onPrimaryColor,
+          //             fontFamily: 'Cairo',
+          //             fontWeight: FontWeight.bold,
+          //             fontSize: 16.sp,
+          //           ),
+          //         ),
+          //       ),
           //     ),
-          //     color: isDark ? AppColors.warning : AppColors.warning,
-          //   );
-          // }),
-          IconButton(
-            onPressed: () => Get.to(() => const ProfileScreen()),
-            tooltip: 'البروفايل',
-            icon: ThemedIcon(
-              Icons.person_outline,
-              type: IconType.appBar,
-              customSize: 26.sp,
-            ),
-            color: AppColors.warning,
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 4.w, right: 4.w),
-            child: GestureDetector(
-              onTap: () => Get.to(() => const NotificationsScreen()),
-              child: Obx(() {
-                final notifCtrl = Get.find<NotificationsController>();
-                final unreadCount = notifCtrl.unreadCount.value;
-
-                return Stack(
-                  alignment: Alignment.topRight,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Get.to(() => const NotificationsScreen());
-                      },
-                      tooltip: 'الإشعارات',
-                      icon: ThemedIcon(
-                        Icons.notifications_none_outlined,
-                        type: IconType.appBar,
-                        customSize: 26.sp,
-                      ),
-                      color: AppColors.warning,
-                    ),
-                    if (unreadCount > 0)
-                      Container(
-                        margin: EdgeInsets.only(top: 8.h, right: 8.w),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 5.w,
-                          vertical: 2.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.warning,
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Text(
-                          unreadCount > 99 ? '99+' : '$unreadCount',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Cairo',
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              }),
-            ),
-          ),
-        ],
-        title: Container(
-          alignment: Alignment.centerRight,
-          child: Container(
+          //   ),
+          // ),
+          actions: const [],
+          title: Container(
+            alignment: Alignment.centerRight,
+            child: Container(
               width: 180.w,
               height: 40.h,
               decoration: const BoxDecoration(
@@ -163,87 +137,167 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-          // child: Shimmer.fromColors(
-          //   baseColor: AppColors.gold.withOpacity(0.6),
-          //   highlightColor: Colors.white,
-          //   period: const Duration(seconds: 2),
-          //   child: Container(
-          //     width: 180.w,
-          //     height: 40.h,
-          //     decoration: const BoxDecoration(
-          //       image: DecorationImage(
-          //         image: AssetImage('assets/images/h-logo.webp'),
-          //         fit: BoxFit.contain,
+          ),
+          // title: _activePanel == _DashboardPanel.home
+          //     ? Container(
+          //         alignment: Alignment.centerRight,
+          //         child: Container(
+          //           width: 180.w,
+          //           height: 40.h,
+          //           decoration: const BoxDecoration(
+          //             image: DecorationImage(
+          //               image: AssetImage('assets/images/h-logo.webp'),
+          //               fit: BoxFit.contain,
+          //             ),
+          //           ),
+          //         ),
+          //       )
+          //     : Text(
+          //         _activePanel == _DashboardPanel.profile
+          //             ? 'الملف الشخصي'
+          //             : 'الإشعارات',
+          //         style: TextStyle(
+          //           fontFamily: 'Cairo',
+          //           fontSize: 18.sp,
+          //           fontWeight: FontWeight.bold,
+          //           color: theme.colorScheme.onBackground,
+          //         ),
           //       ),
-          //     ),
-          //   ),
-          // ),
         ),
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          _buildHomeContent(context),
-          const NotificationsScreen(),
-          const ProfileScreen(),
-          const SettingsScreen(),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: surface,
-          border: Border(top: BorderSide(color: borderColor, width: 1)),
+        body: _buildBodyContent(context),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: _openNewLicenseRequest,
+          backgroundColor: AppColors.forest2,
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.add),
+          label: const Text('طلب جديد'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.r),
+          ),
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildBottomNavItem(
-                    context: context,
-                    index: 0,
-                    icon: Icons.home_outlined,
-                    label: 'الرئيسية',
-                    onTap: () => setState(() => _currentIndex = 0),
-                  ),
-                ),
-                Expanded(
-                  child: _buildBottomNavItem(
-                    context: context,
-                    index: 1,
-                    icon: Icons.add_circle_outline,
-                    label: 'طلب جديد',
-                    onTap: () {
-                      final licenseCtrl = Get.find<LicenseApplicationController>();
-                      licenseCtrl.resetForm();
-                      Get.toNamed(AppRoutes.licenseApplication);
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: _buildBottomNavItem(
-                    context: context,
-                    index: 2,
-                    icon: Icons.list_alt_outlined,
-                    label: 'طلباتي',
-                    onTap: () => Get.toNamed(AppRoutes.myApplications),
-                  ),
-                ),
-                Expanded(
-                  child: _buildBottomNavItem(
-                    context: context,
-                    index: 3,
-                    icon: Icons.more_horiz,
-                    label: 'المزيد',
-                    onTap: () => setState(() => _currentIndex = 3),
-                  ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            margin: EdgeInsets.only(left: 12.w, right: 12.w, bottom: 10.h),
+            height: 70.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28.r),
+              color: AppColors.forest,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.15),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.forest.withOpacity(0.18),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 1.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildBottomNavItem(
+                      context: context,
+                      index: 0,
+                      icon: Icons.home_outlined,
+                      label: 'الرئيسية',
+                      onTap: () {
+                        setState(() {
+                          _activePanel = _DashboardPanel.home;
+                          _currentIndex = 0;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildBottomNavItem(
+                      context: context,
+                      index: 1,
+                      icon: Icons.person_outline,
+                      label: 'البروفايل',
+                      onTap: () {
+                        setState(() {
+                          _activePanel = _DashboardPanel.profile;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildBottomNavItem(
+                      context: context,
+                      index: 2,
+                      icon: Icons.notifications_none_outlined,
+                      label: 'الإشعارات',
+                      onTap: () {
+                        setState(() {
+                          _activePanel = _DashboardPanel.notifications;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildBottomNavItem(
+                      context: context,
+                      index: 3,
+                      icon: Icons.settings_outlined,
+                      label: 'المزيد',
+                      onTap: () {
+                        setState(() {
+                          _activePanel = _DashboardPanel.home;
+                          _currentIndex = 2;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBodyContent(BuildContext context) {
+    final isPanelOpen = _activePanel != _DashboardPanel.home;
+    final panelWidget = _activePanel == _DashboardPanel.profile
+        ? const ProfileScreen(embedded: true)
+        : const NotificationsScreen(embedded: true);
+
+    return Stack(
+      children: [
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 240),
+          opacity: isPanelOpen ? 0.0 : 1.0,
+          child: IgnorePointer(
+            ignoring: isPanelOpen,
+            child: IndexedStack(
+              index: _currentIndex,
+              children: [
+                _buildHomeContent(context),
+                // const LicenseApplicationScreen(),
+                const MyApplicationsScreen(),
+                const SettingsScreen(),
+              ],
+            ),
+          ),
+        ),
+        if (isPanelOpen)
+          AnimatedSlide(
+            duration: const Duration(milliseconds: 240),
+            offset: const Offset(0.00, 0),
+            curve: Curves.easeOutCubic,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 240),
+              opacity: 1.0,
+              child: panelWidget,
+            ),
+          ),
+      ],
     );
   }
 
@@ -255,28 +309,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    final primaryColor = theme.colorScheme.primary;
-    final isActive = _currentIndex == index;
-    final iconColor = isActive
-        ? primaryColor
-        : theme.colorScheme.onSurface.withOpacity(0.7);
-    return GestureDetector(
+    final isActive = index == 0
+        ? _activePanel == _DashboardPanel.home && _currentIndex == 0
+        : index == 1
+        ? _activePanel == _DashboardPanel.profile
+        : index == 2
+        ? _activePanel == _DashboardPanel.notifications
+        : _activePanel == _DashboardPanel.home && _currentIndex == 2;
+    final iconColor = isActive ? AppColors.golden : const Color(0xff6C737F);
+    return InkWell(
       onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 2.h),
+      borderRadius: BorderRadius.circular(16.r),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+        decoration: isActive
+            ? BoxDecoration(
+                color: AppColors.golden.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16.r),
+              )
+            : null,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: iconColor, size: 24.sp),
-            SizedBox(height: 4.h),
-            Text(
-              label,
+            SizedBox(height: 3.h),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 250),
               style: TextStyle(
-                color: iconColor,
                 fontSize: 11.sp,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+                color: iconColor,
                 fontFamily: 'Cairo',
               ),
+              child: Text(label),
             ),
           ],
         ),
@@ -292,128 +359,74 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final surface = context.themeSurface;
     final borderColor = context.themeBorder;
     final isDark = Get.find<SettingsController>().isDark;
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/background.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-        Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.center,
-                end: Alignment.bottomCenter,
-                colors: isDark
-                    ? [
-                        surface,
-                        surface.withOpacity(0.88),
-                        surface.withOpacity(0.88),
-                      ]
-                    : [
-                        surface,
-                        surface.withOpacity(0.58),
-                        surface.withOpacity(0.28),
-                      ],
-              ),
-            ),
-          ),
-        ),
-        Column(
-          children: [
-            // Container(
-            //   color: surface,
-            //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.start,
-            //     children: [
-            //       ElevatedButton.icon(
-            //         onPressed: () {
-            //           final licenseCtrl =
-            //               Get.find<LicenseApplicationController>();
-            //           licenseCtrl.resetForm();
-            //           Get.toNamed(AppRoutes.licenseApplication);
-            //         },
-            //         icon: ThemedIcon(
-            //           Icons.add,
-            //           type: IconType.button,
-            //           customSize: 16.sp,
-            //         ),
-            //         label: Text('طلب جديد', style: TextStyle(fontSize: 13.sp)),
-            //         style: ElevatedButton.styleFrom(
-            //           backgroundColor: primaryColor,
-            //           foregroundColor: onPrimaryColor,
-            //           minimumSize: const Size(120, 38),
-            //           padding: EdgeInsets.symmetric(
-            //             horizontal: 16.w,
-            //             vertical: 8.h,
-            //           ),
-            //         ),
-            //       ),
-            //       SizedBox(width: 8.w),
-            //       OutlinedButton.icon(
-            //         onPressed: () => Get.toNamed(AppRoutes.myApplications),
-            //         icon: ThemedIcon(
-            //           Icons.list_alt,
-            //           type: IconType.normal,
-            //           customSize: 16.sp,
-            //         ),
-            //         label: Text('طلباتي', style: TextStyle(fontSize: 13.sp)),
-            //         style: OutlinedButton.styleFrom(
-            //           foregroundColor: primaryColor,
-            //           side: BorderSide(color: borderColor),
-            //           minimumSize: const Size(100, 38),
-            //           padding: EdgeInsets.symmetric(
-            //             horizontal: 12.w,
-            //             vertical: 8.h,
-            //           ),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: dashCtrl.loadApplications,
-                color: primaryColor,
-                child: Obx(() {
-                  if (dashCtrl.isLoading.value) {
-                    return _buildDashboardLoading(context);
-                  }
+    return Container(
+      child: Column(
+        children: [
+          // Container(
+          //   color: surface,
+          //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     children: [
+          //       ElevatedButton.icon(
+          //         onPressed: () {
+          //           final licenseCtrl =
+          //               Get.find<LicenseApplicationController>();
+          //           licenseCtrl.resetForm();
+          //           Get.toNamed(AppRoutes.licenseApplication);
+          //         },
+          //         icon: ThemedIcon(
+          //           Icons.add,
+          //           type: IconType.button,
+          //           customSize: 16.sp,
+          //         ),
+          //         label: Text('طلب جديد', style: TextStyle(fontSize: 13.sp)),
+          //         style: ElevatedButton.styleFrom(
+          //           backgroundColor: primaryColor,
+          //           foregroundColor: onPrimaryColor,
+          //           minimumSize: const Size(120, 38),
+          //           padding: EdgeInsets.symmetric(
+          //             horizontal: 16.w,
+          //             vertical: 8.h,
+          //           ),
+          //         ),
+          //       ),
+          //       SizedBox(width: 8.w),
+          //       OutlinedButton.icon(
+          //         onPressed: () => Get.toNamed(AppRoutes.myApplications),
+          //         icon: ThemedIcon(
+          //           Icons.list_alt,
+          //           type: IconType.normal,
+          //           customSize: 16.sp,
+          //         ),
+          //         label: Text('طلباتي', style: TextStyle(fontSize: 13.sp)),
+          //         style: OutlinedButton.styleFrom(
+          //           foregroundColor: primaryColor,
+          //           side: BorderSide(color: borderColor),
+          //           minimumSize: const Size(100, 38),
+          //           padding: EdgeInsets.symmetric(
+          //             horizontal: 12.w,
+          //             vertical: 8.h,
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: dashCtrl.loadApplications,
+              color: primaryColor,
+              child: Obx(() {
+                if (dashCtrl.isLoading.value) {
+                  return _buildDashboardLoading(context);
+                }
 
-                  final filteredApplications = _getFilteredApplications(
-                    dashCtrl.applications,
-                  );
+                final filteredApplications = _getFilteredApplications(
+                  dashCtrl.applications,
+                );
 
-                  if (dashCtrl.errorMessage.isNotEmpty) {
-                    return ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 8.h),
-                          child: _buildStatsSection(context, dashCtrl),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 24.h,
-                          ),
-                          child: _buildErrorState(
-                            context,
-                            dashCtrl.errorMessage.value,
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-
+                if (dashCtrl.errorMessage.isNotEmpty) {
                   return ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
@@ -422,25 +435,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 8.h),
                         child: _buildStatsSection(context, dashCtrl),
                       ),
-                      if (filteredApplications.isEmpty)
-                        _buildEmptyState(context)
-                      else
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: _buildApplicationList(
-                            context,
-                            dashCtrl,
-                            filteredApplications,
-                          ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 24.h,
                         ),
+                        child: _buildErrorState(
+                          context,
+                          dashCtrl.errorMessage.value,
+                        ),
+                      ),
                     ],
                   );
-                }),
-              ),
+                }
+
+                return ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 8.h),
+                      child: _buildStatsSection(context, dashCtrl),
+                    ),
+                    if (filteredApplications.isEmpty)
+                      _buildEmptyState(context)
+                    else
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _buildApplicationList(
+                          context,
+                          dashCtrl,
+                          filteredApplications,
+                        ),
+                      ),
+                  ],
+                );
+              }),
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -470,7 +504,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
 
       final orderedStatusKeys =
-          ['approved', 'pending', 'rejected', 'completed', 'draft', 'cancelled', 'under_committee_review']
+          [
+                'approved',
+                'pending',
+                'rejected',
+                'completed',
+                'draft',
+                'cancelled',
+                'under_committee_review',
+              ]
               .where(statusCounts.containsKey)
               .followedBy(
                 statusCounts.keys.where(
@@ -781,9 +823,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               SizedBox(height: 24.h),
               ElevatedButton.icon(
                 onPressed: () {
-                  final licenseCtrl = Get.find<LicenseApplicationController>();
-                  licenseCtrl.resetForm();
-                  Get.toNamed(AppRoutes.licenseApplication);
+                  // final licenseCtrl = Get.find<LicenseApplicationController>();
+                  // licenseCtrl.resetForm();
+                  // Get.toNamed(AppRoutes.licenseApplication);
                 },
                 icon: ThemedIcon(
                   Icons.add,

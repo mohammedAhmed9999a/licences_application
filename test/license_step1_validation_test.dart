@@ -23,6 +23,20 @@ void main() {
     expect(controller.step1ErrorField.value, 'phone');
   });
 
+  test(
+    'validateStep1 marks the submission attempt when empty fields are submitted',
+    () {
+      final controller = LicenseApplicationController();
+      controller.emailController.text = '';
+      controller.phoneController.text = '';
+      controller.agreedToTerms.value = true;
+
+      expect(controller.validateStep1(), isFalse);
+      // expect(controller.hasAttemptedStep1Submission.value, isTrue);
+      expect(controller.errorMessage.value, contains('البريد الإلكتروني'));
+    },
+  );
+
   test('validateStep1 accepts valid step1 data', () {
     final controller = LicenseApplicationController();
     controller.emailController.text = 'user@example.com';

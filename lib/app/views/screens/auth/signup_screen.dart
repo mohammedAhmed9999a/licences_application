@@ -25,6 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailFieldKey = GlobalKey();
   final _passwordFieldKey = GlobalKey();
   final _confirmPasswordFieldKey = GlobalKey();
+  bool _showValidationErrors = false;
 
   @override
   void dispose() {
@@ -70,8 +71,10 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _handleSignup(AuthController ctrl) {
+    setState(() {
+      _showValidationErrors = true;
+    });
     _scrollToFirstError(ctrl);
-    setState(() {});
     ctrl.signup();
   }
 
@@ -111,22 +114,32 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               children: [
                 SizedBox(height: 16.h),
-                // Ministry Logo
-                Shimmer.fromColors(
-                  baseColor: AppColors.gold.withOpacity(0.6),
-                  highlightColor: Colors.white,
-                  period: const Duration(seconds: 2),
-                  child: Container(
-                    width: 250.w,
-                    height: 100.h,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/h-logo.webp'),
-                        fit: BoxFit.contain,
-                      ),
+                Container(
+                  width: 250.w,
+                  height: 100.h,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/h-logo.webp'),
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
+                // Ministry Logo
+                // Shimmer.fromColors(
+                //   baseColor: AppColors.gold.withOpacity(0.6),
+                //   highlightColor: Colors.white,
+                //   period: const Duration(seconds: 2),
+                //   child: Container(
+                //     width: 250.w,
+                //     height: 100.h,
+                //     decoration: const BoxDecoration(
+                //       image: DecorationImage(
+                //         image: AssetImage('assets/images/h-logo.webp'),
+                //         fit: BoxFit.contain,
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 // Padding(
                 //   padding: EdgeInsets.symmetric(horizontal: 20.w),
                 //   child: Row(
@@ -162,7 +175,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 10.w),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: cardColor.withAlpha(140),
+                      color: cardColor.withAlpha(240),
                       borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: borderColor),
                       boxShadow: [
@@ -211,24 +224,30 @@ class _SignupScreenState extends State<SignupScreen> {
                               ValueListenableBuilder<TextEditingValue>(
                                 valueListenable: ctrl.nameController,
                                 builder: (context, _, __) {
+                                  final nameError = _showValidationErrors
+                                      ? ctrl.validateNameField(
+                                          ctrl.nameController.text,
+                                        )
+                                      : null;
+
                                   return LabeledField(
                                     key: _nameFieldKey,
                                     label: 'الاسم الكامل',
                                     required: true,
-                                    errorText: ctrl.validateNameField(
-                                      ctrl.nameController.text,
-                                    ),
+                                    errorText: nameError,
                                     successText:
-                                        ctrl.nameController.text.isNotEmpty &&
-                                            ctrl.validateNameField(
-                                                  ctrl.nameController.text,
-                                                ) ==
-                                                null
+                                        _showValidationErrors &&
+                                            ctrl
+                                                .nameController
+                                                .text
+                                                .isNotEmpty &&
+                                            nameError == null
                                         ? 'الاسم صحيح'
                                         : null,
                                     child: RtlTextField(
                                       controller: ctrl.nameController,
                                       focusNode: nameFocusNode,
+                                      maxLength: 50,
                                       hintText: 'الاسم الكامل',
                                       textInputAction: TextInputAction.next,
                                       onSubmitted: (_) {
@@ -246,29 +265,30 @@ class _SignupScreenState extends State<SignupScreen> {
                               ValueListenableBuilder<TextEditingValue>(
                                 valueListenable: ctrl.signupEmailController,
                                 builder: (context, _, __) {
+                                  final emailError = _showValidationErrors
+                                      ? ctrl.validateEmailField(
+                                          ctrl.signupEmailController.text,
+                                        )
+                                      : null;
+
                                   return LabeledField(
                                     key: _emailFieldKey,
                                     label: 'البريد الإلكتروني',
                                     required: true,
-                                    errorText: ctrl.validateEmailField(
-                                      ctrl.signupEmailController.text,
-                                    ),
+                                    errorText: emailError,
                                     successText:
-                                        ctrl
+                                        _showValidationErrors &&
+                                            ctrl
                                                 .signupEmailController
                                                 .text
                                                 .isNotEmpty &&
-                                            ctrl.validateEmailField(
-                                                  ctrl
-                                                      .signupEmailController
-                                                      .text,
-                                                ) ==
-                                                null
+                                            emailError == null
                                         ? 'البريد الإلكتروني صالح'
                                         : null,
                                     child: RtlTextField(
                                       controller: ctrl.signupEmailController,
                                       focusNode: emailFocusNode,
+                                      maxLength: 50,
                                       hintText: 'name@example.com',
                                       keyboardType: TextInputType.emailAddress,
                                       textInputAction: TextInputAction.next,
@@ -290,27 +310,27 @@ class _SignupScreenState extends State<SignupScreen> {
                                     valueListenable:
                                         ctrl.signupPasswordController,
                                     builder: (context, _, __) {
+                                      final passwordError =
+                                          _showValidationErrors
+                                          ? ctrl.validateSignupPasswordField(
+                                              ctrl
+                                                  .signupPasswordController
+                                                  .text,
+                                            )
+                                          : null;
+
                                       return Obx(
                                         () => LabeledField(
                                           label: 'كلمة المرور',
                                           required: true,
-                                          errorText: ctrl
-                                              .validateSignupPasswordField(
-                                                ctrl
-                                                    .signupPasswordController
-                                                    .text,
-                                              ),
+                                          errorText: passwordError,
                                           successText:
-                                              ctrl
+                                              _showValidationErrors &&
+                                                  ctrl
                                                       .signupPasswordController
                                                       .text
                                                       .isNotEmpty &&
-                                                  ctrl.validateSignupPasswordField(
-                                                        ctrl
-                                                            .signupPasswordController
-                                                            .text,
-                                                      ) ==
-                                                      null
+                                                  passwordError == null
                                               ? 'كلمة المرور قوية'
                                               : null,
                                           child: RtlTextField(
@@ -319,6 +339,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 ctrl.signupPasswordController,
                                             focusNode: passwordFocusNode,
                                             hintText: 'أدخل كلمة مرور قوية',
+                                            maxLength: 65,
                                             obscureText: ctrl
                                                 .obscureSignupPassword
                                                 .value,
@@ -354,33 +375,29 @@ class _SignupScreenState extends State<SignupScreen> {
                                     valueListenable:
                                         ctrl.confirmPasswordController,
                                     builder: (context, _, __) {
+                                      final confirmError = _showValidationErrors
+                                          ? ctrl.validateConfirmPasswordField(
+                                              ctrl
+                                                  .signupPasswordController
+                                                  .text,
+                                              ctrl
+                                                  .confirmPasswordController
+                                                  .text,
+                                            )
+                                          : null;
+
                                       return Obx(
                                         () => LabeledField(
                                           label: 'تأكيد كلمة المرور',
                                           required: true,
-                                          errorText: ctrl
-                                              .validateConfirmPasswordField(
-                                                ctrl
-                                                    .signupPasswordController
-                                                    .text,
-                                                ctrl
-                                                    .confirmPasswordController
-                                                    .text,
-                                              ),
+                                          errorText: confirmError,
                                           successText:
-                                              ctrl
+                                              _showValidationErrors &&
+                                                  ctrl
                                                       .confirmPasswordController
                                                       .text
                                                       .isNotEmpty &&
-                                                  ctrl.validateConfirmPasswordField(
-                                                        ctrl
-                                                            .signupPasswordController
-                                                            .text,
-                                                        ctrl
-                                                            .confirmPasswordController
-                                                            .text,
-                                                      ) ==
-                                                      null
+                                                  confirmError == null
                                               ? 'كلمتا المرور متطابقتان'
                                               : null,
                                           child: RtlTextField(
@@ -388,6 +405,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             controller:
                                                 ctrl.confirmPasswordController,
                                             focusNode: confirmPasswordFocusNode,
+                                            maxLength: 65,
                                             hintText: 'أعد إدخال كلمة المرور',
                                             obscureText: ctrl
                                                 .obscureConfirmPassword

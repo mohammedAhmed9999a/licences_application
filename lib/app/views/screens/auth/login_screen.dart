@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _scrollController = ScrollController();
   final _emailFieldKey = GlobalKey();
   final _passwordFieldKey = GlobalKey();
+  bool _showValidationErrors = false;
 
   @override
   void dispose() {
@@ -55,8 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin(AuthController ctrl) {
+    setState(() {
+      _showValidationErrors = true;
+    });
     _scrollToFirstError(ctrl);
-    setState(() {});
     ctrl.login();
   }
 
@@ -138,25 +141,25 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
-                        vertical: 8.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(14.r),
-                        border: Border.all(color: borderColor),
-                      ),
-                      child: Text(
-                        'بوابة الخدمات',
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 12.sp,
-                          color: textSecondary,
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(
+                    //     horizontal: 12.w,
+                    //     vertical: 8.h,
+                    //   ),
+                    //   decoration: BoxDecoration(
+                    //     color: theme.cardColor,
+                    //     borderRadius: BorderRadius.circular(14.r),
+                    //     border: Border.all(color: borderColor),
+                    //   ),
+                    //   child: Text(
+                    //     'بوابة الخدمات',
+                    //     style: TextStyle(
+                    //       fontFamily: 'Cairo',
+                    //       fontSize: 12.sp,
+                    //       color: textSecondary,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
                 SizedBox(height: 60.h),
@@ -166,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     vertical: 24.h,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.cardColor.withAlpha(140),
+                    color: theme.cardColor.withAlpha(240),
                     borderRadius: BorderRadius.circular(24.r),
                     border: Border.all(color: borderColor),
                     boxShadow: [
@@ -205,25 +208,28 @@ class _LoginScreenState extends State<LoginScreen> {
                       ValueListenableBuilder<TextEditingValue>(
                         valueListenable: ctrl.emailController,
                         builder: (context, _, __) {
+                          final emailError = _showValidationErrors
+                              ? ctrl.validateEmailField(
+                                  ctrl.emailController.text,
+                                )
+                              : null;
+
                           return LabeledField(
                             key: _emailFieldKey,
                             label: 'البريد الإلكتروني',
                             required: true,
-                            errorText: ctrl.validateEmailField(
-                              ctrl.emailController.text,
-                            ),
+                            errorText: emailError,
                             successText:
-                                ctrl.emailController.text.isNotEmpty &&
-                                    ctrl.validateEmailField(
-                                          ctrl.emailController.text,
-                                        ) ==
-                                        null
+                                _showValidationErrors &&
+                                    ctrl.emailController.text.isNotEmpty &&
+                                    emailError == null
                                 ? 'البريد الإلكتروني صالح'
                                 : null,
                             child: RtlTextField(
                               controller: ctrl.emailController,
                               focusNode: emailFocusNode,
                               hintText: 'name@example.com',
+                              maxLength: 50,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               onSubmitted: (_) {
@@ -239,19 +245,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       ValueListenableBuilder<TextEditingValue>(
                         valueListenable: ctrl.passwordController,
                         builder: (context, _, __) {
+                          final passwordError = _showValidationErrors
+                              ? ctrl.validateLoginPasswordField(
+                                  ctrl.passwordController.text,
+                                )
+                              : null;
+
                           return Obx(
                             () => LabeledField(
                               label: 'كلمة المرور',
                               required: true,
-                              errorText: ctrl.validateLoginPasswordField(
-                                ctrl.passwordController.text,
-                              ),
+                              errorText: passwordError,
                               successText:
-                                  ctrl.passwordController.text.isNotEmpty &&
-                                      ctrl.validateLoginPasswordField(
-                                            ctrl.passwordController.text,
-                                          ) ==
-                                          null
+                                  _showValidationErrors &&
+                                      ctrl.passwordController.text.isNotEmpty &&
+                                      passwordError == null
                                   ? 'كلمة المرور مناسبة'
                                   : null,
                               child: RtlTextField(
@@ -259,6 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: ctrl.passwordController,
                                 focusNode: passwordFocusNode,
                                 hintText: '••••••••••',
+                                maxLength: 65,
                                 obscureText: ctrl.obscurePassword.value,
                                 textInputAction: TextInputAction.done,
                                 onSubmitted: (_) {

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../widgets/common_widgets.dart';
 import '../../../../controllers/license_application_controller.dart';
@@ -1249,7 +1250,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
                     'الموقع القديم',
@@ -1277,6 +1278,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
               value: ctrl.oldSelectedGovernorate.value?.name,
               items: ctrl.oldGovernorates.map((item) => item.name).toList(),
               enabled: governorateEditable,
+              isLoading: ctrl.isOldGovernoratesLoading.value,
               loadingLabel: 'جاري تحميل المحافظات...',
               onRefresh: governorateEditable
                   ? () => ctrl.refreshGovernorates()
@@ -1295,6 +1297,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
               value: ctrl.oldSelectedDistrict.value?.name,
               items: ctrl.oldDistricts.map((item) => item.name).toList(),
               enabled: governorateEditable,
+              isLoading: ctrl.isOldDistrictsLoading.value,
               loadingLabel: 'جاري تحميل المناطق...',
               onRefresh: governorateEditable
                   ? () => ctrl.refreshOldDistricts()
@@ -1313,6 +1316,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
               value: ctrl.oldSelectedSubdistrict.value?.name,
               items: ctrl.oldSubdistricts.map((item) => item.name).toList(),
               enabled: governorateEditable,
+              isLoading: ctrl.isOldSubdistrictsLoading.value,
               loadingLabel: 'جاري تحميل النواحي...',
               onRefresh: governorateEditable
                   ? () => ctrl.refreshOldSubdistricts()
@@ -1331,6 +1335,7 @@ class _OldSettlementLocationForm extends StatelessWidget {
               value: ctrl.oldSelectedTown.value?.name,
               items: ctrl.oldTowns.map((item) => item.name).toList(),
               enabled: governorateEditable,
+              isLoading: ctrl.isOldTownsLoading.value,
               loadingLabel: 'جاري تحميل البلديات...',
               onRefresh: governorateEditable
                   ? () => ctrl.refreshOldTowns()
@@ -1447,18 +1452,21 @@ class _OldSettlementLocationForm extends StatelessWidget {
     String? loadingLabel,
     VoidCallback? onRefresh,
   }) {
-    return LabeledField(
-      label: label,
-      required: true,
-      child: _DropdownField(
-        hint: 'اختر $label',
-        value: value,
-        items: items,
-        enabled: enabled,
-        isLoading: isLoading,
-        loadingLabel: loadingLabel,
-        onRefresh: onRefresh,
-        onChanged: onChanged,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
+      child: LabeledField(
+        label: label,
+        required: true,
+        child: _DropdownField(
+          hint: 'اختر $label',
+          value: value,
+          items: items,
+          enabled: enabled,
+          isLoading: isLoading,
+          loadingLabel: loadingLabel,
+          onRefresh: onRefresh,
+          onChanged: onChanged,
+        ),
       ),
     );
   }
@@ -1613,104 +1621,105 @@ class _DropdownField extends StatelessWidget {
         ],
       ),
       child: isLoading
-          ? Row(
-              children: [
-                SizedBox(
-                  width: 18.w,
-                  height: 18.w,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      theme.colorScheme.primary,
-                    ),
-                    backgroundColor: theme.colorScheme.primary.withOpacity(
-                      0.12,
+          ? Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 25.w,
+                    height: 25.w,
+                    child: LoadingAnimationWidget.staggeredDotsWave(
+                      color: theme.colorScheme.primary,
+                      size: 24.w,
                     ),
                   ),
-                ),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: Text(
-                    loadingLabel ?? 'جاري التحميل...',
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 12.5.sp,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Text(
+                      loadingLabel ?? 'جاري التحميل...',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 12.5.sp,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
                     ),
                   ),
-                ),
-                Icon(
-                  Icons.sync_rounded,
-                  size: 18.sp,
-                  color: theme.colorScheme.primary,
-                ),
-              ],
+                  Icon(
+                    Icons.sync_rounded,
+                    size: 18.sp,
+                    color: theme.colorScheme.primary,
+                  ),
+                ],
+              ),
             )
-          : Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: value,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                      isDense: true,
-                    ),
-                    hint: Text(
-                      hint,
+          : Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: value,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        // isDense: true,
+                      ),
+                      hint: Text(
+                        hint,
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 13.sp,
+                          color: hintColor,
+                        ),
+                      ),
+                      icon: Icon(Icons.keyboard_arrow_down, color: iconColor),
+                      dropdownColor: fillColor,
                       style: TextStyle(
                         fontFamily: 'Cairo',
                         fontSize: 13.sp,
-                        color: hintColor,
+                        color: textColor,
                       ),
-                    ),
-                    icon: Icon(Icons.keyboard_arrow_down, color: iconColor),
-                    dropdownColor: fillColor,
-                    style: TextStyle(
-                      fontFamily: 'Cairo',
-                      fontSize: 13.sp,
-                      color: textColor,
-                    ),
-                    items: items
-                        .map(
-                          (item) => DropdownMenuItem(
-                            value: item,
-                            child: Text(
-                              item,
-                              textDirection: TextDirection.rtl,
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 13.sp,
-                                color: textColor,
+                      items: items
+                          .map(
+                            (item) => DropdownMenuItem(
+                              value: item,
+                              child: Text(
+                                item,
+                                textDirection: TextDirection.rtl,
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13.sp,
+                                  color: textColor,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: enabled ? onChanged : null,
-                  ),
-                ),
-                if (onRefresh != null && enabled)
-                  Padding(
-                    padding: EdgeInsetsDirectional.only(start: 4.w),
-                    child: IconButton(
-                      onPressed: onRefresh,
-                      tooltip: 'تحديث',
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 28,
-                        minHeight: 28,
-                      ),
-                      icon: Icon(
-                        Icons.refresh,
-                        size: 18.sp,
-                        color: theme.colorScheme.primary,
-                      ),
+                          )
+                          .toList(),
+                      onChanged: enabled ? onChanged : null,
                     ),
                   ),
-              ],
+                  if (onRefresh != null && enabled)
+                    Padding(
+                      padding: EdgeInsetsDirectional.only(start: 4.w),
+                      child: IconButton(
+                        onPressed: onRefresh,
+                        tooltip: 'تحديث',
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 28,
+                          minHeight: 28,
+                        ),
+                        icon: Icon(
+                          Icons.refresh,
+                          size: 18.sp,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
     );
   }

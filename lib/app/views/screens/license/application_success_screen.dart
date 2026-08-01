@@ -6,24 +6,54 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:licences_application/app/controllers/auth_controller.dart';
 import 'package:licences_application/app/views/screens/terms_pdf_viewer_screen.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../../theme/app_theme.dart';
 import '../../../controllers/license_application_controller.dart';
 import '../../../routes/app_routes.dart';
 
-class ApplicationSuccessScreen extends StatelessWidget {
+class ApplicationSuccessScreen extends StatefulWidget {
   const ApplicationSuccessScreen({super.key});
+
+  @override
+  State<ApplicationSuccessScreen> createState() =>
+      _ApplicationSuccessScreenState();
+}
+
+class _ApplicationSuccessScreenState extends State<ApplicationSuccessScreen> {
+  bool _isExporting = false;
 
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<LicenseApplicationController>();
+    final ctrlAuth = Get.find<AuthController>();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = isDark ? AppColors.primaryLight : AppColors.primary;
+    final accentColor = isDark ? AppColors.accentLight : AppColors.accent;
+    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.surface;
+    final surfaceVariantColor = isDark
+        ? AppColors.darkSurfaceVariant
+        : AppColors.surfaceVariant;
+    final cardColor = isDark ? AppColors.darkSurfaceVariant : AppColors.golden3;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.border;
+    final textColor = isDark ? AppColors.darkText : AppColors.textPrimary;
+    final secondaryTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.textSecondary;
+    final mutedTextColor = isDark ? AppColors.darkTextHint : AppColors.textHint;
+    final shadowColor = isDark
+        ? AppColors.primaryDark.withOpacity(0.28)
+        : AppColors.primaryDark.withOpacity(0.08);
 
     Future<void> exportApplicationPdf() async {
+      if (!mounted) return;
+      setState(() => _isExporting = true);
       final now = DateTime.now();
       final submissionDateLabel = DateFormat(
         'dd/MM/yyyy - hh:mm a',
@@ -100,10 +130,14 @@ class ApplicationSuccessScreen extends StatelessWidget {
         String label2,
         String value2, {
         bool alternate = false,
+        bool allowWrap = false,
       }) {
         final rowColor = alternate
             ? PdfColor.fromHex('#f8f7f0')
             : PdfColors.white;
+        final shouldWrap =
+            allowWrap && (value1.length > 30 || value2.length > 30);
+        final rowHeight = shouldWrap ? 30.h : 20.h;
 
         return pw.Table(
           border: pw.TableBorder.symmetric(
@@ -127,7 +161,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
               decoration: pw.BoxDecoration(color: rowColor),
               children: [
                 pw.Container(
-                  height: 20.h,
+                  height: rowHeight,
                   padding: const pw.EdgeInsets.symmetric(
                     vertical: 10,
                     horizontal: 4,
@@ -137,11 +171,12 @@ class ApplicationSuccessScreen extends StatelessWidget {
                   child: pw.Text(
                     value2.isEmpty ? '-' : value2,
                     textAlign: pw.TextAlign.right,
+                    softWrap: shouldWrap,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
                 ),
                 pw.Container(
-                  height: 20.h,
+                  height: rowHeight,
                   padding: const pw.EdgeInsets.symmetric(
                     vertical: 10,
                     horizontal: 4,
@@ -159,7 +194,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                   ),
                 ),
                 pw.Container(
-                  height: 20.h,
+                  height: rowHeight,
                   padding: const pw.EdgeInsets.symmetric(
                     vertical: 10,
                     horizontal: 4,
@@ -169,11 +204,12 @@ class ApplicationSuccessScreen extends StatelessWidget {
                   child: pw.Text(
                     value1.isEmpty ? '-' : value1,
                     textAlign: pw.TextAlign.right,
+                    softWrap: shouldWrap,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
                 ),
                 pw.Container(
-                  height: 20.h,
+                  height: rowHeight,
                   padding: const pw.EdgeInsets.symmetric(
                     vertical: 10,
                     horizontal: 4,
@@ -359,7 +395,9 @@ class ApplicationSuccessScreen extends StatelessWidget {
         );
       }
 
-      final bgData = await rootBundle.load('assets/images/pattern-light.png');
+      final bgData = await rootBundle.load(
+        'assets/images/pattern-tiled-smooth.png',
+      );
       debugPrint('حجم البيانات: ${bgData.lengthInBytes}');
       final bgImage = pw.MemoryImage(bgData.buffer.asUint8List());
       debugPrint('عرض الصورة: ${bgImage.width}, ارتفاعها: ${bgImage.height}');
@@ -373,27 +411,18 @@ class ApplicationSuccessScreen extends StatelessWidget {
               italic: font,
               boldItalic: font,
             ),
-            margin: pw.EdgeInsets.all(24.sp),
+            margin: pw.EdgeInsets.all(8.sp),
             buildBackground: (context) {
               return pw.Container(
                 width: PdfPageFormat.a4.width,
                 height: PdfPageFormat.a4.height,
                 child: pw.Opacity(
                   opacity: 0.18,
-                  child: pw.Column(
-                    mainAxisAlignment: pw.MainAxisAlignment.start,
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: List.generate(
-                      188,
-                      (_) => pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: List.generate(
-                          40,
-                          (_) => pw.Image(bgImage, width: 400.w, height: 600.h),
-                        ),
-                      ),
-                    ),
+                  child: pw.Image(
+                    bgImage,
+                    width: PdfPageFormat.a4.width,
+                    height: PdfPageFormat.a4.height,
+                    fit: pw.BoxFit.fill,
                   ),
                 ),
               );
@@ -493,7 +522,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                                 'إدارة خدمات الطاقة',
                                 style: pw.TextStyle(
                                   fontSize: 18,
-                                  color: PdfColors.green800,
+                                  color: PdfColor.fromHex('#002623'),
                                   fontWeight: pw.FontWeight.bold,
                                 ),
                                 textAlign: pw.TextAlign.center,
@@ -568,9 +597,13 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       'تاريخ الولدة',
                       birthDate,
                       'بريد حساب المستخدم',
-                      ctrl.emailController.text.trim().isNotEmpty
-                          ? ctrl.emailController.text.trim()
+                      ctrlAuth.userEmail.isNotEmpty
+                          ? ctrlAuth.userEmail
                           : 'غير متوفر',
+                      allowWrap: true,
+                      // ctrl.emailController.text.trim().isNotEmpty
+                      //     ? ctrl.emailController.text.trim()
+                      //     : 'غير متوفر',
                     ),
                   ]),
                   if (ctrl.investorType.value == 'company')
@@ -600,6 +633,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       ctrl.emailController.text.trim(),
                       'رقم التواصل',
                       ctrl.phoneController.text.trim(),
+                      allowWrap: true,
                     ),
                     if (ctrl.phone2Controller.text.trim().isNotEmpty)
                       buildFourColumnRow(
@@ -624,19 +658,18 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       if (ctrl.settlementRelocation.value)
                         buildFourColumnRow(
                           'الموقع الفديم',
-                          (ctrl.oldSelectedGovernorate.value?.name
-                                      ?.toString() ??
+                          (ctrl.oldSelectedGovernorate.value?.name.toString() ??
                                   '/') +
                               ' / ' +
                               (ctrl.oldSelectedDistrict.value?.name
-                                      ?.toString() ??
+                                      .toString() ??
                                   '/') +
                               ' / ' +
                               (ctrl.oldSelectedSubdistrict.value?.name
-                                      ?.toString() ??
+                                      .toString() ??
                                   '/') +
                               ' / ' +
-                              (ctrl.oldSelectedTown.value?.name?.toString() ??
+                              (ctrl.oldSelectedTown.value?.name.toString() ??
                                   'غير محدد'),
                           'إحداثيات الموقع  القديم',
                           (ctrl.oldLatitudeController.text.trim().isNotEmpty
@@ -652,17 +685,17 @@ class ApplicationSuccessScreen extends StatelessWidget {
                       if (ctrl.settlementRelocation.value)
                         buildFourColumnRow(
                           'لموقع الجديد',
-                          (ctrl.selectedGovernorate.value?.name?.toString() ??
+                          (ctrl.selectedGovernorate.value?.name.toString() ??
                                   '/') +
                               ' / ' +
-                              (ctrl.selectedDistrict.value?.name?.toString() ??
+                              (ctrl.selectedDistrict.value?.name.toString() ??
                                   '/') +
                               ' / ' +
                               (ctrl.selectedSubdistrict.value?.name
-                                      ?.toString() ??
+                                      .toString() ??
                                   '/') +
                               ' / ' +
-                              (ctrl.selectedTown.value?.name?.toString() ??
+                              (ctrl.selectedTown.value?.name.toString() ??
                                   'غير محدد'),
                           'إحداثيات الموقع الجديد',
                           (ctrl.latitudeController.text.trim().isNotEmpty
@@ -769,26 +802,24 @@ class ApplicationSuccessScreen extends StatelessWidget {
           borderRadius: 8,
           duration: const Duration(seconds: 3),
         );
+      } finally {
+        if (mounted) {
+          setState(() => _isExporting = false);
+        }
       }
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? AppColors.darkSurface
-          : Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: surfaceColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.darkSurfaceVariant
-            : AppColors.surface,
+        backgroundColor: surfaceVariantColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
             height: 1.h,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? AppColors.darkDivider
-                : AppColors.borderLight,
+            color: isDark ? AppColors.darkDivider : borderColor,
           ),
         ),
         title: Row(
@@ -804,7 +835,7 @@ class ApplicationSuccessScreen extends StatelessWidget {
                     Icons.arrow_back_ios_new_outlined,
                     size: 18.sp,
                     textDirection: ui.TextDirection.ltr,
-                    color: AppColors.textSecondary,
+                    color: primaryColor,
                   ),
                   // SizedBox(width: 4.w),
                   // Text(
@@ -818,21 +849,31 @@ class ApplicationSuccessScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Shimmer.fromColors(
-              baseColor: AppColors.gold.withOpacity(0.6),
-              highlightColor: Colors.white,
-              period: const Duration(seconds: 2),
-              child: Container(
-                width: 200.w,
-                height: 100.h,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/h-logo.webp'),
-                    fit: BoxFit.contain,
-                  ),
+            Container(
+              width: 200.w,
+              height: 100.h,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/h-logo.webp'),
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
+            // Shimmer.fromColors(
+            //   baseColor: AppColors.gold.withOpacity(0.6),
+            //   highlightColor: Colors.white,
+            //   period: const Duration(seconds: 2),
+            //   child: Container(
+            //     width: 200.w,
+            //     height: 100.h,
+            //     decoration: const BoxDecoration(
+            //       image: DecorationImage(
+            //         image: AssetImage('assets/images/h-logo.webp'),
+            //         fit: BoxFit.contain,
+            //       ),
+            //     ),
+            //   ),
+            // ),
 
             // Ministry branding
             // Row(
@@ -865,234 +906,372 @@ class ApplicationSuccessScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            children: [
-              SizedBox(height: 20.h),
-
-              // Main success card
-              Container(
-                padding: EdgeInsets.all(24.w),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.darkSurfaceVariant
-                      : AppColors.surface,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.darkBorder
-                        : AppColors.borderLight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black.withOpacity(0.25)
-                          : Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
                 child: Column(
                   children: [
-                    // Success icon
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 44.w,
-                          height: 44.h,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 26.sp,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.h),
-
-                    // Title
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        'لقد استلمنا طلبك',
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? AppColors.darkText
-                              : AppColors.textPrimary,
-                        ),
-                        textDirection: ui.TextDirection.rtl,
-                      ),
-                    ),
                     SizedBox(height: 8.h),
 
-                    // Description
-                    Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: Text(
-                        'بمكنك إغلاق هذه الصفحة الآن. سيتم التواصل معك قريباً عبر رقم الهاتف أو البريد الإلكتروني. احتفظ بـرمز الاستجابة السريعة ورقم الطلب لمتابعة معاملة الترخيص.',
-                        style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 12.sp,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary,
-                          height: 1.6,
+                    Container(
+                      padding: EdgeInsets.all(20.w),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [
+                                  AppColors.darkSurfaceVariant,
+                                  AppColors.darkSurfaceAlt,
+                                ]
+                              : [AppColors.golden3, AppColors.surface],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        textDirection: ui.TextDirection.rtl,
+                        borderRadius: BorderRadius.circular(24.r),
+                        border: Border.all(color: borderColor),
+                        boxShadow: [
+                          BoxShadow(
+                            color: shadowColor,
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
-                    ),
-                    SizedBox(height: 24.h),
-
-                    // QR Code
-                    Obx(
-                      () => Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(color: AppColors.borderLight),
-                        ),
-                        child: Column(
-                          children: [
-                            QrImageView(
-                              data:
-                                  ctrl
-                                      .submittedApplicationNumber
-                                      .value
-                                      .isNotEmpty
-                                  ? ctrl.submittedApplicationNumber.value
-                                  : 'SY-LR-20260623-0001',
-                              version: QrVersions.auto,
-                              size: 180,
-                              backgroundColor: Colors.white,
-                              eyeStyle: const QrEyeStyle(
-                                eyeShape: QrEyeShape.square,
-                                color: AppColors.textPrimary,
-                              ),
-                              dataModuleStyle: const QrDataModuleStyle(
-                                dataModuleShape: QrDataModuleShape.square,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            SizedBox(height: 10.h),
-                            // Application number
-                            Text(
-                              'رقم طلب الترخيص',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 11.sp,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Obx(
-                              () => Text(
-                                ctrl.submittedApplicationNumber.value.isNotEmpty
-                                    ? ctrl.submittedApplicationNumber.value
-                                    : 'SY-LR-20260623-0001',
-                                style: TextStyle(
-                                  fontFamily: 'Cairo',
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? AppColors.darkText
-                                      : AppColors.primary,
-                                  letterSpacing: 1,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 6.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: accentColor.withOpacity(0.16),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_outline,
+                                      size: 16.sp,
+                                      color: primaryColor,
+                                    ),
+                                    SizedBox(width: 6.w),
+                                    Text(
+                                      'تم الاستلام بنجاح',
+                                      style: TextStyle(
+                                        fontFamily: 'Cairo',
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              Container(
+                                width: 48.w,
+                                height: 48.h,
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withOpacity(0.14),
+                                  borderRadius: BorderRadius.circular(14.r),
+                                ),
+                                child: Icon(
+                                  Icons.verified_outlined,
+                                  color: primaryColor,
+                                  size: 24.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16.h),
+
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Text(
+                              'لقد استلمنا طلبك',
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
+                              ),
+                              textDirection: ui.TextDirection.rtl,
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(height: 8.h),
+
+                          Align(
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: Text(
+                              'بمكنك إغلاق هذه الصفحة الآن. سيتم التواصل معك قريباً عبر رقم الهاتف أو البريد الإلكتروني. احتفظ بـرمز الاستجابة السريعة ورقم الطلب لمتابعة معاملة الترخيص.',
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 12.sp,
+                                color: secondaryTextColor,
+                                height: 1.6,
+                              ),
+                              textDirection: ui.TextDirection.rtl,
+                            ),
+                          ),
+                          SizedBox(height: 22.h),
+
+                          Obx(
+                            () => Container(
+                              padding: EdgeInsets.all(14.sp),
+                              decoration: BoxDecoration(
+                                color: cardColor,
+                                borderRadius: BorderRadius.circular(18.r),
+                                border: Border.all(color: borderColor),
+                              ),
+                              child: Column(
+                                children: [
+                                  QrImageView(
+                                    data:
+                                        ctrl
+                                            .submittedApplicationNumber
+                                            .value
+                                            .isNotEmpty
+                                        ? ctrl.submittedApplicationNumber.value
+                                        : 'SY-LR-20260623-0001',
+                                    version: QrVersions.auto,
+                                    size: 140.sp,
+                                    backgroundColor: cardColor,
+                                    eyeStyle: QrEyeStyle(
+                                      eyeShape: QrEyeShape.square,
+                                      color: primaryColor,
+                                    ),
+                                    dataModuleStyle: QrDataModuleStyle(
+                                      dataModuleShape: QrDataModuleShape.square,
+                                      color: primaryColor,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  Text(
+                                    'رقم طلب الترخيص',
+                                    style: TextStyle(
+                                      fontFamily: 'Cairo',
+                                      fontSize: 11.sp,
+                                      color: secondaryTextColor,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Obx(
+                                    () => Text(
+                                      ctrl
+                                              .submittedApplicationNumber
+                                              .value
+                                              .isNotEmpty
+                                          ? ctrl
+                                                .submittedApplicationNumber
+                                                .value
+                                          : 'SY-LR-20260623-0001',
+                                      style: TextStyle(
+                                        fontFamily: 'Cairo',
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: primaryColor,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 22.h),
+
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final useColumn = constraints.maxWidth < 360;
+                              if (useColumn) {
+                                return Column(
+                                  children: [
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: OutlinedButton.icon(
+                                        style: OutlinedButton.styleFrom(
+                                          side: BorderSide(color: primaryColor),
+                                          foregroundColor: primaryColor,
+                                          backgroundColor: isDark
+                                              ? AppColors.darkSurfaceVariant
+                                              : AppColors.surface,
+                                        ),
+                                        onPressed: () => Get.offAllNamed(
+                                          AppRoutes.dashboard,
+                                        ),
+                                        icon: Icon(
+                                          Icons.home_outlined,
+                                          size: 18.sp,
+                                        ),
+                                        label: Text(
+                                          'العودة إلى الصفحة الرئيسية',
+                                          style: TextStyle(
+                                            fontFamily: 'Cairo',
+                                            fontSize: 12.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10.h),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primaryColor,
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                        ),
+                                        onPressed: () async {
+                                          await exportApplicationPdf();
+                                        },
+                                        icon: Icon(
+                                          Icons.picture_as_pdf_outlined,
+                                          size: 18.sp,
+                                        ),
+                                        label: Text(
+                                          'تصدير الطلب بصيغة PDF',
+                                          style: TextStyle(
+                                            fontFamily: 'Cairo',
+                                            fontSize: 12.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+                              return Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(color: primaryColor),
+                                        foregroundColor: primaryColor,
+                                        backgroundColor: isDark
+                                            ? AppColors.darkSurfaceVariant
+                                            : AppColors.surface,
+                                      ),
+                                      onPressed: () =>
+                                          Get.offAllNamed(AppRoutes.dashboard),
+                                      icon: Icon(
+                                        Icons.home_outlined,
+                                        size: 18.sp,
+                                      ),
+                                      label: Text(
+                                        'العودة إلى الصفحة الرئيسية',
+                                        style: TextStyle(
+                                          fontFamily: 'Cairo',
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: primaryColor,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                      ),
+                                      onPressed: () async {
+                                        await exportApplicationPdf();
+                                      },
+                                      icon: Icon(
+                                        Icons.picture_as_pdf_outlined,
+                                        size: 18.sp,
+                                      ),
+                                      label: Text(
+                                        'تصدير الطلب بصيغة PDF',
+                                        style: TextStyle(
+                                          fontFamily: 'Cairo',
+                                          fontSize: 12.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
 
-                    SizedBox(height: 24.h),
-
-                    // Action buttons
-                    Row(
-                      children: [
-                        // Go to home
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () =>
-                                Get.offAllNamed(AppRoutes.dashboard),
-                            icon: Icon(Icons.home_outlined, size: 18.sp),
-                            label: Text(
-                              'العودة إلى الصفحة الرئيسية',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        // Export PDF
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              Get.snackbar(
-                                'تحميل',
-                                'جاري تحضير ملف PDF...',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: AppColors.primary,
-                                colorText: Colors.white,
-                                margin: const EdgeInsets.all(16),
-                                borderRadius: 8,
-                                duration: const Duration(seconds: 2),
-                              );
-                              await exportApplicationPdf();
-                            },
-                            icon: Icon(
-                              Icons.picture_as_pdf_outlined,
-                              size: 18.sp,
-                            ),
-                            label: Text(
-                              'تصدير الطلب بصيغة PDF',
-                              style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    SizedBox(height: 28.h),
+                    Text(
+                      'وزارة الطاقة © 2026',
+                      style: TextStyle(
+                        fontFamily: 'Cairo',
+                        fontSize: 12.sp,
+                        color: mutedTextColor,
+                      ),
                     ),
                   ],
                 ),
               ),
-
-              SizedBox(height: 40.h),
-              // Footer
-              Text(
-                'وزارة الطاقة © 2026',
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 12.sp,
-                  color: AppColors.textHint,
+            ),
+          ),
+          if (_isExporting)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.25),
+                child: Center(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 22.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurfaceVariant : cardColor,
+                      borderRadius: BorderRadius.circular(20.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 18,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        LoadingAnimationWidget.threeArchedCircle(
+                          color: primaryColor,
+                          size: 42.sp,
+                        ),
+                        SizedBox(height: 14.h),
+                        Text(
+                          'جاري تجهيز ملف PDF...',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: textColor,
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        Text(
+                          'قد يستغرق ذلك بضع ثوانٍ',
+                          style: TextStyle(
+                            fontFamily: 'Cairo',
+                            fontSize: 11.sp,
+                            color: secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              SizedBox(height: 20.h),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }

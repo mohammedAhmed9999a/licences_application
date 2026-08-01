@@ -35,7 +35,6 @@ class LicenseApplicationScreen extends StatelessWidget {
         // ],
       ),
       body: Column(
-      
         children: [
           // Step indicator
           Obx(

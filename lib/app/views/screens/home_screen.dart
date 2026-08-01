@@ -73,21 +73,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: Column(
                       children: [
-                        Shimmer.fromColors(
-                          baseColor: AppColors.gold.withOpacity(0.6),
-                          highlightColor: Colors.white,
-                          period: const Duration(seconds: 2),
-                          child: Container(
-                            width: 300.w,
-                            height: 80.h,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage('assets/images/h-logo.webp'),
-                                fit: BoxFit.contain,
-                              ),
+                        Container(
+                          width: 300.w,
+                          height: 80.h,
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/h-logo.webp'),
+                              fit: BoxFit.contain,
                             ),
                           ),
                         ),
+                        // Shimmer.fromColors(
+                        //   baseColor: AppColors.gold.withOpacity(0.6),
+                        //   highlightColor: Colors.white,
+                        //   period: const Duration(seconds: 2),
+                        //   child: Container(
+                        //     width: 300.w,
+                        //     height: 80.h,
+                        //     decoration: const BoxDecoration(
+                        //       image: DecorationImage(
+                        //         image: AssetImage('assets/images/h-logo.webp'),
+                        //         fit: BoxFit.contain,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         // const MinistryLogoWidget(size: 72),
                         SizedBox(height: 28.h),
                         Text(
@@ -358,7 +368,7 @@ class _AuthCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: theme.cardColor.withAlpha(140),
+        color: theme.cardColor.withAlpha(245),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: theme.dividerColor, width: 0.5),
         boxShadow: [

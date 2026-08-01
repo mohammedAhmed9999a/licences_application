@@ -167,39 +167,75 @@ class AuthController extends GetxController {
       Get.offAllNamed(AppRoutes.dashboard);
     } catch (e) {
       if (e is dio.DioException) {
-        final responseData = e.response?.data;
-        if (responseData is Map) {
-          final errors = responseData['errors'];
-          if (errors is Map) {
-            final verificationErrors = errors['requires_verification'];
-            if (verificationErrors is List && verificationErrors.isNotEmpty) {
-              errorMessage.value =
-                  responseData['message']?.toString().trim() ??
-                  verificationErrors.first.toString();
-              showResendVerification.value = true;
-              verificationEmail.value = email;
-              resendAttemptsLeft.value = 3;
-              return;
+        if (e.type == dio.DioExceptionType.connectionError) {
+          final errorText = e.error?.toString().toLowerCase() ?? '';
+          if (errorText.contains('failed host lookup') ||
+              errorText.contains('socketexception') ||
+              errorText.contains('network is unreachable') ||
+              errorText.contains('hostname not known')) {
+            errorMessage.value =
+                'تعذر الوصول إلى خادم المصادقة. تحقق من اتصال الإنترنت أو اسم الخادم وحاول مرة أخرى.';
+          } else {
+            errorMessage.value =
+                'تعذر الاتصال بخادم المصادقة. تحقق من اتصال الإنترنت وحاول مرة أخرى.';
+          }
+        } else if (e.type == dio.DioExceptionType.connectionTimeout ||
+            e.type == dio.DioExceptionType.sendTimeout ||
+            e.type == dio.DioExceptionType.receiveTimeout) {
+          errorMessage.value = 'انتهت مهلة الاتصال بالخادم. حاول مرة أخرى.';
+        } else {
+          final responseData = e.response?.data;
+          if (responseData is Map) {
+            final errors = responseData['errors'];
+            if (errors is Map) {
+              final verificationErrors = errors['requires_verification'];
+              if (verificationErrors is List && verificationErrors.isNotEmpty) {
+                errorMessage.value =
+                    responseData['message']?.toString().trim() ??
+                    verificationErrors.first.toString();
+                showResendVerification.value = true;
+                verificationEmail.value = email;
+                resendAttemptsLeft.value = 3;
+                return;
+              }
+
+              if (errors.isNotEmpty) {
+                final firstError = errors.values.first;
+                if (firstError is List && firstError.isNotEmpty) {
+                  errorMessage.value = firstError.first.toString();
+                  return;
+                }
+                if (firstError is String && firstError.isNotEmpty) {
+                  errorMessage.value = firstError;
+                  return;
+                }
+              }
             }
 
-            final emailErrors = errors['email'];
-            if (emailErrors is List && emailErrors.isNotEmpty) {
-              errorMessage.value = emailErrors.first.toString();
+            final message =
+                responseData['message']?.toString().trim() ??
+                responseData['error']?.toString().trim() ??
+                responseData['msg']?.toString().trim() ??
+                '';
+            if (message.isNotEmpty) {
+              errorMessage.value = message;
               return;
             }
           }
 
-          final message =
-              responseData['message']?.toString().trim() ??
-              responseData['error']?.toString().trim() ??
-              responseData['msg']?.toString().trim() ??
-              '';
-          if (message.isNotEmpty) {
-            errorMessage.value = message;
+          if (responseData is String && responseData.trim().isNotEmpty) {
+            errorMessage.value = responseData.trim();
             return;
           }
+
+          final errorText = e.error?.toString().trim();
+          if (errorText != null && errorText.isNotEmpty) {
+            errorMessage.value = errorText;
+            return;
+          }
+
+          errorMessage.value = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
         }
-        errorMessage.value = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
       } else {
         errorMessage.value = 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى';
       }
