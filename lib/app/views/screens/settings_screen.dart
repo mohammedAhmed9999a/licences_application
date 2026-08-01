@@ -14,58 +14,50 @@ class SettingsScreen extends StatelessWidget {
     final ctrl = Get.find<SettingsController>();
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: isDark
-            ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
-            : Theme.of(context).scaffoldBackgroundColor.withAlpha(180),
+    return Scaffold(
+      backgroundColor: isDark
+          ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
+          : Theme.of(context).scaffoldBackgroundColor.withAlpha(100),
 
-        // appBar: const MinistryAppBar(title: null),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 8.h),
+      // appBar: const MinistryAppBar(title: null),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.h),
 
-              // Title
-              Text(
-                'settings'.tr,
-                style: Theme.of(context).textTheme.headlineMedium,
-                textDirection: TextDirection.rtl,
+            // Title
+            Text(
+              'settings'.tr,
+              style: Theme.of(context).textTheme.headlineMedium,
+              textDirection: TextDirection.rtl,
+            ),
+            SizedBox(height: 20.h),
+
+            // ── Language Section ────────────────────────────────────────
+            // _SectionHeader(title: 'language'.tr),
+
+            // SizedBox(height: 10.h),
+            // _LanguageCard(ctrl: ctrl),
+            SizedBox(height: 24.h),
+
+            // ── Theme Section ───────────────────────────────────────────
+            _SectionHeader(title: 'theme'.tr),
+            SizedBox(height: 10.h),
+            _ThemeCard(ctrl: ctrl),
+
+            SizedBox(height: 250.h),
+            // Spacer(),
+
+            // App version footer
+            Center(
+              child: Text(
+                'footer_copy'.tr,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
-              SizedBox(height: 20.h),
-
-              // ── Language Section ────────────────────────────────────────
-              // _SectionHeader(title: 'language'.tr),
-
-              // SizedBox(height: 10.h),
-              // _LanguageCard(ctrl: ctrl),
-              SizedBox(height: 24.h),
-
-              // ── Theme Section ───────────────────────────────────────────
-              _SectionHeader(title: 'theme'.tr),
-              SizedBox(height: 10.h),
-              _ThemeCard(ctrl: ctrl),
-
-              SizedBox(height: 250.h),
-              // Spacer(),
-
-              // App version footer
-              Center(
-                child: Text(
-                  'footer_copy'.tr,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

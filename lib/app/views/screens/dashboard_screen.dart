@@ -76,7 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Scaffold(
         backgroundColor: isDark
             ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
-            : Theme.of(context).scaffoldBackgroundColor.withAlpha(240),
+            : Theme.of(context).scaffoldBackgroundColor.withAlpha(246),
         appBar: AppBar(
           backgroundColor: surface,
           elevation: 0,
@@ -608,7 +608,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       image: DecorationImage(
                         image: AssetImage('assets/images/background.png'),
                         fit: BoxFit.cover,
-                        opacity: isDark ? 0.08 : 0.6,
+                        opacity: isDark ? 0.08 : 0.9,
                       ),
                       border: Border.all(
                         color: isSelected ? stat.color : Colors.transparent,

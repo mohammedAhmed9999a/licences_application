@@ -2668,7 +2668,7 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       case 'contactInfo':
         return 'بيانات التواصل';
       case 'termsContact':
-        return 'الموافقة على الشروط';
+        return 'الشروط والتواصل';
       case 'licenseDetails':
         return 'تفاصيل الترخيص';
       case 'settlementDetails':
@@ -2678,9 +2678,9 @@ class _LicenseDetailsScreenState extends State<LicenseDetailsScreen> {
       case 'identityDocument':
         return 'وثائق الهوية';
       case 'currentLocation':
-        return 'موقع المحطة';
+        return 'الموقع والتصنيف';
       case 'locationClassification':
-        return 'تصنيف الموقع';
+        return 'الموقع والتصنيف';
       case 'surveyPlan':
         return 'المخطط المساحي';
       case 'propertyRecord':
