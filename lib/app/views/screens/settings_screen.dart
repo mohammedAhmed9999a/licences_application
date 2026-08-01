@@ -16,8 +16,8 @@ class SettingsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark
-          ? Theme.of(context).scaffoldBackgroundColor.withAlpha(225)
-          : Theme.of(context).scaffoldBackgroundColor.withAlpha(100),
+          ? Theme.of(context).scaffoldBackgroundColor.withAlpha(10)
+          : Theme.of(context).scaffoldBackgroundColor.withAlpha(10),
 
       // appBar: const MinistryAppBar(title: null),
       body: SingleChildScrollView(
