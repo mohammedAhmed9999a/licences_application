@@ -50,7 +50,7 @@ class SettingsController extends GetxController {
     _updateSystemUIOverlay(mode);
   }
 
-  // ── System UI ─────────────────────────────────────────────────────────
+  // System UI
   void _updateSystemUIOverlay(ThemeMode mode) {
     final isDarkTheme = mode == ThemeMode.dark;
     SystemChrome.setSystemUIOverlayStyle(
@@ -69,7 +69,7 @@ class SettingsController extends GetxController {
     );
   }
 
-  // ── Language ──────────────────────────────────────────────────────────
+  // Language
   bool get isArabic => locale.value.languageCode == 'ar';
 
   void _loadLocale() {
@@ -99,7 +99,7 @@ class SettingsController extends GetxController {
     }
   }
 
-  // ── Convenience getters for UI ────────────────────────────────────────
+  // Convenience getters for UI
   String get currentLangLabel => isArabic ? 'ar'.tr : 'en'.tr;
   String get currentThemeLabel => isDark ? 'dark_theme'.tr : 'light_theme'.tr;
   IconData get themeIcon =>

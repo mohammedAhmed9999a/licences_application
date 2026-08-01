@@ -7,23 +7,13 @@ import 'package:licences_application/core/services/core_api_service.dart';
 import '../routes/app_routes.dart';
 import '../models/governorate_model.dart';
 import '../models/application_model.dart';
-import '../../core/validators/form_validator.dart';
+import '../models/attachment_requirement.dart';
+import 'parts/license_correction_mixin.dart';
+import 'parts/license_form_state_mixin.dart';
+import 'parts/license_validation_mixin.dart';
 
-class AttachmentRequirement {
-  final String key;
-  final String title;
-  final String docType;
-  final bool isRequired;
-
-  const AttachmentRequirement({
-    required this.key,
-    required this.title,
-    required this.docType,
-    this.isRequired = true,
-  });
-}
-
-class LicenseApplicationController extends GetxController {
+class LicenseApplicationController extends GetxController
+    with LicenseValidationMixin, LicenseCorrectionMixin, LicenseFormStateMixin {
   static LicenseApplicationController get to => Get.find();
 
   String extractSubmissionErrorMessage(Object error) {
@@ -639,7 +629,7 @@ class LicenseApplicationController extends GetxController {
       partnersKeys.add(ValueKey(DateTime.now().microsecondsSinceEpoch));
     }
 
-    final planningRaw = application.planningLocation?.toLowerCase() ?? '';
+    final planningRaw = application.planningLocation.toLowerCase();
     if (planningRaw.contains('outside') || planningRaw.contains('خارج')) {
       planningLocation.value = 'outside';
     } else {
@@ -647,7 +637,7 @@ class LicenseApplicationController extends GetxController {
     }
 
     // Normalize road type
-    final roadRaw = application.roadType?.toLowerCase() ?? '';
+    final roadRaw = application.roadType.toLowerCase();
     if (roadRaw.contains('local') || roadRaw.contains('محلي')) {
       roadType.value = 'local';
     } else if (roadRaw.contains('central') ||
@@ -896,10 +886,10 @@ class LicenseApplicationController extends GetxController {
       final originalLatitude = original?.latitude ?? '';
       final originalLongitude = original?.longitude ?? '';
 
-      final governorateId = selectedGovernorate.value?.id?.toString();
-      final districtId = selectedDistrict.value?.id?.toString();
-      final subDistrictId = selectedSubdistrict.value?.id?.toString();
-      final townId = selectedTown.value?.id?.toString();
+      final governorateId = selectedGovernorate.value?.id.toString();
+      final districtId = selectedDistrict.value?.id.toString();
+      final subDistrictId = selectedSubdistrict.value?.id.toString();
+      final townId = selectedTown.value?.id.toString();
       final latitude = latitudeController.text.trim();
       final longitude = longitudeController.text.trim();
 
@@ -917,7 +907,7 @@ class LicenseApplicationController extends GetxController {
         payload['settlement'] = {
           'is_relocation': 1,
           'license_number': previousLicenseNumber.text.trim(),
-          'old_location': _buildOldLocationPayload(),
+          'old_location': buildOldLocationPayload(),
           'new_location': location,
         };
       } else {
@@ -981,781 +971,31 @@ class LicenseApplicationController extends GetxController {
   }
 
   // ─── Submit Step 1 ────────────────────────────────────────────────
-  void goToNextStep() {
-    if (currentStep.value < 3) {
-      currentStep.value++;
-    }
-  }
+  void goToNextStep() => super.goToNextStep();
 
-  void goToPreviousStep() {
-    if (currentStep.value > 0) {
-      currentStep.value--;
-    }
-  }
+  void goToPreviousStep() => super.goToPreviousStep();
 
   // ─── Validation ───────────────────────────────────────────────────
-  void scrollToStep1Field(GlobalKey key) {
-    final ctx = key.currentContext;
-    if (ctx == null) return;
+  void scrollToStep1Field(GlobalKey key) => super.scrollToStep1Field(key);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        Scrollable.ensureVisible(
-          ctx,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeInOut,
-          alignment: 0.16,
-        );
-      } catch (_) {}
-    });
-  }
+  void scrollToStep1Error() => super.scrollToStep1Error();
 
-  void scrollToStep1Error() {
-    if (step1ErrorField.value == 'phone' &&
-        phoneFieldKey.currentContext != null) {
-      scrollToStep1Field(phoneFieldKey);
-      return;
-    }
-    if (step1ErrorField.value == 'email' &&
-        emailFieldKey.currentContext != null) {
-      scrollToStep1Field(emailFieldKey);
-      return;
-    }
-    if (step1ErrorField.value == 'phone2' &&
-        secondaryPhoneFieldKey.currentContext != null) {
-      scrollToStep1Field(secondaryPhoneFieldKey);
-      return;
-    }
-    if (step1ErrorField.value == 'terms' &&
-        termsFieldKey.currentContext != null) {
-      scrollToStep1Field(termsFieldKey);
-      return;
-    }
+  bool validateStep1() => super.validateStep1();
 
-    if (phoneController.text.trim().isEmpty &&
-        phoneFieldKey.currentContext != null) {
-      scrollToStep1Field(phoneFieldKey);
-      return;
-    }
-    if (emailController.text.trim().isEmpty &&
-        emailFieldKey.currentContext != null) {
-      scrollToStep1Field(emailFieldKey);
-      return;
-    }
-    if (!agreedToTerms.value && termsFieldKey.currentContext != null) {
-      scrollToStep1Field(termsFieldKey);
-      return;
-    }
-  }
+  bool validateStep2() => super.validateStep2();
 
-  bool validateStep1() {
-    hasAttemptedStep1Submission.value = true;
-    errorMessage.value = '';
-    step1ErrorField.value = '';
+  void clearStep2FieldErrors() => super.clearStep2FieldErrors();
 
-    final emailError = FormValidator.validateEmailField(emailController.text);
-    if (emailError != null) {
-      errorMessage.value = emailError;
-      step1ErrorField.value = 'email';
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToStep1Error();
-      });
-      return false;
-    }
+  void scrollToField(GlobalKey key) => super.scrollToField(key);
 
-    final phone = phoneController.text.trim();
-    if (phone.isEmpty) {
-      errorMessage.value = 'يرجى إدخال رقم التواصل';
-      step1ErrorField.value = 'phone';
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToStep1Error();
-      });
-      return false;
-    }
-    if (!RegExp(r'^09\d{8}$').hasMatch(phone)) {
-      errorMessage.value = 'رقم التواصل يجب أن يبدأ بـ 09 وأن يكون 10 أرقام';
-      step1ErrorField.value = 'phone';
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToStep1Error();
-      });
-      return false;
-    }
+  void scrollToFirstError() => super.scrollToFirstError();
 
-    final secondaryPhone = phone2Controller.text.trim();
-    if (secondaryPhone.isNotEmpty &&
-        !RegExp(r'^09\d{8}$').hasMatch(secondaryPhone)) {
-      errorMessage.value =
-          'رقم التواصل الثانوي يجب أن يبدأ بـ 09 وأن يكون 10 أرقام';
-      step1ErrorField.value = 'phone2';
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToStep1Error();
-      });
-      return false;
-    }
+  void validateStep2Field(String fieldName, String value) =>
+      super.validateStep2Field(fieldName, value);
 
-    if (!agreedToTerms.value) {
-      errorMessage.value = 'يجب الموافقة على الشروط والأحكام للمتابعة';
-      step1ErrorField.value = 'terms';
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToStep1Error();
-      });
-      return false;
-    }
-    return true;
-  }
+  void requestFocus(FocusNode nextFocus) => super.requestFocus(nextFocus);
 
-  bool validateStep2() {
-    errorMessage.value = '';
-    clearStep2FieldErrors();
-
-    if (requestType.value == 'settlement') {
-      final hasPreviousLicenseNumber = previousLicenseNumber.text
-          .trim()
-          .isNotEmpty;
-      final hasSettlementAgreement = settledAgreed.value;
-
-      if (!hasPreviousLicenseNumber) {
-        settlementPreviousLicenseError.value = 'يرجى إدخال رقم الترخيص السابق';
-      } else if (!RegExp(
-        r'^[A-Za-z0-9-]+$',
-      ).hasMatch(previousLicenseNumber.text.trim())) {
-        settlementPreviousLicenseError.value =
-            'رقم الترخيص يجب أن يحتوي على أحرف إنكليزية وأرقام وواصلة (-) فقط، بدون مسافات أو رموز أخرى';
-      } else {
-        settlementPreviousLicenseError.value = '';
-      }
-
-      if (!hasSettlementAgreement) {
-        settlementAgreementError.value =
-            'يجب الموافقة على المراحل الإلزامية للتسوية';
-      } else {
-        settlementAgreementError.value = '';
-      }
-
-      if (!hasPreviousLicenseNumber || !hasSettlementAgreement) {
-        errorMessage.value = 'يرجى إكمال بيانات التسوية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-    }
-
-    if (investorType.value == 'individual') {
-      final firstName = firstNameController.text.trim();
-      if (firstName.isEmpty) {
-        firstNameError.value = 'يرجى إدخال الاسم الأول';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-      if (firstName.length <= 2) {
-        firstNameError.value = 'الاسم يجب أن يكون أكثر من حرفين';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-      if (!FormValidator.isArabicName(firstName)) {
-        firstNameError.value = 'الاسم يجب أن يكون باللغة العربية حصراً';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-
-      final fatherName = fatherNameController.text.trim();
-      if (fatherName.isEmpty) {
-        fatherNameError.value = 'يرجى إدخال اسم الأب';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-      if (fatherName.length <= 2) {
-        fatherNameError.value = 'اسم الأب يجب أن يكون أكثر من حرفين';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-      if (!FormValidator.isArabicName(fatherName)) {
-        fatherNameError.value = 'اسم الأب يجب أن يكون باللغة العربية حصراً';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-
-      final motherName = motherNameController.text.trim();
-      if (motherName.isEmpty) {
-        motherNameError.value = 'يرجى إدخال اسم الأم';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-      if (motherName.length <= 2) {
-        motherNameError.value = 'اسم الأم يجب أن يكون أكثر من حرفين';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-      if (!FormValidator.isArabicName(motherName)) {
-        motherNameError.value = 'اسم الأم يجب أن يكون باللغة العربية حصراً';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-
-      final nickname = nicknameController.text.trim();
-      if (nickname.isEmpty) {
-        nicknameError.value = 'يرجى إدخال الكنية';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-      if (nickname.length <= 2) {
-        nicknameError.value = 'الكنية يجب أن تكون أكثر من حرفين';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-      if (!FormValidator.isArabicName(nickname)) {
-        nicknameError.value = 'الكنية يجب أن تكون باللغة العربية حصراً';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-
-      final nationalId = nationalIdController.text.trim();
-      if (nationalId.isEmpty) {
-        nationalIdError.value = 'يرجى إدخال الرقم الوطني';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-      if (!RegExp(r'^\d+$').hasMatch(nationalId)) {
-        nationalIdError.value = 'الرقم الوطني يجب أن يحتوي على أرقام فقط';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-      if (nationalId.length < 8 || nationalId.length > 12) {
-        nationalIdError.value = 'الرقم الوطني يجب أن يكون بين 8 و12 رقماً';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-
-      final birthPlace = birthPlaceController.text.trim();
-      if (birthPlace.isEmpty) {
-        birthPlaceError.value = 'يرجى إدخال مكان الولادة';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-      if (birthPlace.length <= 2) {
-        birthPlaceError.value = 'مكان الولادة يجب أن يكون أكثر من حرفين';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-      if (!FormValidator.isArabicName(birthPlace)) {
-        birthPlaceError.value = 'مكان الولادة يجب أن يكون باللغة العربية حصراً';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        return false;
-      }
-
-      final selectedBirthDate = birthDate.value;
-      if (selectedBirthDate == null) {
-        birthDateError.value = 'يرجى اختيار تاريخ الولادة';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-
-      final now = DateTime.now();
-      var age = now.year - selectedBirthDate.year;
-      if (now.month < selectedBirthDate.month ||
-          (now.month == selectedBirthDate.month &&
-              now.day < selectedBirthDate.day)) {
-        age--;
-      }
-      if (age < 18) {
-        birthDateError.value = 'يجب أن لا يقل عمر مقدم الطلب عن 18 سنة';
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-    } else if (investorType.value == 'company') {
-      var hasRepresentativeErrors = false;
-      var hasCompanyErrors = false;
-
-      final firstName = firstNameController.text.trim();
-      if (firstName.isEmpty) {
-        firstNameError.value = 'يرجى إدخال الاسم الأول';
-        hasRepresentativeErrors = true;
-      } else if (firstName.length <= 2) {
-        firstNameError.value = 'الاسم يجب أن يكون أكثر من حرفين';
-        hasRepresentativeErrors = true;
-      } else if (!FormValidator.isArabicName(firstName)) {
-        firstNameError.value = 'الاسم يجب أن يكون باللغة العربية حصراً';
-        hasRepresentativeErrors = true;
-      } else {
-        firstNameError.value = '';
-      }
-
-      final nickname = nicknameController.text.trim();
-      if (nickname.isEmpty) {
-        nicknameError.value = 'يرجى إدخال الكنية';
-        hasRepresentativeErrors = true;
-      } else if (nickname.length <= 2) {
-        nicknameError.value = 'الكنية يجب أن تكون أكثر من حرفين';
-        hasRepresentativeErrors = true;
-      } else if (!FormValidator.isArabicName(nickname)) {
-        nicknameError.value = 'الكنية يجب أن تكون باللغة العربية حصراً';
-        hasRepresentativeErrors = true;
-      } else {
-        nicknameError.value = '';
-      }
-
-      final nationalId = nationalIdController.text.trim();
-      if (nationalId.isEmpty) {
-        nationalIdError.value = 'يرجى إدخال الرقم الوطني';
-        hasRepresentativeErrors = true;
-      } else if (!RegExp(r'^\d+$').hasMatch(nationalId)) {
-        nationalIdError.value = 'الرقم الوطني يجب أن يحتوي على أرقام فقط';
-        hasRepresentativeErrors = true;
-      } else if (nationalId.length < 8 || nationalId.length > 12) {
-        nationalIdError.value = 'الرقم الوطني يجب أن يكون بين 8 و12 رقماً';
-        hasRepresentativeErrors = true;
-      } else {
-        nationalIdError.value = '';
-      }
-
-      final companyName = companyNameController.text.trim();
-      if (companyName.isEmpty) {
-        companyNameError.value = 'يرجى إدخال اسم الشركة';
-        hasCompanyErrors = true;
-      } else if (companyName.length <= 2) {
-        companyNameError.value = 'اسم الشركة يجب أن يكون أكثر من حرفين';
-        hasCompanyErrors = true;
-      } else if (!FormValidator.isArabicName(companyName)) {
-        companyNameError.value = 'اسم الشركة يجب أن يكون باللغة العربية حصراً';
-        hasCompanyErrors = true;
-      } else {
-        companyNameError.value = '';
-      }
-
-      final licenseNum = companyLicenseNumberController.text.trim();
-      if (licenseNum.isEmpty) {
-        companyLicenseNumberError.value = 'يرجى إدخال رقم ترخيص الشركة';
-        hasCompanyErrors = true;
-      } else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(licenseNum)) {
-        companyLicenseNumberError.value =
-            'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
-        hasCompanyErrors = true;
-      } else {
-        companyLicenseNumberError.value = '';
-      }
-
-      if (companyLicenseDate.value == null) {
-        companyLicenseDateError.value = 'يرجى اختيار تاريخ ترخيص الشركة';
-        hasCompanyErrors = true;
-      } else {
-        companyLicenseDateError.value = '';
-      }
-
-      if (hasRepresentativeErrors || hasCompanyErrors) {
-        errorMessage.value = 'يرجى إدخال البيانات الشخصية والشركة المطلوبة';
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToFirstError();
-        });
-        return false;
-      }
-    }
-    return true;
-  }
-
-  void clearStep2FieldErrors() {
-    firstNameError.value = '';
-    fatherNameError.value = '';
-    motherNameError.value = '';
-    nicknameError.value = '';
-    nationalIdError.value = '';
-    birthPlaceError.value = '';
-    birthDateError.value = '';
-    settlementPreviousLicenseError.value = '';
-    settlementAgreementError.value = '';
-    companyNameError.value = '';
-    companyLicenseNumberError.value = '';
-    companyLicenseDateError.value = '';
-  }
-
-  void scrollToField(GlobalKey key) {
-    final ctx = key.currentContext;
-    if (ctx == null) return;
-
-    // Try the standard ensureVisible first. If it fails or has no effect,
-    // fall back to computing an offset and animating the step2 scroll controller.
-    try {
-      Scrollable.ensureVisible(
-        ctx,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        alignment: 0.15,
-      );
-      return;
-    } catch (_) {}
-
-    // Fallback: compute widget position relative to the viewport and animate.
-    final renderBox = ctx.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-    final widgetOffset = renderBox.localToGlobal(Offset.zero).dy;
-
-    double scrollTop = 0.0;
-    try {
-      final scrollableRenderBox =
-          Scrollable.of(ctx).context.findRenderObject() as RenderBox?;
-      if (scrollableRenderBox != null) {
-        scrollTop = scrollableRenderBox.localToGlobal(Offset.zero).dy;
-      }
-    } catch (_) {}
-
-    final targetOffset =
-        step2ScrollController.offset + (widgetOffset - scrollTop) - 24.0;
-    final clamped = targetOffset < 0
-        ? 0.0
-        : (step2ScrollController.hasClients
-              ? targetOffset.clamp(
-                  0.0,
-                  step2ScrollController.position.maxScrollExtent,
-                )
-              : targetOffset);
-    if (step2ScrollController.hasClients) {
-      step2ScrollController.animateTo(
-        clamped,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void scrollToFirstError() {
-    if (firstNameError.value.isNotEmpty &&
-        firstNameFieldKey.currentContext != null) {
-      scrollToField(firstNameFieldKey);
-      return;
-    }
-    if (fatherNameError.value.isNotEmpty &&
-        fatherNameFieldKey.currentContext != null) {
-      scrollToField(fatherNameFieldKey);
-      return;
-    }
-    if (motherNameError.value.isNotEmpty &&
-        motherNameFieldKey.currentContext != null) {
-      scrollToField(motherNameFieldKey);
-      return;
-    }
-    if (nicknameError.value.isNotEmpty &&
-        nicknameFieldKey.currentContext != null) {
-      scrollToField(nicknameFieldKey);
-      return;
-    }
-    if (nationalIdError.value.isNotEmpty &&
-        nationalIdFieldKey.currentContext != null) {
-      scrollToField(nationalIdFieldKey);
-      return;
-    }
-    if (birthPlaceError.value.isNotEmpty &&
-        birthPlaceFieldKey.currentContext != null) {
-      scrollToField(birthPlaceFieldKey);
-      return;
-    }
-    if (birthDateError.value.isNotEmpty &&
-        birthDateFieldKey.currentContext != null) {
-      scrollToField(birthDateFieldKey);
-      return;
-    }
-    if (settlementPreviousLicenseError.value.isNotEmpty &&
-        previousLicenseNumberFieldKey.currentContext != null) {
-      scrollToField(previousLicenseNumberFieldKey);
-      return;
-    }
-    if (settlementAgreementError.value.isNotEmpty &&
-        settlementAgreementFieldKey.currentContext != null) {
-      scrollToField(settlementAgreementFieldKey);
-      return;
-    }
-    if (companyNameError.value.isNotEmpty &&
-        companyNameFieldKey.currentContext != null) {
-      scrollToField(companyNameFieldKey);
-      return;
-    }
-    if (companyLicenseNumberError.value.isNotEmpty &&
-        companyLicenseNumberFieldKey.currentContext != null) {
-      scrollToField(companyLicenseNumberFieldKey);
-      return;
-    }
-    if (companyLicenseDateError.value.isNotEmpty &&
-        companyLicenseDateFieldKey.currentContext != null) {
-      scrollToField(companyLicenseDateFieldKey);
-      return;
-    }
-  }
-
-  void validateStep2Field(String fieldName, String value) {
-    switch (fieldName) {
-      case 'firstName':
-        if (value.trim().isEmpty) {
-          firstNameError.value = 'يرجى إدخال الاسم الأول';
-        } else if (value.trim().length <= 2) {
-          firstNameError.value = 'الاسم يجب أن يكون أكثر من حرفين';
-        } else if (!FormValidator.isArabicName(value.trim())) {
-          firstNameError.value = 'الاسم يجب أن يكون باللغة العربية حصراً';
-        } else {
-          firstNameError.value = '';
-        }
-        if (firstNameError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'fatherName':
-        if (investorType.value == 'company') {
-          fatherNameError.value = '';
-          return;
-        }
-        if (value.trim().isEmpty) {
-          fatherNameError.value = 'يرجى إدخال اسم الأب';
-        } else if (value.trim().length <= 2) {
-          fatherNameError.value = 'اسم الأب يجب أن يكون أكثر من حرفين';
-        } else if (!FormValidator.isArabicName(value.trim())) {
-          fatherNameError.value = 'اسم الأب يجب أن يكون باللغة العربية حصراً';
-        } else {
-          fatherNameError.value = '';
-        }
-        if (fatherNameError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'motherName':
-        if (investorType.value == 'company') {
-          motherNameError.value = '';
-          return;
-        }
-        if (value.trim().isEmpty) {
-          motherNameError.value = 'يرجى إدخال اسم الأم';
-        } else if (value.trim().length <= 2) {
-          motherNameError.value = 'اسم الأم يجب أن يكون أكثر من حرفين';
-        } else if (!FormValidator.isArabicName(value.trim())) {
-          motherNameError.value = 'اسم الأم يجب أن يكون باللغة العربية حصراً';
-        } else {
-          motherNameError.value = '';
-        }
-        if (motherNameError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'nickname':
-        if (value.trim().isEmpty) {
-          nicknameError.value = 'يرجى إدخال الكنية';
-        } else if (value.trim().length <= 2) {
-          nicknameError.value = 'الكنية يجب أن تكون أكثر من حرفين';
-        } else if (!FormValidator.isArabicName(value.trim())) {
-          nicknameError.value = 'الكنية يجب أن تكون باللغة العربية حصراً';
-        } else {
-          nicknameError.value = '';
-        }
-        if (nicknameError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'nationalId':
-        if (value.trim().isEmpty) {
-          nationalIdError.value = 'يرجى إدخال الرقم الوطني';
-        } else if (!RegExp(r'^\d+$').hasMatch(value.trim())) {
-          nationalIdError.value = 'الرقم الوطني يجب أن يحتوي على أرقام فقط';
-        } else if (value.trim().length < 8 || value.trim().length > 12) {
-          nationalIdError.value = 'الرقم الوطني يجب أن يكون بين 8 و12 رقماً';
-        } else {
-          nationalIdError.value = '';
-        }
-        if (nationalIdError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'birthPlace':
-        if (investorType.value == 'company') {
-          birthPlaceError.value = '';
-          return;
-        }
-        if (value.trim().isEmpty) {
-          birthPlaceError.value = 'يرجى إدخال مكان الولادة';
-        } else if (value.trim().length <= 2) {
-          birthPlaceError.value = 'مكان الولادة يجب أن يكون أكثر من حرفين';
-        } else if (!FormValidator.isArabicName(value.trim())) {
-          birthPlaceError.value =
-              'مكان الولادة يجب أن يكون باللغة العربية حصراً';
-        } else {
-          birthPlaceError.value = '';
-        }
-        if (birthPlaceError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'birthDate':
-        if (investorType.value == 'company') {
-          birthDateError.value = '';
-          return;
-        }
-        if (birthDate.value == null) {
-          birthDateError.value = 'يرجى اختيار تاريخ الولادة';
-        } else {
-          final now = DateTime.now();
-          var age = now.year - birthDate.value!.year;
-          if (now.month < birthDate.value!.month ||
-              (now.month == birthDate.value!.month &&
-                  now.day < birthDate.value!.day)) {
-            age--;
-          }
-          birthDateError.value = age < 18
-              ? 'يجب أن لا يقل عمر مقدم الطلب عن 18 سنة'
-              : '';
-        }
-        if (birthDateError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'companyName':
-        if (value.trim().isEmpty) {
-          companyNameError.value = 'يرجى إدخال اسم الشركة';
-        } else if (value.trim().length <= 2) {
-          companyNameError.value = 'اسم الشركة يجب أن يكون أكثر من حرفين';
-        } else if (!FormValidator.isArabicName(value.trim())) {
-          companyNameError.value =
-              'اسم الشركة يجب أن يكون باللغة العربية حصراً';
-        } else {
-          companyNameError.value = '';
-        }
-        if (companyNameError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'companyLicenseNumber':
-        if (value.trim().isEmpty) {
-          companyLicenseNumberError.value = 'يرجى إدخال رقم ترخيص الشركة';
-        } else if (!RegExp(r'^[A-Za-z0-9]+$').hasMatch(value.trim())) {
-          companyLicenseNumberError.value =
-              'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام فقط.';
-        } else {
-          companyLicenseNumberError.value = '';
-        }
-        if (companyLicenseNumberError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'previousLicenseNumber':
-        if (value.trim().isEmpty) {
-          settlementPreviousLicenseError.value =
-              'يرجى إدخال رقم الترخيص السابق';
-        } else if (!RegExp(r'^[A-Za-z0-9-]+$').hasMatch(value.trim())) {
-          settlementPreviousLicenseError.value =
-              'غير مسموح بإدخال مسافات أو رموز أو أحرف عربية. الرجاء استخدام أحرف إنكليزية وأرقام وواصلة (-) فقط.';
-        } else {
-          settlementPreviousLicenseError.value = '';
-        }
-        if (settlementPreviousLicenseError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-      case 'companyLicenseDate':
-        if (companyLicenseDate.value == null) {
-          companyLicenseDateError.value = 'يرجى اختيار تاريخ ترخيص الشركة';
-        } else {
-          final now = DateTime.now();
-          final selectedDate = DateTime(
-            companyLicenseDate.value!.year,
-            companyLicenseDate.value!.month,
-            companyLicenseDate.value!.day,
-          );
-          final today = DateTime(now.year, now.month, now.day);
-          if (!selectedDate.isBefore(today)) {
-            companyLicenseDateError.value =
-                'يجب أن يكون التاريخ من أمس أو قبله';
-          } else {
-            companyLicenseDateError.value = '';
-          }
-        }
-        if (companyLicenseDateError.value.isNotEmpty) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            scrollToFirstError();
-          });
-        }
-        break;
-    }
-  }
-
-  void requestFocus(FocusNode nextFocus) {
-    FocusScope.of(Get.context!).requestFocus(nextFocus);
-  }
-
-  bool validateStep3() {
-    errorMessage.value = '';
-    final oldLocationValid =
-        oldSelectedGovernorate.value != null &&
-        oldSelectedDistrict.value != null &&
-        oldSelectedSubdistrict.value != null &&
-        oldSelectedTown.value != null &&
-        oldLatitudeController.text.isNotEmpty &&
-        oldLongitudeController.text.isNotEmpty;
-    if (requestType.value == 'settlement' &&
-        settlementRelocation.value &&
-        !oldLocationValid) {
-      errorMessage.value = 'يرجى إدخال بيانات الموقع القديم كاملة';
-      return false;
-    }
-    if (selectedGovernorate.value == null) {
-      errorMessage.value = 'يرجى اختيار المحافظة';
-      return false;
-    }
-    if (selectedDistrict.value == null) {
-      errorMessage.value = 'يرجى اختيار المنطقة';
-      return false;
-    }
-    if (selectedSubdistrict.value == null) {
-      errorMessage.value = 'يرجى اختيار الناحية';
-      return false;
-    }
-    if (selectedTown.value == null) {
-      errorMessage.value = 'يرجى اختيار البلدة';
-      return false;
-    }
-    if (latitudeController.text.isEmpty || longitudeController.text.isEmpty) {
-      errorMessage.value = 'يرجى تحديد موقع المحطة على الخريطة';
-      return false;
-    }
-    return true;
-  }
+  bool validateStep3() => super.validateStep3();
 
   List<AttachmentRequirement> getRequiredAttachments() {
     final isSettlement = requestType.value == 'settlement';
@@ -2236,7 +1476,7 @@ class LicenseApplicationController extends GetxController {
   }
 
   // ─── Lookups ─────────────────────────────────────────────────────
-  Map<String, dynamic> _buildOldLocationPayload() {
+  Map<String, dynamic> buildOldLocationPayload() {
     return {
       'governorate_id': oldSelectedGovernorate.value?.id,
       'district_id': oldSelectedDistrict.value?.id,
