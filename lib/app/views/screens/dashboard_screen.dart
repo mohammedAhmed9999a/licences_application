@@ -1,20 +1,16 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
 import '../../theme/app_theme.dart';
 import '../../controllers/dashboard_controller.dart';
 import '../../controllers/license_application_controller.dart';
-import '../../controllers/notifications_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../models/application_model.dart';
 import '../../models/license_detail_model.dart';
 import '../../routes/app_routes.dart';
 import '../widgets/common_widgets.dart';
-import 'license/license_application_screen.dart';
 import 'my_applications_screen.dart';
 import 'notifications_screen.dart';
 import 'profile_screen.dart';
@@ -633,8 +629,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           stat.label,
                           style: TextStyle(
                             fontFamily: 'Cairo',
-                            fontSize: 11.sp,
-                            color: textSecondary,
+                            fontSize: 12.sp,
+                            fontWeight: isDark
+                                ? FontWeight.w800
+                                : FontWeight.w700,
+                            color: stat.color,
                           ),
                         ),
                       ],
@@ -1193,18 +1192,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Color _statusColor(String status) {
     switch (status) {
-      case 'approved':
+      case 'approved' || 'APPROVED':
         return AppColors.success;
-      case 'rejected':
+      case 'rejected' || "REJECTED":
         return AppColors.error;
-      case 'pending':
-        return AppColors.warning;
-      case 'additional_info_required':
+      case 'pending' || 'PENDING':
+        return AppColors.info;
+      case 'additional_info_required' || 'ADDITIONAL_INFO_REQUIRED':
         return AppColors.warning;
       case 'completed':
         return AppColors.statusCompleted;
-      case 'under_committee_review':
-        return AppColors.info;
+      case 'under_committee_review' || 'UNDER_COMMITTEE_REVIEW':
+        return Color(0xFF7E22CE);
       case 'cancelled':
         return AppColors.statusCancelled;
       default:
